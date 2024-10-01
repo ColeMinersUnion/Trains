@@ -5,7 +5,7 @@ class Graph:
         self.graph = []
 
     def addNode(self, n : Node):
-        self.graph[n.index] = n
+        self.graph.insert(n.index - 1, n)
 
     
     def findPaths(self, starting: Node, ending: Node):
