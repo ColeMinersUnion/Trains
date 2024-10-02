@@ -49,29 +49,22 @@ class Graph:
             return False
         
         if(dir == 1):
-            for i in range(1, len(section) -1):
+            for i in range(0, len(section) -1):
                 block = self.graph[section[i].index - 1]
                 if section_label == block.section:
-                    block.pointsTo([i + 1])
-                else:
-                    continue
+                    block.pointsTo([block.index + 1])
         elif(dir == -1):
-            for j in range(1, len(section) -1):
+            for j in range(len(section)):
                 block = self.graph[section[j].index - 1]
                 if section_label == block.section:
-                    block.pointsTo([i - 1])
-                else:
-                    continue
+                    block.pointsTo([block.index - 1])
         elif(dir == 0):
-            for j in range(1, len(section) -1):
-                block = self.graph[section[j].index - 1]
+            for k in range(1, len(section)):
+                block = self.graph[section[k].index - 1]
                 if section_label == block.section:
-                    block.pointsTo([i - 1, i + 1])
-                else:
-                    continue
+                    block.pointsTo([block.index - 1, block.index + 1])
         else:
             return False
-            
         return True
 
 
