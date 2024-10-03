@@ -15,6 +15,7 @@ authority = 200
 speed_max=70
 commanded_speed=0
 commanded_authority=0
+num_blocks_a=10
 #if speed is safe, push it through to track model
 if speed <= speed_max:
     commanded_speed=speed
@@ -26,7 +27,7 @@ else: #if not safe, override it and change to zero
 #we want to check their occupancy so for every 3.6 seconds the train should be moving to the next block
 next=0
 time=0
-while next<num_blocks:
+while next<num_blocks_a:
     if next == 0:
         print(blocks)
         blocks[next]=not(blocks[next])
