@@ -59,7 +59,8 @@ class Graph:
                 if section_label == block.section:
                     block.pointsTo([block.index - 1])
         elif(dir == 0):
-            for k in range(1, len(section)):
+            for k in range(1, len(section)
+                           ):
                 block = self.graph[section[k].index - 1]
                 if section_label == block.section:
                     block.pointsTo([block.index - 1, block.index + 1])
