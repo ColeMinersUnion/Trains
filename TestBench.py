@@ -1,8 +1,17 @@
-blocks = [False] * 15
-print(blocks)
+class Train:
+    command_speed = 0
+    command_authority = 0
+    
 
-block_to_change = int(input("Input block to change: "))
 
-blocks[block_to_change - 1] = not(blocks[block_to_change - 1])
+    
 
-print(blocks)
+class BlueLineTrack:
+    blocks = {}
+    
+    def __init__(self):
+        for i in range(1, 16):
+            self.blocks[i] = False
+    
+    
+    
