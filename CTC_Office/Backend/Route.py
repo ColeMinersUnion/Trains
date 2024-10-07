@@ -1,6 +1,7 @@
 #Used for storing route information
 from Node import Node
 from Graph import Graph
+from datetime import datetime, timedelta
 
 class Route:
     def __init__(self, start : int, end : int, line : Graph):
@@ -20,8 +21,6 @@ class Route:
                 print(str(block))
             print('---\n\n')
         """
-        
-
         
         if(len(routes) == 0):
             raise Exception("Unable to find route")
@@ -72,7 +71,35 @@ class Route:
         myStr += '\n---\n'
         return myStr
 
+
+    def suggestedSpeed(self, start : datetime, end: datetime, route_index : int) -> tuple:
+        #! For a given route, find the speed for the train to go through across a given route
+        rt = self.paths[route_index] 
+        FastestTime = 0
+
+        for block in rt:
+            #* k = 3.6 for conversion sake
+            b = self.line.graph[block]
+            FastestTime += 3.6 * b.block_length / b.speed_limit
+            #! Seconds = Meters / (Km/Hr)
+
+        #Could also do this in hours and adjusting the thingy ma bob
+        Fast = timedelta(seconds=FastestTime)
+        delta = end - start
+        if(Fast < delta):
+            return False, 1 #! Is that timing possible?, Value to scale speed limits by. 
+        else:
+            return True, delta.total_seconds()/Fast.total_seconds()
+
+    
+    def authority(self, route_index: int) -> float:
+        rt = self.paths[route_index] 
+        distance = 0
+        for block in rt:
+            distance += self.line.graph[block].block_length
+        return distance
         
+    #TODO make a function that takes a speed% to find the time of arrival along a route
         
 if(__name__ == '__main__'):
     from GetBlue import Blue
