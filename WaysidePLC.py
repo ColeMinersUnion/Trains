@@ -22,11 +22,24 @@ class SwitchQueue:
     
 class BluePLC:
     def __init__(self):
+        #stores the occupancy of each block
         self.occupancy = [False  for i in range(17)]
-        self.next_authority = [False for i in range(17)]
+
+        #stores the boolean authority of each block, false values are based on the "zones" that only one train can occupy at a time
+        self.next_authority = [True for i in range(17)]
+        self.next_authority[0] = False
+        self.next_authority[5] = False
+        self.next_authority[11] = False
+        self.next_authority[16] = False
+
+        #stores the previous occupancy of each block, used in track error detection
         self.previous_occupancy = [False for i in range(17)]
         self.block_error = [False for i in range(17)]
+
+        #stores the switch commands for switch 5
         self.switch_5_queue = SwitchQueue()
+
+        #track state variables
         self.switch_5 = False
         self.signal_6 = False
         self.signal_12 = False
@@ -55,7 +68,7 @@ class BluePLC:
         if self.occupancy[12] == True and self.previous_occupancy[5] == False and self.previous_occupancy[5] == False:
             self.block_error[12] = True
 
-        #resets error state if track error is fix
+        #resets error state if track error is fixed
         for i in range(17):
             if self.block_error[i] == True and self.occupancy[i] == False:
                 self.block_error[i] = False
@@ -110,117 +123,22 @@ class BluePLC:
     
     def update_authority(self):
         #determines if each occupied block has the authority to move to the next block, this is layout dependent so it is hardcoded
-        if self.occupancy[0] == True:
-            if any(self.occupancy[1:4]) == True:
-                self.next_authority[0] = False
-            else:
-                self.next_authority[0] = True
 
-        if self.occupancy[1] == True:
-            if any(self.occupancy[2:5]) == True:
-                self.next_authority[1] = False
-            else:
-                self.next_authority[1] = True
+        #resets the zone border blocks to false so that only one train can occupy a zone at a time
+        self.next_authority[0] = False
+        if all(self.occupancy[1:6] == False):
+            self.next_authority[1] = True
+                
+        self.next_authority[5] = False
+        if all(self.occupancy[6:12] == False) and self.switch_5 == True:
+            self.next_authority[5] = True
 
-        if self.occupancy[2] == True:
-            if any(self.occupancy[3:6]) == True:
-                self.next_authority[2] = False
-            else:
-                self.next_authority[2] = True
-
-        if self.occupancy[3] == True:
-            if any(self.occupancy[4:6]) == True:
-                self.next_authority[3] = False
-            else:
-                self.next_authority[3] = True
+        if all(self.occupancy[12:17] == False) and self.switch_5 == False:
+            self.next_authority[5] = True
             
-            if self.switch_5 == False and self.occupancy[12] == True:
-                self.next_authority[3] = False
-            
-            if self.switch_5 == True and self.occupancy[6] == True:
-                self.next_authority[3] = False
-        
-        if self.occupancy[4] == True:
-            if self.occupancy[5] == True:
-                self.next_authority[4] = False
-            else:
-                self.next_authority[4] = True
-            
-            if self.switch_5 == False and any(self.occupancy[12:14]) == True:
-                self.next_authority[4] = False
+        self.next_authority[11] = False
+        self.next_authority[16] = False
 
-            if self.switch_5 == True and any(self.occupancy[6:8]) == True:
-                self.next_authority[4] = False
-        
-        if self.occupancy[5] == True:
-            if self.switch_5 == False and any(self.occupancy[12:15]) == True:
-                self.next_authority[5] = False
-
-            if self.switch_5 == True and any(self.occupancy[6:9]) == True:
-                self.next_authority[5] = False
-            else:
-                self.next_authority[5] = True
-        
-        if self.occupancy[6] == True:
-            if any(self.occupancy[7:10]) == True:
-                self.next_authority[6] = False
-            else:
-                self.next_authority[6] = True
-        
-        if self.occupancy[7] == True:
-            if any(self.occupancy[8:11]) == True:
-                self.next_authority[7] = False
-            else:
-                self.next_authority[7] = True
-
-        if self.occupancy[8] == True:
-            if any(self.occupancy[9:12]) == True:
-                self.next_authority[8] = False
-            else:
-                self.next_authority[8] = True
-        
-        if self.occupancy[9] == True:
-            if any(self.occupancy[10:12]) == True:
-                self.next_authority[9] = False
-            else:
-                self.next_authority[9] = True
-        
-        if self.occupancy[10] == True:
-            if self.occupancy[11] == True:
-                self.next_authority[10] = False
-            else:
-                self.next_authority[10] = True
-        
-        if self.occupancy[11] == True:
-            self.next_authority[11] = True
-
-
-        if self.occupancy[12] == True:
-            if any(self.occupancy[13:16]) == True:
-                self.next_authority[12] = False
-            else:
-                self.next_authority[12] = True
-        
-        if self.occupancy[13] == True:
-            if any(self.occupancy[14:17]) == True:
-                self.next_authority[13] = False
-            else:
-                self.next_authority[13] = True
-        
-        if self.occupancy[14] == True:
-            if any(self.occupancy[15:17]) == True:
-                self.next_authority[14] = False
-            else:
-                self.next_authority[14] = True
-        
-        if self.occupancy[15] == True:
-            if self.occupancy[16] == True:
-                self.next_authority[15] = False
-            else:
-                self.next_authority[15] = True
-        
-        if self.occupancy[16] == True:
-            self.next_authority[16] = True
 
                 
     def update_track(self, new_blocks):
