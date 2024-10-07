@@ -1,44 +1,94 @@
-blocks = [False] * 15
-num_blocks = len(blocks)
-#print(blocks)
 
-#block_to_change = int(input("Input block to change: "))
+from WaysidePLC import BluePLC
 
-#blocks[block_to_change - 1] = not(blocks[block_to_change - 1])
+# class Train:
+#     train_id = 0
+#     def __init__(self, speed, authority, plc):
+#         Train.train_id += 1
+#         self.id = Train.train_id
+#         self.speed = speed
+#         self.authority = authority
+#         self.current_block = 0
+#         self.plc = plc
 
-#print(blocks)
 
-#simulating a train: 
-#first check if speed is safe (max speed of train: 70)
-speed = 50
-authority = 200
-speed_max=70
-commanded_speed=0
-commanded_authority=0
-num_blocks_a=10
-#if speed is safe, push it through to track model
-if speed <= speed_max:
-    commanded_speed=speed
-    commanded_authority=authority
-else: #if not safe, override it and change to zero
-    speed=commanded_speed
-    commanded_authority=authority  #either way authority passes through to the track
-#for each block (15 in total, 1-10 for wayside a, 1-5 & 11-15 for wayside b)
-#we want to check their occupancy so for every 3.6 seconds the train should be moving to the next block
-next=0
-time=0
-while next<num_blocks_a:
-    if next == 0:
-        print(blocks)
-        blocks[next]=not(blocks[next])
-        next = next + 1
-        time = time + 3.6
-    else:
-        print(blocks)
-        blocks[next]=not(blocks[next])
-        blocks[next-1]=not(blocks[next])
-        next = next + 1
-        time = time + 3.6
-print("Time taken to traverse Wayside A: " + str(time) + " seconds")
-print("Commanded speed to be sent to track model: " + str(commanded_speed))
-print("Commanded authority to be sent to the track model: " + str(commanded_authority))
+#     def move(self):
+#         if(self.plc.next_authority[self.current_block] == True):
+#             self.current_block += 1
+#             print("Train", self.id, " has moved to block ", self.current_block)
+
+def print_PLC(plc):
+
+    print("Occupancy: ")
+    for i in range(17):
+        print(i, ":", plc.occupancy[i], end = " | ")
+    print("\n")
+
+    print("Next Authority: ")
+    for i in range(17):
+        if plc.occupancy[i] == True:
+            print(i, ":", plc.next_authority[i], end = " ")
+    print("\n")
+
+    
+    print("Block Error: ")
+    for i in range(17):
+        if plc.block_error[i] == True:
+            print(i, ":", plc.block_error[i], end = " ")
+    print("\n")
+
+    print("Switch 5: ", plc.switch_5)
+    print("Signal 6: ", plc.signal_6)
+    print("Signal 12: ", plc.signal_12)
+    print("Crossing 3: ", plc.crossing_3)
+ 
+
+def main():
+    #Main TestBench Flow
+    plc = BluePLC()
+    tm_occupancy = [False for i in range(17)]
+    trains = []
+    print_PLC(plc)
+    while True:
+        if plc.occupancy[0] == False and plc.occupancy[1] == False and plc.occupancy[2] == False:
+            print("Dispatch Train? (y/n)")
+
+            if input() == "y":
+                switch = input("Enter switch (False/True): ")
+                if switch == "False":
+                    plc.dispatch(False)
+                elif switch == "True":
+                    plc.dispatch(True)
+    
+                tm_occupancy[0] = True
+                plc.update_track(tm_occupancy)
+                trains.append(0)
+            print_PLC(plc)    
+        else:
+            print("Cannot dispatch train")
+        
+        for i in range(len(trains)):
+            if plc.next_authority[trains[i]] == True:
+                tm_occupancy[trains[i]] = False
+                tm_occupancy[trains[i] + 1] = True
+                if trains[i] == 5 and plc.switch_5 == False:
+                    print("Train at block", trains[i], " has moved to block ", 12)
+                    trains[i] = 12
+                else:
+                    print("Train at block", trains[i], " has moved to block ", trains[i] + 1)
+                    trains[i] += 1
+                
+        
+        plc.update_track(tm_occupancy)
+        print_PLC(plc)
+        print("Continue? (y/n)")
+        if input() == "n":
+            break
+
+
+if __name__ == "__main__":
+    main()
+
+
+
+            
