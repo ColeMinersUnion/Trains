@@ -29,6 +29,10 @@ def Blue():
     #! All blocks made. 
     return BlueLine
 
+if(__name__ == '__main__'):
+    blue = Blue()
+    for i in blue.graph:
+        print(str(i)) 
 
 
 

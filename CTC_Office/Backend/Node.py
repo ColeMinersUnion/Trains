@@ -11,6 +11,7 @@ class Node: #Also known as a track block
         self.elevation = elevation
         self.cumaltive_elevation = cumulative_elevation
 
+    """
     def __init__(self, blockDictionary : dict = {}):
         print("Dict Constructor")
         self.section = blockDictionary["Section"]
@@ -22,7 +23,7 @@ class Node: #Also known as a track block
         self.elevation = blockDictionary["ELEVATION (M)"]
         self.cumaltive_elevation = blockDictionary["CUMALTIVE ELEVATION (M)"]
         self.connections = []
-        
+    """ 
 
     
     def __str__(self) -> str:
