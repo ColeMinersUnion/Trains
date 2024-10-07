@@ -1,3 +1,5 @@
+
+
 blocks = [False] * 15
 num_blocks = len(blocks)
 #print(blocks)
@@ -42,3 +44,13 @@ while next<num_blocks_a:
 print("Time taken to traverse Wayside A: " + str(time) + " seconds")
 print("Commanded speed to be sent to track model: " + str(commanded_speed))
 print("Commanded authority to be sent to the track model: " + str(commanded_authority))
+
+from WaysidePLC import *
+
+#acting as CTC
+def testingDispatch():
+    suggested_speed= int(input("Input suggested speed: " ))
+    suggested_auth= int(input("Input suggested authority: "))
+    suggested_switch= bool(input("Input suggested switch change (true or false): "))
+
+    
