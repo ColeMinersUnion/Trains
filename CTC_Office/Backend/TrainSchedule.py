@@ -51,7 +51,11 @@ class TrainSchedule:
             for i in range(len(self.stops) - 1):
                 nextStop = self.stops[i+1]
                 newRoute = Route(oldStop, nextStop, self.line)
-                newRoute.findRoute()
+                try:
+                    newRoute.findRoute()
+                except:
+                    print(f'Route {i} was unable to be made')
+                    return
                 self.routes.append(newRoute)
                 oldStop = nextStop
             return
@@ -59,7 +63,7 @@ class TrainSchedule:
 
 if(__name__ == '__main__'):
     from GetBlue import Blue
-    blue = Blue()
+    blue = Blue(broken=False)
     Thomas = TrainSchedule(blue)
     Thomas.addStop("Station C")
     Thomas.makeRoutes()

@@ -13,16 +13,18 @@ class Route:
         print(len(self.line.graph))
         self.findPaths(self.line.graph[self.start], self.line.graph[self.end])
         routes = list(self.paths)
+        """
         for i, r in enumerate(routes):
             print(f'Route: {i}')
             for block in r:
                 print(str(block))
             print('---\n\n')
+        """
         
 
         
         if(len(routes) == 0):
-            raise Exception("Error in track config. Non circular track.")
+            raise Exception("Unable to find route")
         elif(len(routes) == 1):
             self.paths = routes[0]
             return routes[0]
@@ -50,7 +52,10 @@ class Route:
             return #* End this train (hehe) of thought
         oldCurrentPath = sorted(list(currentPath))
         for i in starting.connections: #! Going through each of the connections to the
-            currentPath.add(i)
+            if(not self.line.graph[i].closed):
+                currentPath.add(i) 
+            else:
+                continue #! That path is closed, unable to path over it.
             #print(f'{starting.connections}: {list(oldCurrentPath)}')
             if oldCurrentPath == sorted(list(currentPath)):
                 #print("oops")
@@ -71,9 +76,12 @@ class Route:
         
 if(__name__ == '__main__'):
     from GetBlue import Blue
-    blue = Blue()
+    blue = Blue(broken=True)
     print(len(blue.graph))
-    ToStationB = Route(0, 16, blue)
-    route = ToStationB.findRoute()
-    print(str(route))
+    ToStationB = Route(0, 11, blue)
+    try:
+        route = ToStationB.findRoute()
+        print(str(route))
+    except:
+        print("The route is unable to be completed")
 

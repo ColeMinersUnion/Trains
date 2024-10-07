@@ -10,6 +10,7 @@ class Node: #Also known as a track block
         self.speed_limit = speed_limit
         self.elevation = elevation
         self.cumaltive_elevation = cumulative_elevation
+        self.closed = False
 
     """
     def __init__(self, blockDictionary : dict = {}):
