@@ -27,10 +27,14 @@ class Node: #Also known as a track block
     """ 
 
     
-    def __str__(self) -> str:
+    def testStr(self) -> str:
         return f"Block #{self.index} is a {self.infrastructure}. It is part of section {self.section}, it is {self.block_length} meters long with a {self.block_grade}% grade. " \
         f"The elevation is {self.elevation} with cum. elevation {self.cumaltive_elevation} and a speed limit of {self.speed_limit}"
-    
+
+    def __str__(self) -> str:
+        return f'Block #{self.index}'
+
+
     def pointsTo(self, blocks : list = []):
         self.connections.extend(blocks)
     
