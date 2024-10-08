@@ -48,6 +48,9 @@ class BluePLC:
     def dispatch(self, new_route):
         self.switch_5_queue.enqueue(new_route)
 
+    def say_hi():
+        print("PLC Uploaded Successfully")
+
     def block_error_check(self):
         #checks every new occupancy to see if a previous block was occupied, if not, track error is detected
         for i in range(1, 6):
@@ -126,14 +129,14 @@ class BluePLC:
 
         #resets the zone border blocks to false so that only one train can occupy a zone at a time
         self.next_authority[0] = False
-        if all(self.occupancy[1:6] == False):
-            self.next_authority[1] = True
+        if all(i == False for i in self.occupancy[1:6]):
+            self.next_authority[0] = True
                 
         self.next_authority[5] = False
-        if all(self.occupancy[6:12] == False) and self.switch_5 == True:
+        if all(i == False for i in self.occupancy[6:12]) and self.switch_5 == True:
             self.next_authority[5] = True
 
-        if all(self.occupancy[12:17] == False) and self.switch_5 == False:
+        if all(i == False for i in self.occupancy[12:17]) and self.switch_5 == False:
             self.next_authority[5] = True
             
         self.next_authority[11] = False
@@ -144,7 +147,6 @@ class BluePLC:
     def update_track(self, new_blocks):
         self.previous_occupancy = self.occupancy
         self.occupancy = copy.deepcopy(new_blocks)
-        self.next_authority = [False for i in range(17)]
         self.block_error_check()
         self.update_crossing()
         self.update_switch()
