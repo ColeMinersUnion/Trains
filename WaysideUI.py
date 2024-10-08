@@ -14,6 +14,44 @@ class MainWindow(QMainWindow):
 
         self.setFixedSize(QSize(800,600)) #fixed size of window
 
+        layout=QGridLayout()
+        
+        #this widget will be the console/table of speed/authority/block numbers:
+        #layout.addWidget(Color('white'))
+        #for table:
+        self.table=QTableWidget()
+        self.setCentralWidget(self.table)
+        self.table.setColumnCount(7)
+        self.table.setRowCount(16)
+        self.table.setHorizontalHeaderLabels(['Selection','Block number','Speed','Authority','Switch','Signal','Crossing'])
+        #self.table.setFixedSize(QSize(531,400))
+        layout.addWidget(self.table)
+
+        widget = QWidget()
+        widget.setLayout(layout)
+        self.setCentralWidget(widget)
+
+        manualModeButton=QPushButton("Manual Mode")
+        layout.addWidget(manualModeButton)
+        manualModeButton.setFixedSize(QSize(171,51))
+        #action when manual mode button is clicked:
+        #manual_mode_button.clicked.connect(self.manual_mode_clicked)
+
+        plcButton=QPushButton("PLC Upload")
+        layout.addWidget(plcButton)
+        plcButton.setFixedSize(QSize(171,51))
+        #action when plc button is clicked:
+
+        #dropdown for waysides
+        otherWaysides=QComboBox()
+        otherWaysides.addItems(['Wayside A', 'Wayside B'])
+        layout.addWidget(otherWaysides)
+        otherWaysides.setFixedSize(QSize(171,20))
+        #call on separate function for action
+        
+        
+'''
+        #probably no longer need toolbar but just in case:
         #toolbar to switch between sections, switches, crossings and have a wayside home button
         toolbar=QToolBar("Wayside Toolbar")
         toolbar.setIconSize(QSize(16, 16))
@@ -40,37 +78,8 @@ class MainWindow(QMainWindow):
         toolbar.addAction(crossings)
 
         self.setStatusBar(QStatusBar(self))
+'''
 
-
-        layout=QVBoxLayout()
-        #this widget will be the console/table of speed/authority/block numbers:
-        layout.addWidget(Color('white'))
-        #for table:
-        
-        
-        manual_mode_button=QPushButton("Enter Maintenance Mode")
-        layout.addWidget(manual_mode_button)
-        #action when manual mode button is clicked:
-        #manual_mode_button.clicked.connect(self.manual_mode_clicked)
-
-        plc_button=QPushButton("PLC Upload")
-        layout.addWidget(plc_button)
-        #action when 
-        
-        widget = QWidget()
-        widget.setLayout(layout)
-        self.setCentralWidget(widget)
-
-        #updating table function here:
-        #def table (self, index, role):
-            #if role==Qt.ItemDataRole.DisplayRole:
-
-            #return self._data[index.row()][index.column()]
-        #def rowCount(self, index):
-            #length of outer list
-            #return len(self._data)
-        #def colCount(self, index):
-            #return len(self._data[0])
         #def manual_mode_clicked():
             #link to manual mode window
         #def view_sections_clicked():
