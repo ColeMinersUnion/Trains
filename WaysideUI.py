@@ -1,8 +1,11 @@
 import sys
-from PyQt6 import *
-from PyQt6.QtWidgets import *
-from PyQt6.QtGui import *
-from PyQt6.QtCore import *
+from PyQt5 import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
+
+#from WaysideShell import *
+#from WaysidePLC import *
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -39,16 +42,20 @@ class MainWindow(QMainWindow):
         self.setStatusBar(QStatusBar(self))
 
 
-        layout=QHBoxLayout()
+        layout=QVBoxLayout()
         #this widget will be the console/table of speed/authority/block numbers:
         layout.addWidget(Color('white'))
         #for table:
-        #self.table = QtWidgets.QTableView()
         
-        maintenance_mode_button=QPushButton("Enter Maintenance Mode")
-        layout.addWidget(maintenance_mode_button)
-        #action when maintenance mode button is clicked:
-        #maintenance_mode_button.clicked.connect(self.maintenance_mode_clicked)
+        
+        manual_mode_button=QPushButton("Enter Maintenance Mode")
+        layout.addWidget(manual_mode_button)
+        #action when manual mode button is clicked:
+        #manual_mode_button.clicked.connect(self.manual_mode_clicked)
+
+        plc_button=QPushButton("PLC Upload")
+        layout.addWidget(plc_button)
+        #action when 
         
         widget = QWidget()
         widget.setLayout(layout)
@@ -64,14 +71,14 @@ class MainWindow(QMainWindow):
             #return len(self._data)
         #def colCount(self, index):
             #return len(self._data[0])
-        #def maintenance_mode_clicked():
-            #link to maintenance mode window
+        #def manual_mode_clicked():
+            #link to manual mode window
         #def view_sections_clicked():
-            #link to block sections window
+            #change table
         #def signals_clicked():
-            #link to signals window
+            #change table
         #def crossings_clicked():
-            #link to crossings window
+            #change table
 
 class Color(QWidget):
     def __init__(self, color):
