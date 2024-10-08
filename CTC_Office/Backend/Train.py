@@ -1,11 +1,11 @@
 #Used as the iterator along a route
 from TrainSchedule import TrainSchedule
 from Node import Node
-from Route import Route
 from Graph import Graph
 import time # I think I need this for the delays going between blocks
 
 class Train:
+
     def __init__(self, schedule: TrainSchedule, line: Graph = None, id: int = 0, location: Node = None) -> None:
         self.id = id #* ID#
         self.location = location #* Node
