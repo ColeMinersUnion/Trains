@@ -24,6 +24,7 @@ class Train:
         if(self.location == self.schedule.routes[self.curr_route].end):
             if(self.curr_route + 1 < len(self.schedule.routes)):
                 self.curr_route += 1
+                self.Next_Stop = self.schedule.stations[self.curr_route + 1]
             else:
                 return False #!Poof train should disappear
         else:
