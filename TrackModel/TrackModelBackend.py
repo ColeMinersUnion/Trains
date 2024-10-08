@@ -1,10 +1,19 @@
 import pandas as pd #reading the excel file
 from enum import Enum
-Failure = Enum('Failure',['Rail','Circuit','Power'])
+from math import atan2,pi,sqrt
+class Failure(Enum):
+    No=0
+    Rail=1
+    Circuit=2
+    Power=3
 
 linenames=[]
-lines=[]
+lines=[] 
+switchid=[] #track switch numbers for pinging
+crossingid=[] #track crossing numbers for pinging
+crossingid=[]
 CLOCK_TIME = 1/60
+failmode = 0
 
 class Block:
     #instantiation
@@ -23,13 +32,28 @@ class Block:
         self.x2=x2
         self.y2=y2
         self.circuit = False
-        self.heater = False
         self.prev = number-1 #will change with crossing instantiation
         self.next = number+1 #will change with crossing instantiation
+        self.center = [(x1+x2)/2,(y1+y2)/2] #center for front end
+        self.mag = sqrt(((x2-x1)*(x2-x1))+((y2-y1)*(y2-y1))) #magnitude for front end
+        self.angle = atan2((y2-y1),(x2-x1))*180/pi #angle for front end
+        if(self.angle<0):
+            self.angle = self.angle+360
+        r = linenames[linenum] + " Line"
+        r = r + "\nSection " + section
+        r = r + "\nBlock " + str(number)
+        r = r + "\n" + str(round(length*3.28084)) + " feet long\n"
+        r = r + str(grade) + "% grade\n"
+        r = r + str(round(speed*0.621371)) + " mph speed limit\n"
+        r = r + "Elevation of " + str(round(elevation*3.28084)) + " feet"
+        r = r + "\nBidirectional: " + str(twoway)
+        r = r + "\nUnderground: " + str(underground) 
+        r = r + "\nOccupied: "
+        self.msg = r 
+        self.failure=0    
 
-    def center(self):
-        return [(self.x1+self.x2)/2,(self.y1+self.y2)/2]
-
+    def toString(self):
+        return self.msg + str(self.circuit)
 class Switch:
 #note, structuring switch depends on section, include that?)
     #instantiation
@@ -37,11 +61,13 @@ class Switch:
     def __init__(self,linenum,blocks):
         self.linenum = linenum
         self.blocks = blocks
-        self.lights = [True, False] #the first block is the central
+        self.switchid = switchid[linenum]
+        switchid[linenum] = switchid[linenum]+1
+        self.leftside=True #the first block is the central
         self.updateEnds()
 
     def updateEnds(self):
-        if(self.lights[1]==True): #connect 0 to 1
+        if(self.leftside): #connect 0 to 1
             lines[self.linenum].blocks[self.blocks[0]].next = self.blocks[1]
             lines[self.linenum].blocks[self.blocks[1]].prev = self.blocks[0]
             lines[self.linenum].blocks[self.blocks[2]].prev = None
@@ -64,48 +90,57 @@ class Switch:
     
     #switch the switch
     def switch(self):
-        self.lights[0] = not self.lights[0]
-        self.lights[1] = not self.lights[1]
+        self.leftside = not self.leftside
         self.updateEnds()
 
-    #stop a specific direction
-    def stop(self,stopblock):
-        for i in [1,2]:
-            if (self.blocks[i]==stopblock and self.lights[i]==True):
-                self.switch()
-                break
-        self.updateEnds()
+    #get the open block
+    def getopen(self):
+        if(self.leftside):
+            return self.blocks[1]
+        else:
+            return self.blocks[2]
 
-    #make a specific direction have green
-    def go(self,goblock):
-        for i in [1,2]:
-            if (self.blocks[i]==goblock and self.lights[i]==False):
-                self.switch()
-                break
-        self.updateEnds()
+    #get the closed block
+    def getclosed(self):
+        if(self.leftside):
+            return self.blocks[2]
+        else:
+            return self.blocks[1]
 class Crossing:
     #instantiation
     def __init__(self,linenum,block):
         self.linenum = linenum
         self.block = block
-        self.on = True
+        self.on = False
+        self.crossingid = crossingid[linenum]
+        crossingid[linenum] = crossingid[linenum]+1
+        self.msg = "Crossing (" + linenames[linenum] + " Line, Block " + str(block) + ")\n Closed: "
+    def toString(self):
+        return self.msg + str(self.on)
 
     #change state of crossing
     def switch(self):
         on = not on
 class Transponder:
     #instantiation
-    def __init__(self,linenum,block):
+    def __init__(self,linenum,block,data):
         self.linenum = linenum
         self.block = block 
-        self.data = ""
-class Station:
+        self.data = data
+        self.msg = "Beacon (" + linenames[linenum] + " Line, Block " + str(block) + ")\n" + data
+class Station: #yard also
     #instantiation
     def __init__(self,linenum,block,name,side):
         self.linenum = linenum
         self.block = block
         self.name = name
         self.side = side
+        self.msg = ""
+        if(name=="YARD"):  
+            self.msg = "YARD"
+        else:
+            self.msg = "Station " + str(name) + "\nSide " + str(side) + "\n" + linenames[linenum] + " Line, Block " + str(block)
+
 class Train:
     def __init__(self,linenum,block1,length):
         self.linenum = linenum
@@ -133,7 +168,7 @@ class Train:
             if (x.block==block):
                 return x.data
         return ""
-    
+
 class Line:
     def __init__(self,linenum):
         self.linenum = linenum
@@ -142,6 +177,7 @@ class Line:
         self.crossings = []
         self.transponders = []
         self.stations = []
+
 
 
     def getSwitch(self,block):
@@ -173,7 +209,7 @@ def readX(string): #return cross marks
 def read(file):
     data=pd.read_excel(file,engine='openpyxl')       
     tempswitch=[] #instantiate switches last to make sure everything is there
-    i=2 #for loop doesnt work idk why
+    i=1 #for loop doesnt work idk why
     while(i<len(data.index)): #go through all blocks/rows
         linename=data.iat[i,0] #get first line
         linenum=len(linenames)
@@ -184,6 +220,8 @@ def read(file):
             lines.append(Line(linenum))
         while len(lines[linenum].blocks) <= data.iat[i,2]:
             lines[linenum].blocks.append(None) #add values to list to fit block
+            crossingid.append(0)
+            switchid.append(0)
         lines[linenum].blocks[data.iat[i,2]]=Block(linenum,
                                                 data.iat[i,1], #section
                                                 data.iat[i,2], #block
@@ -199,9 +237,9 @@ def read(file):
                                                 data.iat[i,18]) #y2-coord
         if(not (pd.isnull(data.iat[i,9]) or pd.isnull(data.iat[i,10]))):
             tempswitch.append([linenum,data.iat[i,2],data.iat[i,9],data.iat[i,10]])
-        if(readX(data.iat[i,11])):
-            lines[linenum].transponders.append(Transponder(linenum,data.iat[i,2]))
-        if(data.iat[i,12]!=""):
+        if(not pd.isnull(data.iat[i,11])):
+            lines[linenum].transponders.append(Transponder(linenum,data.iat[i,2],data.iat[i,11]))
+        if(not pd.isnull(data.iat[i,12])):
             lines[linenum].stations.append(Station(linenum,data.iat[i,2],data.iat[i,12],data.iat[i,13]))
         if(readX(data.iat[i,14])):
             lines[linenum].crossings.append(Crossing(linenum,data.iat[i,2]))
