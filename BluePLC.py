@@ -26,11 +26,7 @@ class BluePLC:
         self.occupancy = [False  for i in range(17)]
 
         #stores the boolean authority of each block, false values are based on the "zones" that only one train can occupy at a time
-        self.next_authority = [True for i in range(17)]
-        self.next_authority[0] = False
-        self.next_authority[5] = False
-        self.next_authority[11] = False
-        self.next_authority[16] = False
+        self.next_authority = [False for i in range(17)]
 
         #stores the previous occupancy of each block, used in track error detection
         self.previous_occupancy = [False for i in range(17)]
@@ -127,18 +123,25 @@ class BluePLC:
     def update_authority(self):
         #determines if each occupied block has the authority to move to the next block, this is layout dependent so it is hardcoded
 
-        #resets the zone border blocks to false so that only one train can occupy a zone at a time
-        self.next_authority[0] = False
-        if all(i == False for i in self.occupancy[1:6]):
-            self.next_authority[0] = True
-                
-        self.next_authority[5] = False
+        #resets the authority to false initally
+        self.next_authority = [False for i in range(17)]    
+        for i in range(17):
+            if i < 6:
+                if all(i == False for i in self.occupancy[1:5]):
+                    self.next_authority[i] = True
+            elif i < 12:
+                if all(i == False for i in self.occupancy[6:12]):
+                    self.next_authority[i] = True
+            else:
+                if all(i == False for i in self.occupancy[12:17]):
+                    self.next_authority[i] = True
+        
         if all(i == False for i in self.occupancy[6:12]) and self.switch_5 == True:
             self.next_authority[5] = True
 
         if all(i == False for i in self.occupancy[12:17]) and self.switch_5 == False:
             self.next_authority[5] = True
-            
+
         self.next_authority[11] = False
         self.next_authority[16] = False
 
