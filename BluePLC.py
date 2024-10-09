@@ -31,7 +31,8 @@ class BluePLC:
         #stores the previous occupancy of each block, used in track error detection
         self.previous_occupancy = [False for i in range(17)]
         self.block_error = [False for i in range(17)]
-
+        self.maint_occ = [False for i in range(17)]
+        #self.zones = [False, False, False]
         #stores the switch commands for switch 5
         self.switch_5_queue = SwitchQueue()
 
@@ -44,7 +45,7 @@ class BluePLC:
     def dispatch(self, new_route):
         self.switch_5_queue.enqueue(new_route)
 
-    def say_hi():
+    def say_hi(self):
         print("PLC Uploaded Successfully")
 
     def block_error_check(self):
@@ -127,25 +128,43 @@ class BluePLC:
         self.next_authority = [False for i in range(17)]    
         for i in range(17):
             if i < 6:
-                if all(i == False for i in self.occupancy[1:5]):
+                if all(j == False for j in self.occupancy[1:5]):
                     self.next_authority[i] = True
             elif i < 12:
-                if all(i == False for i in self.occupancy[6:12]):
+                if all(j == False for j in self.occupancy[6:12]):
                     self.next_authority[i] = True
             else:
-                if all(i == False for i in self.occupancy[12:17]):
+                if all(j == False for j in self.occupancy[12:17]):
                     self.next_authority[i] = True
         
-        if all(i == False for i in self.occupancy[6:12]) and self.switch_5 == True:
+        if all(j == False for j in self.occupancy[6:12]) and self.switch_5 == True:
             self.next_authority[5] = True
 
-        if all(i == False for i in self.occupancy[12:17]) and self.switch_5 == False:
+        if all(j == False for j in self.occupancy[12:17]) and self.switch_5 == False:
             self.next_authority[5] = True
 
         self.next_authority[11] = False
         self.next_authority[16] = False
 
+    def get_blocks(self):
+        return self.occupancy, self.next_authority
 
+    def update_maintenance(self, blocks):
+        for i in range(len(blocks)):
+            
+            if blocks[i] == True:
+                if i < 6 and all(j == False for j in self.occupancy[1:6]):
+                    self.maint_occ[i] = True
+                elif i < 12 and all(j == False for j in self.occupancy[6:12]):
+                    self.maint_occ[i] = True
+                elif i < 17 and all(j == False for j in self.occupancy[12:17]):
+                    self.maint_occ[i] = True
+                else:
+                    self.maint_occ[i] = False
+            else:
+                self.maint_occ[i] = False
+
+        return self.maint_occ
                 
     def update_track(self, new_blocks):
         self.previous_occupancy = self.occupancy
@@ -155,6 +174,7 @@ class BluePLC:
         self.update_switch()
         self.update_signal()
         self.update_authority()
+    
 
         
 
