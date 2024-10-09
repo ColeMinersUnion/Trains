@@ -34,12 +34,23 @@ class WaysideShell:
         self.tm.dispatch(speed, authority)
         self.plc.dispatch(switch)
 
+        
 
+    
     def get_blocks(self):
         return self.occupancy
     
     def set_occupancy(self, occupancy):
         self.occupancy = copy.deepcopy(occupancy)
+        self.plc.update_track(self.occupancy)
+        self.update_next_authority()
+        self.switch_5 = copy.deepcopy(self.plc.switch_5)
+        self.crossing_3 = copy.deepcopy(self.plc.crossing_3)
+        self.signal_6 = copy.deepcopy(self.plc.signal_6)
+        self.signal_12 = copy.deepcopy(self.plc.signal_12)
+
+    def update_next_authority(self):
+        self.next_authority = copy.deepcopy(self.plc.next_authority)
     
     def maintenance_blocks(self, blocks):
         return self.plc.update_maintenance(blocks)
@@ -59,6 +70,7 @@ class TrackModel:
         self.trains.append(0)
         self.occupancy[0] = True
         print(Speed, Authority)
+        self.shell.set_occupancy(self.occupancy)
 
     def move_trains(self):
         for i in range(len(self.trains)):
@@ -88,6 +100,7 @@ class CTC:
 
     def dispatch(self, Speed, Authority, Switch):
         if all(i == False for i in self.occupancy[0:6]):
+            print("ctc dipatch successful")
             self.shell.dispatch(Speed, Authority, Switch)
             return True
         else:
@@ -105,8 +118,8 @@ class Application(object):
         self.app = app
 
         self.shell = WaysideShell()
-        self.ctc = CTC()
-        self.tm = TrackModel()
+        self.ctc = self.shell.ctc
+        self.tm = self.shell.tm
         self.ctc.shell = self.shell
         self.tm.shell = self.shell
 
@@ -118,6 +131,7 @@ class Application(object):
             item.setCheckState(QtCore.Qt.Unchecked)
 
         self.wayside_inputs()
+        self.ctc_inputs()
 
         self.plc_uploaded = False
         # Setup the periodic update
@@ -170,7 +184,7 @@ class Application(object):
     def update_wayside_tables(self):
         for i in range(len(self.shell.occupancy)):
             self.ui.wayside_block_table.setItem(i,0, QTableWidgetItem(str(self.shell.occupancy[i])))
-            self.ui.wayside_block_table.setItem(i,1, QTableWidgetItem(str(self.shell.occupancy[i])))
+            self.ui.wayside_block_table.setItem(i,1, QTableWidgetItem(str(self.shell.next_authority[i])))
     
             self.ui.wayside_elements_table.setItem(0,0, QTableWidgetItem(str(self.shell.switch_5)))
             self.ui.wayside_elements_table.setItem(1,0, QTableWidgetItem(str(self.shell.crossing_3)))
@@ -180,13 +194,16 @@ class Application(object):
 
     #################CTC Functions###########################
     def ctc_inputs(self):
-        self.ui.dispatch_train_button.clicked.connect(self.dispatch_train)
+        self.ui.dispatch_button.clicked.connect(self.dispatch_train)
 
     def dispatch_train(self):
-        speed = int(self.ui.suggested_speed.text())
-        authority = int(self.ui.suggested_authority.text())
-        switch = bool(self.ui.suggested_switch.text())
-        self.ctc.dispatch(speed, authority, switch)
+        if self.plc_uploaded == False:
+            print("cannot dispatch without plc")
+        else:
+            speed = int(self.ui.suggested_speed.text())
+            authority = int(self.ui.suggested_auth.text())
+            switch = bool(self.ui.suggested_switch.currentText())
+            self.ctc.dispatch(speed, authority, switch)
 
     #################Track Model Functions####################
 
@@ -194,11 +211,16 @@ class Application(object):
 
     def move_trains(self):
         self.tm.move_trains()
+
+    
+
+    #################Update UI################################
     
     def update_ui(self):
         self.update_wayside_tables()
         if self.plc_uploaded:
-            self.move_trains()
+            pass
+            #self.move_trains()
         
 
 if __name__ == '__main__':

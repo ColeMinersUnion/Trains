@@ -46,41 +46,54 @@ class BluePLC:
     def dispatch(self, new_route):
         self.switch_5_queue.enqueue(new_route)
 
+
     def say_hi(self):
         print("PLC Uploaded Successfully")
 
     def block_error_check(self):
-        #checks every new occupancy to see if a previous block was occupied, if not, track error is detected
-        for i in range(1, 6):
-            if self.occupancy[i] == True and self.previous_occupancy[i-1] == False and self.previous_occupancy[i] == False:
-                self.block_error[i] = True
-           
-        for i in range(7, 12):
-            if self.occupancy[i] == True and self.previous_occupancy[i-1] == False and self.previous_occupancy[i] == False:
-                self.block_error[i] = True
-
-        for i in range(13, 17):
-            if self.occupancy[i] == True and self.previous_occupancy[i-1] == False and self.previous_occupancy[i] == False:
-                self.block_error[i] = True
-
-        if self.occupancy[6] == True and self.previous_occupancy[5] == False and self.previous_occupancy[6] == False:
-            self.block_error[6] = True
-        
-        if self.occupancy[12] == True and self.previous_occupancy[5] == False and self.previous_occupancy[5] == False:
-            self.block_error[12] = True
-
-        #resets error state if track error is fixed
+        #checks if the occupancy of a block has changed, if so, sets the block error to true
         for i in range(17):
-            if self.block_error[i] == True and self.occupancy[i] == False:
+            if self.occupancy[i] == True and self.train_occ[i] == False and self.maint_occ[i] == False:
+                self.block_error[i] = True
+            else:
                 self.block_error[i] = False
         
     def update_train_occ(self):
-        for i in range(17):
-            if self.occupancy[i] == True and self.block_error[i] == False and self.maint_occ[i] == False:
+        if self.occupancy[0] == True:
+            self.train_occ[0] = True
+        
+        for i in range(1, 17):
+            if  i == 12:
+                if self.train_occ[5] == True and self.occupancy[5] == False and self.occupancy[12] == True and self.switch_5 == False:
+                    self.train_occ[12] = True
+                    self.train_occ[5] = False
+            elif  i == 6:
+                if self.train_occ[5] == True and self.occupancy[5] == False and self.occupancy[6] == True and self.switch_5 == True:
+                    self.train_occ[6] = True
+                    self.train_occ[5] = False
+            
+            elif self.train_occ[i - 1] == True and self.occupancy[i] == True:
                 self.train_occ[i] = True
-            else:
-                self.train_occ[i] = False
+                self.train_occ[i - 1] = False
+    
+    def update_maint_occ(self, proposed_maint):
+        for i in range(17):
+            if proposed_maint[i] == False:
+                self.maint_occ[i] = False
+            elif proposed_maint[i] == True and self.maint_occ[i] == True:
+                pass
+            elif proposed_maint[i] == True and self.maint_occ[i] == False:
+                if i < 6:
+                    if all(j == False for j in self.train_occ[1:6]):
+                        self.maint_occ[i] = True
+                elif i < 12:
+                    if all(j == False for j in self.train_occ[6:12]):
+                        self.maint_occ[i] = True
+                else:
+                    if all(j == False for j in self.train_occ[12:17]):
+                        self.maint_occ[i] = True
 
+        
     def update_crossing(self):
          #checks if the train is within 3 blocks of the crossing, if so sets crossing to true
         if self.train_occ[1] == True or self.train_occ[2] == True or self.train_occ[3] == True or self.train_occ[4] == True or self.train_occ[5] == True:
@@ -96,7 +109,7 @@ class BluePLC:
             self.switch_5 = False
         
         #checks if a train has passed block 5, then takes in the next switch commmand in the queue
-        if self.occupancy[5] == False and self.previous_occupancy[5] == True:
+        if self.train_occ[6] == True or self.train_occ[12] == True:
             self.switch_5_queue.dequeue()
             if self.switch_5_queue.peek() != None:
                 self.switch_5 = self.switch_5_queue.peek()
@@ -104,10 +117,10 @@ class BluePLC:
                 self.switch_5 = False
 
         #checks for track errors on blocks 6-8, and 12-14, if so, sets the switch to the other direction
-        if self.block_error[6] == True or self.block_error[7] == True or self.block_error[8] == True:
+        if any(self.block_error[6:12]) == True or any(self.maint_occ[6:12]) == True:
             self.switch_5 = False
 
-        if self.block_error[12] == True or self.block_error[13] == True or self.block_error[14] == True:
+        if any(self.block_error[12:17]) == True or any(self.maint_occ[12:17]) == True:
             self.switch_5 = True
 
     def update_signal(self):
@@ -133,40 +146,45 @@ class BluePLC:
         #determines if each occupied block has the authority to move to the next block, this is layout dependent so it is hardcoded
 
         #resets the authority to false initally
-        self.next_authority = [False for i in range(17)]    
+        self.next_authority = [False for i in range(17)]  
+  
         for i in range(17):
-            if i < 6:
-                if all(j == False for j in self.occupancy[1:5]):
-                    self.next_authority[i] = True
-            elif i < 12:
-                if all(j == False for j in self.occupancy[6:12]):
-                    self.next_authority[i] = True
-            else:
-                if all(j == False for j in self.occupancy[12:17]):
-                    self.next_authority[i] = True
-        
-        if all(j == False for j in self.occupancy[6:12]) and self.switch_5 == True:
-            self.next_authority[5] = True
+            if self.occupancy[i] == True:    
+                if i < 6:
+                    if all(j == False for j in self.occupancy[1:5]):
+                        self.next_authority[i] = True
+                elif i < 12:
+                    if all(j == False for j in self.occupancy[6:12]):
+                        self.next_authority[i] = True
+                else:
+                    if all(j == False for j in self.occupancy[12:17]):
+                        self.next_authority[i] = True
+            
+                if i == 5 and all(j == False for j in self.occupancy[6:12]) and self.switch_5 == True:
+                    self.next_authority[5] = True
 
-        if all(j == False for j in self.occupancy[12:17]) and self.switch_5 == False:
-            self.next_authority[5] = True
+
+                if i == 5 and all(j == False for j in self.occupancy[12:17]) and self.switch_5 == False:
+                    self.next_authority[5] = True
 
         self.next_authority[11] = False
         self.next_authority[16] = False
 
-    def get_block_info(self):
-        return self.occupancy, self.next_authority
+    def get_next_authority(self):
+        return self.next_authority
 
                 
     def update_track(self, new_blocks):
         self.previous_occupancy = self.occupancy
         self.occupancy = copy.deepcopy(new_blocks)
+        self.update_train_occ()
+        #self.update_maint_occ()
         self.block_error_check()
         self.update_crossing()
         self.update_switch()
         self.update_signal()
         self.update_authority()
-    
+        
 
         
 
