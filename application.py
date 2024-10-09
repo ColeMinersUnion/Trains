@@ -43,14 +43,14 @@ class WaysideShell:
     def set_occupancy(self, occupancy):
         self.occupancy = copy.deepcopy(occupancy)
         self.plc.update_track(self.occupancy)
-        self.update_next_authority()
+        self.next_authority = copy.deepcopy(self.plc.next_authority)
         self.switch_5 = copy.deepcopy(self.plc.switch_5)
         self.crossing_3 = copy.deepcopy(self.plc.crossing_3)
         self.signal_6 = copy.deepcopy(self.plc.signal_6)
         self.signal_12 = copy.deepcopy(self.plc.signal_12)
 
-    def update_next_authority(self):
-        self.next_authority = copy.deepcopy(self.plc.next_authority)
+
+        
     
     def maintenance_blocks(self, blocks):
         return self.plc.update_maintenance(blocks)
@@ -73,9 +73,16 @@ class TrackModel:
         self.shell.set_occupancy(self.occupancy)
 
     def move_trains(self):
+
+        self.switch_5 = copy.deepcopy(self.shell.switch_5)
+        self.signal_6 = copy.deepcopy(self.shell.signal_6)
+        self.signal_12 = copy.deepcopy(self.shell.signal_12)
+        self.crossing_3 = copy.deepcopy(self.shell.crossing_3)
+        if len(self.trains) > 0:
+            print(self.trains[0], self.switch_5)
         for i in range(len(self.trains)):
             if self.shell.next_authority[self.trains[i]] == True:
-                if self.trains[i] == 5 and self.shell.switch_5 == False:
+                if self.trains[i] == 5 and self.switch_5 == False:
                     print("Train at block", self.trains[i], " has moved to block ", 12)
                     self.trains[i] = 12
                     self.occupancy[5] = False
@@ -85,7 +92,6 @@ class TrackModel:
                     self.occupancy[self.trains[i]] = False
                     self.occupancy[self.trains[i] + 1] = True
                     self.trains[i] += 1
-        
         self.shell.set_occupancy(self.occupancy)
 
 class CTC:
@@ -202,7 +208,7 @@ class Application(object):
         else:
             speed = int(self.ui.suggested_speed.text())
             authority = int(self.ui.suggested_auth.text())
-            switch = bool(self.ui.suggested_switch.currentText())
+            switch = eval(self.ui.suggested_switch.currentText())
             self.ctc.dispatch(speed, authority, switch)
 
     #################Track Model Functions####################
@@ -219,8 +225,7 @@ class Application(object):
     def update_ui(self):
         self.update_wayside_tables()
         if self.plc_uploaded:
-            pass
-            #self.move_trains()
+            self.move_trains()
         
 
 if __name__ == '__main__':
