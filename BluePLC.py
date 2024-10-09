@@ -30,8 +30,11 @@ class BluePLC:
 
         #stores the previous occupancy of each block, used in track error detection
         self.previous_occupancy = [False for i in range(17)]
+        #stores any block errors
         self.block_error = [False for i in range(17)]
+        #stores maintenance occupancy of each block
         self.maint_occ = [False for i in range(17)]
+        #stores train occupancy for each block
         self.train_occ = [False for i in range(17)]
 
         #stores the switch commands for switch 5
@@ -42,11 +45,11 @@ class BluePLC:
         self.signal_6 = False
         self.signal_12 = False
         self.crossing_3 = False
-
+    #pushes the route of the train to the queue for the switch on block 5 when it reaches the switch
     def dispatch(self, new_route):
         self.switch_5_queue.enqueue(new_route)
 
-
+    #confirms that the PLC is successfully uploaded
     def say_hi(self):
         print("PLC Uploaded Successfully")
 
@@ -57,11 +60,12 @@ class BluePLC:
                 self.block_error[i] = True
             else:
                 self.block_error[i] = False
-        
+    #updates train occupancy as the train moves through the blue line    
     def update_train_occ(self):
         if self.occupancy[0] == True:
             self.train_occ[0] = True
-        
+        #updates train occupancy at blocks 12 and 5 based upon block occupancies of 12 and 5 and the switch state at block 5
+        #boolean values for the switch state: left=true, right=false
         for i in range(1, 17):
             if  i == 12:
                 if self.train_occ[5] == True and self.occupancy[5] == False and self.occupancy[12] == True and self.switch_5 == False:
@@ -71,18 +75,27 @@ class BluePLC:
                 if self.train_occ[5] == True and self.occupancy[5] == False and self.occupancy[6] == True and self.switch_5 == True:
                     self.train_occ[6] = True
                     self.train_occ[5] = False
-            
+            #for the rest of the blocks, updates the train occupancy as it moves along the track
+            #we are assuming for right now that the train is only the length of one block to simplify things
             elif self.train_occ[i - 1] == True and self.occupancy[i] == True:
                 self.train_occ[i] = True
                 self.train_occ[i - 1] = False
-    
+    #updates the maintenance occupancy of the blocks
     def update_maint_occ(self, proposed_maint):
         for i in range(17):
+            #updates the maintenance occupancy to false if suggested
             if proposed_maint[i] == False:
                 self.maint_occ[i] = False
+            #if both proposed maintenance and current maintenance occupancies are true, do nothing
             elif proposed_maint[i] == True and self.maint_occ[i] == True:
                 pass
+            #if proposed maintenance is true and does not match the current maintenance occupancy 
+            #then check the blocks before the signals (blocks 6 and 12)
             elif proposed_maint[i] == True and self.maint_occ[i] == False:
+                #if the current block is before block 6 and all blocks have a false train occupancy
+                #assign the block's maintenance occupancy to true
+                #do the same if the block is before block 12 and all blocks from 6 to 12 have false train occupancies
+                #otherwise assign a true maintenance occupancy if all blocks from 12-17 have false train occupancies
                 if i < 6:
                     if all(j == False for j in self.train_occ[1:6]):
                         self.maint_occ[i] = True
