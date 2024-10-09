@@ -14,11 +14,11 @@ class WaysideShell:
         self.crossing_3 = False
         self.signal_6 = False
         self.signal_12 = False
-
+    #uploads PLC code
     def upload_plc(self, file_name):
         try:
             plc = importlib.import_module(file_name)
-
+        #throws an error message if the PLC code cannot be uploaded
         except ImportError:
             print(f"Error: Module '{file_name}' not found.")
             return False
@@ -29,17 +29,17 @@ class WaysideShell:
         self.plc.say_hi()
         return True
 
-
+    #dispatches commanded speed, commanded authority to the track model and commanded switch change to the PLC based on suggested values from CTC
     def dispatch(self, speed, authority, switch):
         self.tm.dispatch(speed, authority)
         self.plc.dispatch(switch)
 
         
 
-    
+    #fetches current block occupancy
     def get_blocks(self):
         return self.occupancy
-    
+    #sets up copies of data to pass back to respective destinations
     def set_occupancy(self, occupancy):
         self.occupancy = copy.deepcopy(occupancy)
         self.plc.update_track(self.occupancy)
@@ -65,7 +65,7 @@ class TrackModel:
         self.crossing_3 = False
         self.shell = None
         self.trains = []
-
+    #takes in commanded speed, commanded authority from the shell
     def dispatch(self, Speed, Authority):
         self.trains.append(0)
         self.occupancy[0] = True
@@ -73,7 +73,7 @@ class TrackModel:
         self.shell.set_occupancy(self.occupancy)
 
     def move_trains(self):
-
+        #moves the train forward in the case of no present switch or to a new super block of track depending upon where the train currently stands and the state of the switch on block 5
         self.switch_5 = copy.deepcopy(self.shell.switch_5)
         self.signal_6 = copy.deepcopy(self.shell.signal_6)
         self.signal_12 = copy.deepcopy(self.shell.signal_12)
@@ -103,7 +103,7 @@ class CTC:
         self.signal_12 = False
         self.crossing_3 = False
         self.shell = None
-
+    #dispatches suggested values for speed, authority and switch change to the wayside shell
     def dispatch(self, Speed, Authority, Switch):
         if all(i == False for i in self.occupancy[0:6]):
             print("ctc dipatch successful")
@@ -162,7 +162,7 @@ class Application(object):
     def upload_plc(self):
         file_name = self.ui.plc_file_input.text()
         self.plc_uploaded = self.shell.upload_plc(file_name)
-
+    #manual mode functions:
     def manual_switch_5(self):
         if self.plc_uploaded == False:
             self.shell.switch_5 = not self.shell.switch_5
@@ -186,7 +186,7 @@ class Application(object):
             self.shell.signal_12 = not self.shell.signal_12
         else:
             print("In auto mode")
-    
+    #updates key inputs and outputs on the table in the wayside UI
     def update_wayside_tables(self):
         for i in range(len(self.shell.occupancy)):
             self.ui.wayside_block_table.setItem(i,0, QTableWidgetItem(str(self.shell.occupancy[i])))
