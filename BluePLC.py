@@ -150,14 +150,14 @@ class BluePLC:
   
         for i in range(17):
             if self.occupancy[i] == True:    
-                if i < 6:
-                    if all(j == False for j in self.occupancy[1:5]):
+                if i < 6 and i != 5:
+                    if all(j == False for j in self.occupancy[i+1:5]):
                         self.next_authority[i] = True
-                elif i < 12:
-                    if all(j == False for j in self.occupancy[6:12]):
+                elif i < 12 and i != 5:
+                    if all(j == False for j in self.occupancy[i+1:12]):
                         self.next_authority[i] = True
-                else:
-                    if all(j == False for j in self.occupancy[12:17]):
+                elif i < 16 and i != 5:
+                    if all(j == False for j in self.occupancy[i+1:17]):
                         self.next_authority[i] = True
             
                 if i == 5 and all(j == False for j in self.occupancy[6:12]) and self.switch_5 == True:
@@ -184,7 +184,9 @@ class BluePLC:
         self.update_switch()
         self.update_signal()
         self.update_authority()
-        
+        # print("occ", self.occupancy)
+        # print("auth", self.next_authority)
+
 
         
 
