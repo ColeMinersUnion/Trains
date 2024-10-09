@@ -6,11 +6,10 @@ from PyQt6.QtGui import QTransform, QPixmap, QIcon
 from PyQt6.QtCore import Qt,QTimer
 import sys 
 import TrackModelBackend
-from TrackModelBackend import lines,failmode,CLOCK_TIME      
+from TrackModelBackend import lines,failmode,CLOCK_TIME, failnames,modelspeed      
 
 passive = [] #no update method, do not react to backend changes
 active = [] #update method, react to backend changes
-failnames = ["No","Rail","Circuit","Power"]
 
 
 SCL=100 #scale
@@ -24,35 +23,6 @@ tooltipstyle = """QToolTip {
                 color: white; 
                 border: white solid 1px
                 }"""
-class Map(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.resize(1280,720)
-        self.setWindowTitle("Track Model Map")
-        self.setStyleSheet("background-color: lightyellow;")
-        TrackModelBackend.read('TrackModel/Blue Line.xlsx')
-        active.append(FailureSelect(self))
-        passive.append(HeaterSystem(self))
-        for i in range(3):
-            passive.append(FailureButton((i+1),self)) #add failure buttons
-        for line in lines:
-            for block in line.blocks:
-                passive.append(BlockIcon(block,self)) #updates for view
-            for switch in line.switches: #biggest components to smallest so all can be hovered
-                active.append(SwitchIcon(switch,self))
-            for crossing in line.crossings:
-                active.append(CrossingIcon(crossing,self))
-            for transponder in line.transponders:
-                passive.append(TransponderIcon(transponder,self))  
-            for station in line.stations:
-                passive.append(StationIcon(station,self))
-        self.timer=QTimer() #timer for active components
-        self.timer.timeout.connect(self.update) #connect timer to update method
-        self.timer.start(int(CLOCK_TIME*1000)) #set clock speed of timer
-        
-    def update(self): 
-        for a in active:
-            a.update() #update every active component
 
 class HeaterSystem(QWidget):
     def __init__(self,window):
@@ -96,8 +66,29 @@ class HeaterSystem(QWidget):
             pixmap = QPixmap('TrackModel/Icons/OffHeater.png')
             self.label.setPixmap(pixmap)
 
+class Failure(QWidget):
+    def __init__(self,linenum,blocknum,window):
+        global failmode
+        super().__init__()
+        self.linenum = linenum
+        self.blocknum = blocknum
+        self.pixmap = QPixmap('TrackModel/Icons/' + failnames[failmode] + 'Failure.png')
+        self.label = QLabel(window)
+        self.label.setPixmap(self.pixmap)
+        self.label.setToolTip(failnames[failmode] + " Failure\n " + TrackModelBackend.linenames[linenum] + " Line, Block " + str(blocknum))
+        center = lines[linenum].blocks[blocknum].center
+        self.label.move(int(center[0]*SCL-25),int(YFF-center[1]*SCL-22.5))
+        self.label.setStyleSheet(labelstyle)
+        self.setStyleSheet(tooltipstyle)
+        
+    def update(self):
+        global active
+        if(lines[self.linenum].blocks[self.blocknum].failure==0):
+            active.remove(self)
+
 class FailureSelect(QWidget):
     def __init__(self,window):
+        super().__init__()
         self.label = QLabel(window)
         self.label.setPixmap(QPixmap('TrackModel/Icons/FailureSelect.png'))
         self.update()
@@ -107,6 +98,7 @@ class FailureSelect(QWidget):
             self.label.move(-100,-100)
         else:
             self.label.move(180+failmode*45,50)
+        
 
 class FailureButton(QWidget):
     def __init__(self,failnum,window):
@@ -128,35 +120,10 @@ class FailureButton(QWidget):
         else:   
             failmode=self.failnum
 
-              
-class Testbench(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.resize(400,400)
-        self.setWindowTitle("Track Model Testbench")
-
-        trainbutton = QPushButton("Run train", self)
-        trainbutton.move(100,50)
-
-        switchbutton = QPushButton("Flip switch", self)
-        switchbutton.move(200,50)
-
-        crossbutton = QPushButton("Change crossing", self)
-        crossbutton.move(100,100)
-
-        param2=QLabel("Line number",self)
-        param2.move(100,150)
-        self.input2 = QLineEdit(self)
-        self.input2.move(100,200)
-
-        param3=QLabel("Velocity # / Component #",self)
-        param3.move(100,250)
-        self.input2 = QLineEdit(self)
-        self.input2.move(100,300)
-
 class BlockIcon(QWidget):
     def __init__(self,obj,window): #line number and block number
         super().__init__()
+        self.window=window
         self.obj=obj
         self.pixmap = QPixmap('TrackModel/Icons/BlueArrow.png')
         self.label=QLabel(window)
@@ -168,6 +135,19 @@ class BlockIcon(QWidget):
         self.label.move(self.obj.x1*SCL,YFF-self.obj.y1*SCL-13-offset)
         self.label.setStyleSheet(labelstyle)
         self.setStyleSheet(tooltipstyle)
+        self.label.mousePressEvent = self.setFailure
+        self.setFailure(None)
+
+    def update(self):
+        self.label.setToolTip(self.obj.toString())
+        self.label.show()
+
+
+    def setFailure(self,event):
+        global active, failmode
+        if(failmode > 0):
+            lines[self.obj.linenum].blocks[self.obj.number].failure = failmode
+            active.append(Failure(self.obj.linenum,self.obj.number,self.window))
 
 class SwitchIcon(QWidget):
     def __init__(self,obj,window):
@@ -185,16 +165,18 @@ class SwitchIcon(QWidget):
         self.closedlabel.setToolTip("Switched closed")
         self.closedlabel.setStyleSheet(labelstyle)
         self.setStyleSheet(tooltipstyle)
-        self.update()
         
     def update(self):
+        global lines
         tempobj=lines[self.linenum].switches[self.switchid]
         opencenter=lines[tempobj.linenum].blocks[tempobj.getopen()].center
         closedcenter=lines[tempobj.linenum].blocks[tempobj.getclosed()].center
-        self.openlabel.move(int(opencenter[0]*SCL),int(YFF-opencenter[1]*SCL-22.5))
-        self.closedlabel.move(int(closedcenter[0]*SCL-12.5),int(YFF-closedcenter[1]*SCL-22.5))
-       
-class CrossingIcon(QPushButton):
+        self.openlabel.move(int((opencenter[0]-0.125)*SCL),int(YFF-(opencenter[1]+0.225)*SCL))
+        self.closedlabel.move(int((closedcenter[0]-0.125)*SCL),int(YFF-(closedcenter[1]+0.225)*SCL))
+        self.openlabel.show()
+        self.closedlabel.show()
+    
+class CrossingIcon(QWidget):
     def __init__(self,obj,window):
         super().__init__()
         self.linenum=obj.linenum
@@ -214,8 +196,9 @@ class CrossingIcon(QPushButton):
             self.pixmap = QPixmap('TrackModel/Icons/OffCrossing.png')
         self.label.setPixmap(self.pixmap)
         self.label.setToolTip(tempobj.toString())
+        self.label.show()
 
-class TransponderIcon(QPushButton):
+class TransponderIcon(QWidget):
     def __init__(self,obj,window):
         super().__init__()
         self.obj=obj
@@ -228,7 +211,7 @@ class TransponderIcon(QPushButton):
         self.label.setStyleSheet(labelstyle)
         self.setStyleSheet(tooltipstyle)
 
-class StationIcon(QPushButton):
+class StationIcon(QWidget):
     def __init__(self,obj,window):
         super().__init__()
         self.obj=obj
@@ -244,12 +227,107 @@ class StationIcon(QPushButton):
         self.label.setStyleSheet(labelstyle)
         self.setStyleSheet(tooltipstyle)
 
+class Map(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.resize(1280,720)
+        self.move(0,0)
+        self.setWindowTitle("Track Model Map")
+        self.setStyleSheet("background-color: lightyellow;")
+        TrackModelBackend.read('TrackModel/Blue Line.xlsx')
+        active.append(FailureSelect(self))
+        passive.append(HeaterSystem(self))
+        for i in range(3):
+            passive.append(FailureButton((i+1),self)) #add failure buttons
+        for line in lines:
+            for block in line.blocks:
+                active.append(BlockIcon(block,self)) #updates for view
+            for switch in line.switches: #biggest components to smallest so all can be hovered
+                active.append(SwitchIcon(switch,self))
+            for crossing in line.crossings:
+                active.append(CrossingIcon(crossing,self))
+            for transponder in line.transponders:
+                passive.append(TransponderIcon(transponder,self))  
+            for station in line.stations:
+                passive.append(StationIcon(station,self))
+        self.timer=QTimer() #timer for active components
+        self.timer.timeout.connect(self.update) #connect timer to update method
+        self.timer.start(int(CLOCK_TIME*1000)) #set clock speed of timer
+
+        self.tenBaud=QTimer() #timer for active components
+        self.tenBaud.timeout.connect(self.tenBaudClock) #connect timer to update method
+        self.tenBaud.start(int(CLOCK_TIME*1000)) #set clock speed of timer
+    
+    def tenBaudClock(self):
+        print("10 baud passed")
+        for l in lines:
+            for t in l.trains:
+                t.tenBaudMessage
+
+        
+    
+    def update(self): 
+        for a in active:
+            a.update() #update every active component
+
+class Testbench(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.resize(400,400)
+        self.move(1500,0)
+        self.setWindowTitle("Track Model Testbench")
+
+        param1=QLabel("Line number",self)
+        param1.move(100,150)
+        self.input1 = QLineEdit(self)
+        self.input1.move(100,200)
+
+        param2=QLabel("Component #",self)
+        param2.move(100,250)
+        self.input2 = QLineEdit(self)
+        self.input2.move(100,300)
+
+        occupybutton = QPushButton("Set occupancy", self)
+        occupybutton.move(100,50)
+        occupybutton.clicked.connect(self.switchOccupancy)
+
+        switchbutton = QPushButton("Flip switch", self)
+        switchbutton.move(100,75)
+        switchbutton.clicked.connect(self.flipSwitch)
+
+        crossingbutton = QPushButton("Change crossing", self)
+        crossingbutton.move(100,100)
+        crossingbutton.clicked.connect(self.flipCrossing)
+
+        param1=QLabel("Line number",self)
+        param1.move(100,150)
+        self.input1 = QLineEdit(self)
+        self.input1.move(100,200)
+
+        param2=QLabel("Component #",self)
+        param2.move(100,250)
+        self.input2 = QLineEdit(self)
+        self.input2.move(100,300)
+
+    def switchOccupancy(self):
+        line = int(self.input1.text())
+        comp = int(self.input2.text())
+        lines[line].blocks[comp].switchOccupancy()
+    def flipSwitch(self):
+        line = int(self.input1.text())
+        comp = int(self.input2.text())
+        lines[line].switches[comp].switch()
+    def flipCrossing(self):
+        line = int(self.input1.text())
+        comp = int(self.input2.text())
+        lines[line].crossings[comp].switch()
+
+
+
 app=QApplication(sys.argv)
 map=Map()
 testbench=Testbench()
 map.show()
-#testbench.show()
-while True:
-    for a in active:
-        a.update()
-    sys.exit(app.exec())
+testbench.show()
+sys.exit(app.exec())
+

@@ -1,11 +1,6 @@
 import pandas as pd #reading the excel file
 from enum import Enum
 from math import atan2,pi,sqrt
-class Failure(Enum):
-    No=0
-    Rail=1
-    Circuit=2
-    Power=3
 
 linenames=[]
 lines=[] 
@@ -14,6 +9,8 @@ crossingid=[] #track crossing numbers for pinging
 crossingid=[]
 CLOCK_TIME = 1/60
 failmode = 0
+failnames = ["None","Rail","Circuit","Power"]
+modelspeed = 10
 
 class Block:
     #instantiation
@@ -31,12 +28,13 @@ class Block:
         self.y1=y1
         self.x2=x2
         self.y2=y2
-        self.circuit = False
+        self.occupied = False
         self.prev = number-1 #will change with crossing instantiation
         self.next = number+1 #will change with crossing instantiation
         self.center = [(x1+x2)/2,(y1+y2)/2] #center for front end
         self.mag = sqrt(((x2-x1)*(x2-x1))+((y2-y1)*(y2-y1))) #magnitude for front end
         self.angle = atan2((y2-y1),(x2-x1))*180/pi #angle for front end
+        self.failure=0 
         if(self.angle<0):
             self.angle = self.angle+360
         r = linenames[linenum] + " Line"
@@ -49,11 +47,13 @@ class Block:
         r = r + "\nBidirectional: " + str(twoway)
         r = r + "\nUnderground: " + str(underground) 
         r = r + "\nOccupied: "
-        self.msg = r 
-        self.failure=0    
+        self.msg = r    
 
     def toString(self):
-        return self.msg + str(self.circuit)
+        return self.msg + str(self.occupied) + "\nFailure: " + failnames[self.failure]
+    
+    def switchOccupancy(self):
+        self.occupied = not self.occupied
 class Switch:
 #note, structuring switch depends on section, include that?)
     #instantiation
@@ -92,6 +92,7 @@ class Switch:
     def switch(self):
         self.leftside = not self.leftside
         self.updateEnds()
+        print("Updated switch\n")
 
     #get the open block
     def getopen(self):
@@ -120,7 +121,7 @@ class Crossing:
 
     #change state of crossing
     def switch(self):
-        on = not on
+        self.on = not self.on
 class Transponder:
     #instantiation
     def __init__(self,linenum,block,data):
@@ -151,6 +152,8 @@ class Train:
         self.pos = 0
         self.authority = 0
         self.goingUp = True #direction depending if it crosses segment in ascending or descending block order
+        self.msgqueue = []
+        self.tenbaud = [False,False,False,False,False,False,False,False,False,False]
 
     def newPos(self):
         pos += self.velocity * CLOCK_TIME
@@ -168,6 +171,16 @@ class Train:
             if (x.block==block):
                 return x.data
         return ""
+    
+    def queueMessage(self,bool):
+        self.msgqueue.append(bool)
+    def tenBaudMessage(self):
+        if(len(self.msgqueue)>0):
+            self.tenbaud.append(self.msgqueue[0])
+            while(len(self.tenbaud>10)):
+                self.tenbaud.remove(0)
+
+        
 
 class Line:
     def __init__(self,linenum):
@@ -177,6 +190,7 @@ class Line:
         self.crossings = []
         self.transponders = []
         self.stations = []
+        self.trains = []
 
 
 
