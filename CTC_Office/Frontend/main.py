@@ -6,15 +6,16 @@ import importlib
 
 print(os.getcwd())
 sys.path.insert(1, os.getcwd() + '/CTC_Office/Backend')
+#!sys.path.insert(1, os.getcwd() + '\CTC_Office\Backend')
 for i, s in enumerate(sys.path):
     print(f'Path {i}: {s}')
 
-from CTC import CTC_Office
+CTC_Module = importlib.import_module('CTC')
 
 
 
 
-Office = CTC_Office()
+Office = CTC_Module.CTC_Office()
 Office.addBlueLine()
 Office.addTrain(['Station C'])
 
