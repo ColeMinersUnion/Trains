@@ -36,11 +36,10 @@ class WaysideShell:
 
 
     def get_blocks(self):
-        return self.plc.get_blocks()
+        return self.occupancy
     
     def set_occupancy(self, occupancy):
-        self.plc.update_track(occupancy)
-        self.occupancy, self.next_authority = self.plc.get_block_info()
+        self.occupancy = copy.deepcopy(occupancy)
     
     def maintenance_blocks(self, blocks):
         return self.plc.update_maintenance(blocks)
@@ -124,7 +123,7 @@ class Application(object):
         # Setup the periodic update
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.update_ui)  # Function to update the UI
-        self.timer.start(3000)  # Updates every 3 seconds 
+        self.timer.start(1500)  # Updates every 1.5 seconds 
 
         self.ui.show()
         self.run()
@@ -136,10 +135,37 @@ class Application(object):
     def wayside_inputs(self):
         # Connects the buttons to their functions
         self.ui.plc_upload_button.clicked.connect(self.upload_plc)
-
+        self.ui.manual_sw5_button.clicked.connect(self.manual_switch_5)
+        self.ui.manual_x3_button.clicked.connect(self.manual_crossing_3)
+        self.ui.manual_sig6_button.clicked.connect(self.manual_signal_6)
+        self.ui.manual_sig12_button.clicked.connect(self.manual_signal_12)
     def upload_plc(self):
         file_name = self.ui.plc_file_input.text()
         self.plc_uploaded = self.shell.upload_plc(file_name)
+
+    def manual_switch_5(self):
+        if self.plc_uploaded == False:
+            self.shell.switch_5 = not self.shell.switch_5
+        else:
+            print("In auto mode")
+    
+    def manual_crossing_3(self):
+        if self.plc_uploaded == False:
+            self.shell.crossing_3 = not self.shell.crossing_3
+        else:
+            print("In auto mode")
+    
+    def manual_signal_6(self):
+        if self.plc_uploaded == False:
+            self.shell.signal_6 = not self.shell.signal_6
+        else:
+            print("In auto mode")
+    
+    def manual_signal_12(self):
+        if self.plc_uploaded == False:
+            self.shell.signal_12 = not self.shell.signal_12
+        else:
+            print("In auto mode")
     
     def update_wayside_tables(self):
         for i in range(len(self.shell.occupancy)):

@@ -422,33 +422,33 @@
          <item row="3" column="0">
           <widget class="QLabel" name="label_16">
            <property name="text">
-            <string>Signal 11</string>
+            <string>Signal 12</string>
            </property>
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QPushButton" name="pushButton_3">
+          <widget class="QPushButton" name="manual_sw5_button">
            <property name="text">
             <string>Toggle</string>
            </property>
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="QPushButton" name="pushButton_4">
+          <widget class="QPushButton" name="manual_x3_button">
            <property name="text">
             <string>Toggle</string>
            </property>
           </widget>
          </item>
          <item row="2" column="1">
-          <widget class="QPushButton" name="pushButton_5">
+          <widget class="QPushButton" name="manual_sig6_button">
            <property name="text">
             <string>Toggle</string>
            </property>
           </widget>
          </item>
          <item row="3" column="1">
-          <widget class="QPushButton" name="pushButton_6">
+          <widget class="QPushButton" name="manual_sig12_button">
            <property name="text">
             <string>Toggle</string>
            </property>
@@ -686,7 +686,7 @@
          </row>
          <row>
           <property name="text">
-           <string>Signal 11</string>
+           <string>Signal 12</string>
           </property>
          </row>
          <column>
@@ -737,7 +737,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEdit"/>
+          <widget class="QLineEdit" name="suggested_speed"/>
          </item>
         </layout>
        </item>
@@ -751,7 +751,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEdit_2"/>
+          <widget class="QLineEdit" name="suggested_auth"/>
          </item>
         </layout>
        </item>
@@ -765,7 +765,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QComboBox" name="comboBox">
+          <widget class="QComboBox" name="suggested_switch">
            <item>
             <property name="text">
              <string>True</string>
@@ -781,7 +781,7 @@
         </layout>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton">
+        <widget class="QPushButton" name="dispatch_button">
          <property name="text">
           <string>Dispatch</string>
          </property>
@@ -799,7 +799,7 @@
        <rect>
         <x>390</x>
         <y>0</y>
-        <width>260</width>
+        <width>273</width>
         <height>536</height>
        </rect>
       </property>
