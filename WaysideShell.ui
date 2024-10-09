@@ -30,7 +30,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="wayside">
      <attribute name="title">
@@ -42,7 +42,7 @@
         <x>10</x>
         <y>10</y>
         <width>371</width>
-        <height>551</height>
+        <height>552</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="block_occ">
@@ -82,6 +82,16 @@
          <attribute name="horizontalHeaderCascadingSectionResizes">
           <bool>false</bool>
          </attribute>
+         <row>
+          <property name="text">
+           <string>Block 0</string>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>6</pointsize>
+           </font>
+          </property>
+         </row>
          <row>
           <property name="text">
            <string>Block 1</string>
@@ -284,7 +294,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QTableWidget" name="tableWidget_6">
+        <widget class="QTableWidget" name="wayside_elements_table">
          <row>
           <property name="text">
            <string>Switch 5</string>

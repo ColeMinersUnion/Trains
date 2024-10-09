@@ -32,7 +32,8 @@ class BluePLC:
         self.previous_occupancy = [False for i in range(17)]
         self.block_error = [False for i in range(17)]
         self.maint_occ = [False for i in range(17)]
-        #self.zones = [False, False, False]
+        self.train_occ = [False for i in range(17)]
+
         #stores the switch commands for switch 5
         self.switch_5_queue = SwitchQueue()
 
@@ -72,10 +73,17 @@ class BluePLC:
         for i in range(17):
             if self.block_error[i] == True and self.occupancy[i] == False:
                 self.block_error[i] = False
+        
+    def update_train_occ(self):
+        for i in range(17):
+            if self.occupancy[i] == True and self.block_error[i] == False and self.maint_occ[i] == False:
+                self.train_occ[i] = True
+            else:
+                self.train_occ[i] = False
 
     def update_crossing(self):
          #checks if the train is within 3 blocks of the crossing, if so sets crossing to true
-        if self.occupancy[1] == True or self.occupancy[2] == True or self.occupancy[3] == True or self.occupancy[4] == True or self.occupancy[5] == True:
+        if self.train_occ[1] == True or self.train_occ[2] == True or self.train_occ[3] == True or self.train_occ[4] == True or self.train_occ[5] == True:
             self.crossing_3 = True
         else:
             self.crossing_3 = False
@@ -146,25 +154,9 @@ class BluePLC:
         self.next_authority[11] = False
         self.next_authority[16] = False
 
-    def get_blocks(self):
+    def get_block_info(self):
         return self.occupancy, self.next_authority
 
-    def update_maintenance(self, blocks):
-        for i in range(len(blocks)):
-            
-            if blocks[i] == True:
-                if i < 6 and all(j == False for j in self.occupancy[1:6]):
-                    self.maint_occ[i] = True
-                elif i < 12 and all(j == False for j in self.occupancy[6:12]):
-                    self.maint_occ[i] = True
-                elif i < 17 and all(j == False for j in self.occupancy[12:17]):
-                    self.maint_occ[i] = True
-                else:
-                    self.maint_occ[i] = False
-            else:
-                self.maint_occ[i] = False
-
-        return self.maint_occ
                 
     def update_track(self, new_blocks):
         self.previous_occupancy = self.occupancy

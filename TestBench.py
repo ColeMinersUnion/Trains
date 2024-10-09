@@ -1,5 +1,6 @@
 
 from BluePLC import BluePLC
+from WaysideShell import WaysideShell
 
 def print_PLC(plc):
 
@@ -27,6 +28,24 @@ def print_PLC(plc):
     print("Crossing 3: ", plc.crossing_3)
  
 
+class ctc:
+    def __init__(self):
+        self.occupancy = [False for i in range(17)]
+        self.block_error = [False for i in range(17)]
+        self.switch_5 = False
+        self.signal_6 = False
+        self.signal_12 = False
+        self.crossing_3 = False
+        self.shell = WaysideShell()
+
+    def dispatch(self, Speed, Authority, Switch):
+        if all(i == False for i in self.occupancy[0:6]):
+            self.shell.dispatch(Speed, Authority, Switch)
+            return True
+        else:
+            print("Cannot dispatch train")
+            return False
+            
 def main():
     #Main TestBench Flow
     plc = BluePLC()
