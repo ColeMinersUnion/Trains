@@ -1,4 +1,5 @@
-from TrackModelFrontend import QApplication,Map,Testbench
+from TrackModelFrontend import Map,Testbench
+from PyQt6.QtWidgets import QApplication
 import sys
 
 def main():

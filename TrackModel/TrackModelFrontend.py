@@ -1,7 +1,7 @@
 # method to automtically make shapes and add to array, for loop to make new blocks with arrays of requests
 
-import PyQt6, math
-from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QLineEdit, QSlider
+import math
+from PyQt6.QtWidgets import QWidget, QLabel, QPushButton, QLineEdit, QSlider
 from PyQt6.QtGui import QTransform, QPixmap
 from PyQt6.QtCore import Qt,QTimer
 import TrackModelBackend
@@ -384,10 +384,8 @@ class Testbench(QWidget):
         line = int(self.input1.text())
         comp = int(self.input2.text())
         if len(lines[line].trains)==0:
-            print("adding train")
             lines[line].trains.append(TrackModelBackend.Train(line,0,comp))
         else:
-            print("moving train:")
             lines[line].trains[0].addPos(comp)
 
 
