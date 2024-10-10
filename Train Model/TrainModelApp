@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QPushButton, QTabWidget, QLineEdit, QSpacerItem, QSizePolicy, QHBoxLayout, QGridLayout
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QPushButton, QTabWidget, QLineEdit, QSpacerItem, QSizePolicy, QHBoxLayout, QGridLayout, QMainWindow
 from PyQt5.QtCore import QTimer, Qt, QObject, pyqtSignal, pyqtSlot, QThread
 from PyQt5.QtGui import QFont
 from TrainModelClass import trainModel
@@ -200,6 +200,11 @@ class MetricsTab(QWidget):
         self.acceleration_label.setFont(QFont('Arial', 14))
         col1_layout.addWidget(self.acceleration_label)
 
+        self.service_brake_status_label = QLabel()
+        self.service_brake_status_label.setAlignment(Qt.AlignCenter)
+        self.service_brake_status_label.setFont(QFont('Arial', 14))
+        col1_layout.addWidget(self.service_brake_status_label)
+
         self.passenger_count_label = QLabel()
         self.passenger_count_label.setAlignment(Qt.AlignCenter)
         self.passenger_count_label.setFont(QFont('Arial', 14))
@@ -209,6 +214,11 @@ class MetricsTab(QWidget):
         self.weight_label.setAlignment(Qt.AlignCenter)
         self.weight_label.setFont(QFont('Arial', 14))
         col2_layout.addWidget(self.weight_label)
+
+        self.train_length_label = QLabel()
+        self.train_length_label.setAlignment(Qt.AlignCenter)
+        self.train_length_label.setFont(QFont('Arial', 14))
+        col2_layout.addWidget(self.train_length_label)
 
         self.temperature_label = QLabel()
         self.temperature_label.setAlignment(Qt.AlignCenter)
@@ -224,11 +234,6 @@ class MetricsTab(QWidget):
         self.door_status_label.setAlignment(Qt.AlignCenter)
         self.door_status_label.setFont(QFont('Arial', 14))
         col2_layout.addWidget(self.door_status_label)
-
-        self.service_brake_status_label = QLabel()
-        self.service_brake_status_label.setAlignment(Qt.AlignCenter)
-        self.service_brake_status_label.setFont(QFont('Arial', 14))
-        col2_layout.addWidget(self.service_brake_status_label)
 
         main_layout.addLayout(col1_layout)
         main_layout.addLayout(col2_layout)
@@ -251,6 +256,7 @@ class MetricsTab(QWidget):
         light_status = "On" if self.train.lightStatus else "Off"
         door_status = "Open" if self.train.doorStatus else "Closed"
         service_brake_status = "On" if self.train.serviceBrake else "Off"
+        train_length = self.train.getLength()
 
         self.current_speed_label.setText(f"Current Speed: {current_speed:.2f} mph")
         self.goal_speed_label.setText(f"Goal Speed: {goal_speed:.2f} mph")
@@ -261,6 +267,7 @@ class MetricsTab(QWidget):
         self.light_status_label.setText(f"Light Status: {light_status}")
         self.door_status_label.setText(f"Door Status: {door_status}")
         self.service_brake_status_label.setText(f"Service Brake: {service_brake_status}")
+        self.train_length_label.setText(f"Train Length: {train_length} ft")  # Set the length
 
 
 class TestBench(QWidget):
@@ -431,31 +438,37 @@ class TestBench(QWidget):
                 main_window.start_speed_calculation()
                 self.train.speedCalculations()
 
-class MainWindow(QTabWidget):
-    def __init__(self):
+class TrainWindow(QTabWidget):
+    def __init__(self, train_model):
         super().__init__()
-        self.train = trainModel()
+        self.train = train_model
         self.train_tab = PassengerView(self.train)
         self.failure_tab = MurphyView(self.train)
         self.metrics_tab = MetricsTab(self.train)
         self.test_bench = TestBench(self.train, self.metrics_tab, self.train_tab)
 
+        # Add the tabs to the new window
         self.addTab(self.train_tab, "Passenger View")
         self.addTab(self.failure_tab, "Murphy View")
         self.addTab(self.metrics_tab, "Metrics")
         self.addTab(self.test_bench, "Test Bench")
 
-        self.calculation_timer = QTimer(self)
-        self.calculation_timer.timeout.connect(self.start_speed_calculation)
-        self.calculation_timer.start(500)  # Every 500ms
-
+        # Start the worker in a thread for this train model
         self.thread = QThread()
         self.worker = Worker(self.train)
         self.worker.moveToThread(self.thread)
 
-        self.worker.finished.connect(self.thread.deleteLater)
+        self.worker.finished.connect(self.thread.quit)
+        self.worker.finished.connect(self.thread.wait)  # Ensure the thread finishes properly
         self.thread.started.connect(self.worker.run)
-        self.thread.finished.connect(self.on_calculation_finished)
+
+        # Start the thread
+        self.thread.start()
+
+        # Set up a timer for speed calculations
+        self.calculation_timer = QTimer(self)
+        self.calculation_timer.timeout.connect(self.start_speed_calculation)
+        self.calculation_timer.start(500)  # Every 500ms
 
     def start_speed_calculation(self):
         if not self.thread.isRunning():
@@ -465,20 +478,49 @@ class MainWindow(QTabWidget):
 
             self.worker.finished.connect(self.thread.quit)
             self.thread.started.connect(self.worker.run)
-            self.thread.finished.connect(self.on_calculation_finished)
 
             self.thread.start()
 
+    def closeEvent(self, event):
+        # Stop the thread and wait for it to finish before closing the window
+        self.calculation_timer.stop()
+        self.thread.quit()
+        self.thread.wait()
+        event.accept()  # Accept the close event
+
     def on_calculation_finished(self):
+        # Print statement for debugging
         #print("Speed calculation finished")
         self.metrics_tab.update_labels()
+
+
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.train_windows = [] 
+        self.initUI()
+
+    def initUI(self):
+        self.setWindowTitle("Train Control System")
+        self.setGeometry(100, 100, 300, 200)
+
+        self.add_train_button = QPushButton("Add Train", self)
+        self.add_train_button.clicked.connect(self.create_train_window)
+        self.add_train_button.setGeometry(50, 50, 200, 50)
+
+    def create_train_window(self):
+        train = trainModel()
+        train_window = TrainWindow(train) 
+        self.train_windows.append(train_window)
+
+        train_window.setWindowTitle(f"Train {len(self.train_windows)}")
+        train_window.resize(800, 600)
+        train_window.show()
 
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()
-    window.setWindowTitle("Train Model")
-    window.resize(800, 600)
     window.show()
     sys.exit(app.exec_())
-    
+

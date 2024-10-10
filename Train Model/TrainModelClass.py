@@ -105,6 +105,9 @@ class trainModel:
         self.totalMassCalc()
         return self.totalMass * 2.20462
     
+    def getLength(self):
+        return self.length
+    
     def getTemp(self):
         return self.temperature
 
@@ -156,7 +159,7 @@ class trainModel:
             if self.emergencyBrake:
                 self.acceleration = -2.73
                 while self.currentSpeed > 0:
-                    # Check for brake deactivation
+
                     if not self.emergencyBrake:
                         self.acceleration = 0
                         break
@@ -175,7 +178,7 @@ class trainModel:
             elif self.serviceBrake:
                 self.acceleration = -1.2
                 while self.currentSpeed > 0:
-                    # Check for brake deactivation
+
                     if not self.serviceBrake:
                         self.acceleration = 0
                         break
@@ -195,7 +198,7 @@ class trainModel:
                 if not self.serviceBrake and not self.emergencyBrake:
                     self.acceleration = -0.01
                     while self.currentSpeed > 0:
-                        # Check for brake deactivation
+
                         if not self.engineFailure:
                             self.acceleration = 0
                             break
@@ -224,7 +227,7 @@ class trainModel:
 
                 self.currentSpeed = self.prevSpeed + (self.period / 2) * (self.acceleration + self.prevAcceleration)
 
-                print(self.getAccelerationImperial())
+                #print(self.getAccelerationImperial())
                 time.sleep(self.period)
 
     # used to check if service brake needs to turn on
