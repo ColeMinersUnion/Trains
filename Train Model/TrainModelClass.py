@@ -42,6 +42,8 @@ class trainModel:
         if self.signalFailure:
             return
         
+        input = input * 0.44704
+        
         if(input > self.maxSpeed):
             self.goalSpeed = self.maxSpeed
         else:

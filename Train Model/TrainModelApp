@@ -384,7 +384,7 @@ class TestBench(QWidget):
             return
         try:
             goal_speed = float(self.goal_speed_input.text())
-            self.train.setGoalSpeed(goal_speed * 0.44704)  # Convert mph to meters per second
+            self.train.setGoalSpeed(goal_speed)
             self.metrics_tab.update_labels()
 
             main_window = self.parent()
