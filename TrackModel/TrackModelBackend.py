@@ -9,8 +9,8 @@ crossingid=[] #track crossing numbers for pinging
 crossingid=[]
 failmode = 0
 failnames = ["None","Rail","Circuit","Power"]
-modelspeed = 10
-
+heaters = False
+speed = 1
 class Block:
     #instantiation
     def __init__(self, linenum, section, number, length, grade, speed, twoway, elevation, underground,x1,y1,x2,y2):

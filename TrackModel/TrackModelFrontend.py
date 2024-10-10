@@ -5,7 +5,7 @@ from PyQt6.QtWidgets import QWidget, QLabel, QPushButton, QLineEdit, QSlider
 from PyQt6.QtGui import QTransform, QPixmap
 from PyQt6.QtCore import Qt,QTimer
 import TrackModelBackend
-from TrackModelBackend import lines,failmode,failnames
+from TrackModelBackend import lines,failmode,failnames,speed,heaters
 
 passive = [] #no update method, do not react to backend changes
 active = [] #update method, react to backend changes
@@ -24,8 +24,6 @@ tooltipstyle = """QToolTip {
                 }"""
 
 clock=0
-speed=1
-
 class SpeedMeter(QWidget):
     def __init__(self,window):
         global speed
@@ -57,7 +55,6 @@ class HeaterSystem(QWidget):
         self.label = QLabel(window)
         self.label.move(405,0)
         self.label.setToolTip("Track heaters off")
-        self.on=False
         pixmap = QPixmap('TrackModel/Icons/OffHeater.png')
         self.label.setPixmap(pixmap)
         
@@ -74,19 +71,20 @@ class HeaterSystem(QWidget):
         self.slider.setValue(self.temp)
 
     def update(self):
+        global heaters
         self.temp=self.slider.value()
         self.number.setText(str(self.temp) + " °F")
         self.number.adjustSize()
 
-        if((not self.on) and self.temp<=32):
+        if((not heaters) and self.temp<=32):
             self.label.setToolTip("Track heaters on")
-            self.on=True
+            heaters=True
             pixmap = QPixmap('TrackModel/Icons/OnHeater.png')
             self.label.setPixmap(pixmap)
 
-        if(self.on and self.temp>32):
+        if(heaters and self.temp>32):
             self.label.setToolTip("Track heaters off")
-            self.on=False
+            heaters=False
             pixmap = QPixmap('TrackModel/Icons/OffHeater.png')
             self.label.setPixmap(pixmap)
 
@@ -319,6 +317,7 @@ class Map(QWidget):
         
     
     def tenBaudClock(self):
+        global lines
         global clock
         global speed
         clock += speed
@@ -327,7 +326,7 @@ class Map(QWidget):
             print("10 baud passed")
             for l in lines:
                 for t in l.trains:
-                    t.tenBaudMessage
+                    t.tenBaudMessage()
 
         
     
