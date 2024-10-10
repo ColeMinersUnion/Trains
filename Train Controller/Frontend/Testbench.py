@@ -1,8 +1,7 @@
 import PyQt5
 import sys
 from PyQt5.QtWidgets import QApplication, QCheckBox, QMainWindow, QLabel, QWidget, QVBoxLayout, QLineEdit, QPushButton, QTextEdit, QLayout
-#from backend import Backend #importing backend logic
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, QTimer
 from backend import Backend
 
 class TestbenchUI(QWidget):
@@ -75,6 +74,12 @@ class TestbenchUI(QWidget):
         layout.addWidget(QLabel("Headlights Status: "))
         layout.addWidget(self.hl_checkbox)
 
+        #input for speed limit
+        self.speed_limit_input = QLineEdit(self)
+        self.speed_limit_input.setPlaceholderText("Enter Speed Limit")
+        layout.addWidget(QLabel("Speed Limit:"))
+        layout.addWidget(self.speed_limit_input)
+
         # Button to submit command
         self.submit_button = QPushButton("Submit", self)
         self.submit_button.clicked.connect(self.submit_inputs)
@@ -101,8 +106,22 @@ class TestbenchUI(QWidget):
         lights_status = self.light_checkbox.isChecked()
         internal_temperature = int(self.internal_temp_input.text()) if self.internal_temp_input.text() != "" else 0
         headlights_status = self.hl_checkbox.isChecked()
+        speed_limit = int(self.speed_limit_input.text()) if self.speed_limit_input.text() != "" else 0
 
-        self.backend.update_testbench_status(commanded_speed, authority, brake_status, suggested_speed, current_speed, power_output, door_status, lights_status, internal_temperature, headlights_status)
+        #self.backend.set_commanded_speed(commanded_speed)
+        #self.backend.set_authority(authority)
+        #self.backend.set_brake_status(brake_status)
+        #self.backend.set_suggested_speed(suggested_speed)
+        #self.backend.set_current_speed(current_speed)
+        #self.backend.set_power_output(power_output)
+        #self.backend.set_door_status(door_status)
+        #self.backend.set_lights_status(lights_status)
+        #self.backend.set_internal_temperature(internal_temperature)
+        #self.backend.set_headlights_status(headlights_status)
+        #self.backend.set_speed_limit(speed_limit)
+
+        self.backend.update_testbench_status(commanded_speed, authority, brake_status, suggested_speed, current_speed, power_output, door_status, lights_status, internal_temperature, headlights_status, speed_limit)
+
         #self.status_label.setText(
         #f"Speed: {self.backend.commanded_speed}\n"
         #f"Authority: {self.backend.authority}\n"

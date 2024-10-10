@@ -2,62 +2,54 @@ import sys
 import os
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel
 from PyQt5.QtGui import QPixmap
+from PyQt5.QtCore import pyqtSignal
 import backend
 
 class LightsAndDoorsUI(QWidget):
-    def __init__(self):
+    LDS_Updated  = pyqtSignal()
+
+    def __init__(self, backend):
         super().__init__()
         self.backend = backend
         self.initUI()
 
     def initUI(self):
-        self.setWindowTitle("Image with Buttons")
-        self.setGeometry(100, 100, 400, 300)
+        layout = QVBoxLayout()
 
-        # Create a layout for the top row of buttons
-        top_button_layout = QHBoxLayout()
-        top_button1 = QPushButton("Door 1")
-        top_button2 = QPushButton("Door 3")
-        top_button3 = QPushButton("Door 5")
-        top_button_layout.addWidget(top_button1)
-        top_button_layout.addWidget(top_button2)
-        top_button_layout.addWidget(top_button3)
+        # Button to toggle lights
+        self.lights_button = QPushButton("Lights: Off", self)
+        self.lights_button.clicked.connect(self.toggle_lights)
+        layout.addWidget(self.lights_button)
 
-        # Load the image
-        image_path = os.path.join(os.path.dirname(__file__), "trains.png")
-        image_label = QLabel(self)
-        pixmap = QPixmap(image_path)
-        if pixmap.isNull():
-            print(f"Error: Unable to load image '{image_path}'.")
-        else:
-            image_label.setPixmap(pixmap)
-            image_label.setScaledContents(True)
-            image_label.setMinimumSize(400, 300)
+        # Button to toggle doors
+        self.doors_button = QPushButton("Doors: Closed", self)
+        self.doors_button.clicked.connect(self.toggle_doors)
+        layout.addWidget(self.doors_button)
 
-        image_layout = QHBoxLayout()
-        left_button = QPushButton("Left Button")
-        right_button = QPushButton("Right Button")
-        image_layout.addWidget(left_button)
-        image_layout.addWidget(image_label)
-        image_layout.addWidget(right_button)
+        # Button to toggle headlights
+        self.headlights_button = QPushButton("Headlights: Off", self)
+        self.headlights_button.clicked.connect(self.toggle_headlights)
+        layout.addWidget(self.headlights_button)
 
-        # Create a layout for the bottom row of buttons
-        bottom_button_layout = QHBoxLayout()
-        bottom_button1 = QPushButton("Door 2")
-        bottom_button2 = QPushButton("Door 4")
-        bottom_button3 = QPushButton("Door 6")
-        bottom_button_layout.addWidget(bottom_button1)
-        bottom_button_layout.addWidget(bottom_button2)
-        bottom_button_layout.addWidget(bottom_button3)
+        self.setLayout(layout)
 
-        # Create a main layout
-        main_layout = QVBoxLayout()
-        main_layout.addLayout(top_button_layout)
-        main_layout.addLayout(image_layout)
-        main_layout.addWidget(image_label)
-        main_layout.addLayout(bottom_button_layout)
+    def toggle_lights(self):
+        current_status = self.backend.get_lights_status()
+        new_status = not current_status
+        self.backend.set_lights_status(new_status)
+        self.lights_button.setText(f"Lights: {'On' if new_status else 'Off'}")
 
-        self.setLayout(main_layout)
+    def toggle_doors(self):
+        current_status = self.backend.get_door_status()
+        new_status = not current_status
+        self.backend.set_door_status(new_status)
+        self.doors_button.setText(f"Doors: {'Open' if new_status else 'Closed'}")
+
+    def toggle_headlights(self):
+        current_status = self.backend.get_headlights_status()
+        new_status = not current_status
+        self.backend.set_headlights_status(new_status)
+        self.headlights_button.setText(f"Headlights: {'On' if new_status else 'Off'}")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
