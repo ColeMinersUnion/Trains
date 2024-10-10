@@ -1,11 +1,11 @@
 # method to automtically make shapes and add to array, for loop to make new blocks with arrays of requests
 
-import PyQt6
+import PyQt6, math
 from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QLineEdit, QSlider
 from PyQt6.QtGui import QTransform, QPixmap
 from PyQt6.QtCore import Qt,QTimer
 import TrackModelBackend
-from TrackModelBackend import lines,failmode,failnames      
+from TrackModelBackend import lines,failmode,failnames
 
 passive = [] #no update method, do not react to backend changes
 active = [] #update method, react to backend changes
@@ -32,18 +32,21 @@ class SpeedMeter(QWidget):
         super().__init__()  
         self.slider = QSlider(Qt.Orientation.Horizontal, window)
         self.slider.setGeometry(650,0,180,45)
-        self.slider.setMinimum(1)
-        self.slider.setMaximum(50)
+        self.slider.setMinimum(-100)
+        self.slider.setMaximum(200)
         self.slider.valueChanged.connect(self.update)
         
         self.number = QLabel(window)
         self.number.move(830,0)
+        temp=0
+        self.slider.setValue(0)
         self.number.setText(str(speed) + "x")
-        self.slider.setValue(speed)
+
 
     def update(self):
         global speed
-        speed=self.slider.value()
+        temp=self.slider.value()
+        speed=float(int(10*math.pow(10,temp/100))/10)
         self.number.setText(str(speed) + "x")
         self.number.adjustSize()
 
@@ -318,8 +321,8 @@ class Map(QWidget):
         global clock
         global speed
         clock += speed
-        if clock>=100:
-            clock -= 100
+        if clock>=1000:
+            clock -= 1000
             print("10 baud passed")
             for l in lines:
                 for t in l.trains:
