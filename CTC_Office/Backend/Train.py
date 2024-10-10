@@ -20,7 +20,8 @@ class Train:
     def move(self) -> bool:
         #The notion is that I can do like a while(move())
         #Sort of thing and in the loop id:      time.sleep(block_length/speed)
-
+        if(len(self.schedule.routes) == 0 ):
+            return False
         if(self.location == self.schedule.routes[self.curr_route].end):
             if(self.curr_route + 1 < len(self.schedule.routes)):
                 self.curr_route += 1
@@ -44,6 +45,18 @@ class Train:
             return 0.36
         else:
             return 3.6
+        
+    def speedy(self):
+        return self.location.speed_limit
+    
+    def auth(self):
+        try:
+            self.authority = 0
+            for i in list(self.schedule.routes[self.curr_route].paths)[self.curr_route_index : ]:
+                self.authority += self.line.graph[i].block_length
+            return self.authority
+        except:
+            return 0
     
 if(__name__ == '__main__'):
     #Making the route
