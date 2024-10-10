@@ -30,7 +30,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="wayside">
      <attribute name="title">
@@ -42,7 +42,7 @@
         <x>10</x>
         <y>10</y>
         <width>371</width>
-        <height>552</height>
+        <height>558</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="block_occ">
@@ -281,7 +281,7 @@
        <rect>
         <x>400</x>
         <y>310</y>
-        <width>281</width>
+        <width>251</width>
         <height>251</height>
        </rect>
       </property>
@@ -360,9 +360,9 @@
      <widget class="QWidget" name="verticalLayoutWidget_10">
       <property name="geometry">
        <rect>
-        <x>690</x>
+        <x>680</x>
         <y>170</y>
-        <width>181</width>
+        <width>191</width>
         <height>281</height>
        </rect>
       </property>
@@ -466,10 +466,10 @@
      <widget class="QWidget" name="verticalLayoutWidget_4">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>260</y>
-        <width>160</width>
-        <height>130</height>
+        <x>630</x>
+        <y>20</y>
+        <width>191</width>
+        <height>281</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="ctc_log">
@@ -488,10 +488,10 @@
      <widget class="QWidget" name="verticalLayoutWidget_2">
       <property name="geometry">
        <rect>
-        <x>220</x>
-        <y>0</y>
+        <x>10</x>
+        <y>50</y>
         <width>258</width>
-        <height>291</height>
+        <height>411</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="Maintenance">
@@ -653,10 +653,10 @@
      <widget class="QWidget" name="verticalLayoutWidget_6">
       <property name="geometry">
        <rect>
-        <x>230</x>
-        <y>310</y>
-        <width>181</width>
-        <height>171</height>
+        <x>580</x>
+        <y>320</y>
+        <width>281</width>
+        <height>241</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="track_state">
@@ -701,10 +701,10 @@
      <widget class="QWidget" name="verticalLayoutWidget">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>0</y>
-        <width>196</width>
-        <height>241</height>
+        <x>290</x>
+        <y>80</y>
+        <width>251</width>
+        <height>341</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="ctc_dispatch">
@@ -797,10 +797,10 @@
      <widget class="QWidget" name="verticalLayoutWidget_3">
       <property name="geometry">
        <rect>
-        <x>390</x>
-        <y>0</y>
-        <width>273</width>
-        <height>536</height>
+        <x>10</x>
+        <y>10</y>
+        <width>361</width>
+        <height>561</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="BlockTable">
@@ -1027,10 +1027,10 @@
      <widget class="QWidget" name="verticalLayoutWidget_7">
       <property name="geometry">
        <rect>
-        <x>190</x>
-        <y>360</y>
-        <width>181</width>
-        <height>171</height>
+        <x>400</x>
+        <y>320</y>
+        <width>251</width>
+        <height>251</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="track_state_2">
@@ -1075,10 +1075,10 @@
      <widget class="QWidget" name="verticalLayoutWidget_8">
       <property name="geometry">
        <rect>
-        <x>40</x>
-        <y>30</y>
-        <width>258</width>
-        <height>291</height>
+        <x>400</x>
+        <y>40</y>
+        <width>251</width>
+        <height>271</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="Murphy">
@@ -1229,10 +1229,10 @@
      <widget class="QWidget" name="verticalLayoutWidget_13">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>360</y>
-        <width>160</width>
-        <height>130</height>
+        <x>680</x>
+        <y>170</y>
+        <width>191</width>
+        <height>281</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="ctc_log_3">
@@ -1257,7 +1257,7 @@
      <x>0</x>
      <y>0</y>
      <width>896</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuBlue_Line">
