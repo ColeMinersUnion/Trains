@@ -94,6 +94,9 @@ class TrackModel:
                     self.trains[i] += 1
         self.shell.set_occupancy(self.occupancy)
 
+    def murphy_track(self, murphy_list):
+        pass
+
 class CTC:
     def __init__(self):
         self.occupancy = [False for i in range(17)]
