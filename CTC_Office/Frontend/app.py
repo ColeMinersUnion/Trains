@@ -2,7 +2,7 @@
 from PyQt6.QtWidgets import QMainWindow, QPushButton, QVBoxLayout, QWidget, QLineEdit, QLabel
 from Components.SchedulePreviewer import SchedulePreviewer
 from datetime import datetime
-import os
+import time
 
 
 class CTCApplication(QMainWindow):
@@ -62,15 +62,35 @@ class CTCApplication(QMainWindow):
 
         lbl = QLabel()
         lbl.setText("Testbench Information")
+
+        lbl1 = QLabel()
+        lbl1.setText("Moving Trains and seeing the track Schedule")
+        self.layout.addWidget(lbl1)
         self.layout.addWidget(self.button)
         self.layout.addWidget(self.scheduleWidget.widget)
+
+        lbl2 = QLabel()
+        lbl2.setText("Adding and removing trains")
+        self.layout.addWidget(lbl2)
         self.layout.addWidget(self.addTrain)
         self.layout.addWidget(self.submit)
         self.layout.addWidget(self.clear)
+
+        lbl3 = QLabel()
+        lbl3.setText("Automatic Mode")
+        self.layout.addWidget(lbl3)
         self.layout.addWidget(self.Automatic)
         self.layout.addWidget(self.Auto)
+
+        lbl4 = QLabel()
+        lbl4.setText("Breaking the track")
+        self.layout.addWidget(lbl4)
         self.layout.addWidget(self.breakBlok)
         self.layout.addWidget(self.submitBreak)
+
+        lbl5 = QLabel()
+        lbl5.setText("Fixing the track")
+        self.layout.addWidget(lbl5)
         self.layout.addWidget(self.fixBlock)
         self.layout.addWidget(self.submitFix)
         
@@ -92,8 +112,8 @@ class CTCApplication(QMainWindow):
         if(train.move()):
             self.scheduleWidget.update(train.id, str(train.location), train.Next_Stop, datetime.now())
 
-        self.speed.setText(f'Speed: {train.speedy()}')
-        self.auth.setText(f'Authority {train.auth()}')
+        self.speed.setText(f'Speed: {train.speedy()/1.609344} Mph')
+        self.auth.setText(f'Authority {train.auth()/1609.344} Miles')
         if train.Next_Stop == 'Station B':
             self.switchState.setText("Up")
         else:
@@ -135,7 +155,7 @@ class CTCApplication(QMainWindow):
     def onAuto(self):
         fn = self.Automatic.text()
         try:
-            print(os.getcwd())
+            #print(os.getcwd())
             file = open(fn)
             txt = file.readline()
             self.Office.addTrain([txt])
@@ -148,6 +168,7 @@ class CTCApplication(QMainWindow):
 
 
     def autoMove(self):
+        id = self.Office.nextID - 1
         train = self.Office.Schedule.trains[id]
 
         while(train.move()):
@@ -159,7 +180,8 @@ class CTCApplication(QMainWindow):
                 self.switchState.setText("Up")
             else:
                 self.switchState.setText("Down")
-            train.waitTime(speedUp=True)
+
+            time.sleep(train.waitTime(speedUp=True))
 
 
 

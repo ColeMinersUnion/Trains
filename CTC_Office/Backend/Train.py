@@ -47,7 +47,10 @@ class Train:
             return 3.6
         
     def speedy(self):
-        return self.location.speed_limit
+        try:
+            return self.location.speed_limit
+        except:
+            return 0
     
     def auth(self):
         try:
