@@ -7,10 +7,10 @@ lines=[]
 switchid=[] #track switch numbers for pinging
 crossingid=[] #track crossing numbers for pinging
 crossingid=[]
-CLOCK_TIME = 1/60
 failmode = 0
 failnames = ["None","Rail","Circuit","Power"]
 modelspeed = 10
+speed = 1
 
 class Block:
     #instantiation
@@ -147,24 +147,29 @@ class Train:
         self.linenum = linenum
         self.block1 = block1
         self.block2 = block1 #train can occupy multiple blocks
-        self.length=length
         self.velocity = 0
         self.pos = 0
-        self.authority = 0
         self.goingUp = True #direction depending if it crosses segment in ascending or descending block order
+        '''
+        msgqueue = 10 Baud messages passed by wayside to train via track
+        tenbaud = 10 bauds available after processing the bud limit
+        possible inputs through here: speed, authority, train temp, doors,
+        '''
         self.msgqueue = []
         self.tenbaud = [False,False,False,False,False,False,False,False,False,False]
+        self.beacondata = ""
 
-    def newPos(self):
-        pos += self.velocity * CLOCK_TIME
-        if pos>(lines[self.linenum].blocks(self.block1).length):
-            pos -= self.block.length
+    def addPos(self,x):
+        self.pos = self.pos + x
+        if self.pos>(lines[self.linenum].blocks(self.block1).length):
+            self.pos -= self.block.length
             if(self.goingUp):
                 self.block1=lines[self.linenum].blocks(self.block1).next
             else:
                 self.block1=lines[self.linenum].blocks(self.block1).prev
-        if pos>(lines[self.linenum].blocks(self.block1).length-self.length): 
+        if self.pos>(lines[self.linenum].blocks(self.block1).length-self.length): 
             self.block2 = self.block1 #move train off old track if up far enough
+        self.beacondata = self.getTransponder(self.block1)
 
     def getTransponder(self,block):
         for x in lines[self.linenum].transponders:

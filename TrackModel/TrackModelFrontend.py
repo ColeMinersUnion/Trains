@@ -2,11 +2,11 @@
 
 import PyQt6
 from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QLineEdit, QSlider
-from PyQt6.QtGui import QTransform, QPixmap, QIcon
+from PyQt6.QtGui import QTransform, QPixmap
 from PyQt6.QtCore import Qt,QTimer
 import sys 
 import TrackModelBackend
-from TrackModelBackend import lines,failmode,CLOCK_TIME, failnames,modelspeed      
+from TrackModelBackend import lines,failmode,failnames,speed      
 
 passive = [] #no update method, do not react to backend changes
 active = [] #update method, react to backend changes
@@ -24,6 +24,28 @@ tooltipstyle = """QToolTip {
                 border: white solid 1px
                 }"""
 
+class SpeedUp(QWidget):
+    def __init__(self,window):
+        super().__init__()
+        self.slider = QSlider(Qt.Orientation.Horizontal, window)
+        self.slider.setGeometry(750,0,180,45)
+        self.slider.setMinimum(1)
+        self.slider.setMaximum(50)
+        self.slider.setTickInterval(1)
+        self.slider.valueChanged.connect(self.update)
+        self.number = QLabel(window)
+        self.number.move(930,0)
+        self.number.setText("1x")
+        self.slider.setValue(1)
+
+
+    def update(self):
+        global speed
+        sliderspeed=self.slider.value()
+        speed = sliderspeed
+        self.number.setText(str(sliderspeed) + "x")
+        self.number.adjustSize()
+
 class HeaterSystem(QWidget):
     def __init__(self,window):
         super().__init__()
@@ -39,8 +61,6 @@ class HeaterSystem(QWidget):
         self.slider.setGeometry(450,0,180,45)
         self.slider.setMinimum(0)
         self.slider.setMaximum(100)
-        self.slider.setTickPosition(QSlider.TickPosition.TicksBelow)
-        self.slider.setTickInterval(1)
         self.slider.valueChanged.connect(self.update)
         
         self.number = QLabel(window)
@@ -66,25 +86,57 @@ class HeaterSystem(QWidget):
             pixmap = QPixmap('TrackModel/Icons/OffHeater.png')
             self.label.setPixmap(pixmap)
 
+class TrainOccupy(QWidget):
+    def __init__(self,linenum,blocknum,window):
+        global failmode
+        super().__init__()
+        self.linenum = linenum
+        self.blocknum = blocknum
+        self.label = QLabel(window)
+        self.center = lines[linenum].blocks[blocknum].center
+        pixmap = QPixmap('TrackModel/Icons/TrainOccupy.png')
+        self.label.setPixmap(pixmap)
+        self.label.move(-100,-100)
+        self.label.setToolTip("Occupied at \n" + TrackModelBackend.linenames[linenum] + " Line, Block " + str(blocknum))
+        self.label.setStyleSheet(labelstyle)
+        self.setStyleSheet(tooltipstyle)
+        self.update()
+
+    def update(self):
+        if(lines[self.linenum].blocks[self.blocknum].occupied):
+            self.label.move((int((self.center[0]-0.125)*SCL)),int(YFF-(self.center[1]+0.175)*SCL))
+        else:
+            self.label.move(-100,-100)
+        self.label.show()
+
+
 class Failure(QWidget):
     def __init__(self,linenum,blocknum,window):
         global failmode
         super().__init__()
         self.linenum = linenum
         self.blocknum = blocknum
-        self.pixmap = QPixmap('TrackModel/Icons/' + failnames[failmode] + 'Failure.png')
         self.label = QLabel(window)
-        self.label.setPixmap(self.pixmap)
-        self.label.setToolTip(failnames[failmode] + " Failure\n " + TrackModelBackend.linenames[linenum] + " Line, Block " + str(blocknum))
-        center = lines[linenum].blocks[blocknum].center
-        self.label.move(int(center[0]*SCL-25),int(YFF-center[1]*SCL-22.5))
+        self.center = lines[linenum].blocks[blocknum].center
+        pixmap = QPixmap('TrackModel/Icons/RailFailure.png')
+        self.label.setPixmap(pixmap)
+        self.label.move(-100,-100)
         self.label.setStyleSheet(labelstyle)
         self.setStyleSheet(tooltipstyle)
+        self.update()
         
     def update(self):
-        global active
-        if(lines[self.linenum].blocks[self.blocknum].failure==0):
-            active.remove(self)
+        objfail = lines[self.linenum].blocks[self.blocknum].failure
+        if(objfail==0):
+            self.label.move(-100,-100)
+        else:
+            pixmap = QPixmap('TrackModel/Icons/' + failnames[objfail] + 'Failure.png')
+            self.label.setPixmap(pixmap)
+            self.label.move((int((self.center[0]-0.35)*SCL)),int(YFF-(self.center[1]+0.225)*SCL))
+            self.label.setToolTip(failnames[objfail] + " Failure\n " + TrackModelBackend.linenames[self.linenum] + " Line, Block " + str(self.blocknum))
+        self.label.show()
+
+        
 
 class FailureSelect(QWidget):
     def __init__(self,window):
@@ -123,9 +175,10 @@ class FailureButton(QWidget):
 class BlockIcon(QWidget):
     def __init__(self,obj,window): #line number and block number
         super().__init__()
+        global active
         self.window=window
         self.obj=obj
-        self.pixmap = QPixmap('TrackModel/Icons/BlueArrow.png')
+        self.pixmap = QPixmap('TrackModel/Icons/' + TrackModelBackend.linenames[obj.linenum] + 'Arrow.png')
         self.label=QLabel(window)
         self.pixmap = self.pixmap.transformed(QTransform().scale(obj.mag*SCL/100,1))
         self.pixmap = self.pixmap.transformed(QTransform().rotate(0-self.obj.angle))
@@ -136,18 +189,19 @@ class BlockIcon(QWidget):
         self.label.setStyleSheet(labelstyle)
         self.setStyleSheet(tooltipstyle)
         self.label.mousePressEvent = self.setFailure
-        self.setFailure(None)
+        active.append(Failure(self.obj.linenum,self.obj.number,self.window))
+        active.append(TrainOccupy(self.obj.linenum,self.obj.number,self.window))
 
     def update(self):
         self.label.setToolTip(self.obj.toString())
         self.label.show()
 
-
     def setFailure(self,event):
-        global active, failmode
-        if(failmode > 0):
+        global failmode
+        objfail = lines[self.obj.linenum].blocks[self.obj.number].failure
+        if(objfail == 0):
             lines[self.obj.linenum].blocks[self.obj.number].failure = failmode
-            active.append(Failure(self.obj.linenum,self.obj.number,self.window))
+        
 
 class SwitchIcon(QWidget):
     def __init__(self,obj,window):
@@ -235,7 +289,6 @@ class Map(QWidget):
         self.setWindowTitle("Track Model Map")
         self.setStyleSheet("background-color: lightyellow;")
         TrackModelBackend.read('TrackModel/Blue Line.xlsx')
-        active.append(FailureSelect(self))
         passive.append(HeaterSystem(self))
         for i in range(3):
             passive.append(FailureButton((i+1),self)) #add failure buttons
@@ -250,13 +303,15 @@ class Map(QWidget):
                 passive.append(TransponderIcon(transponder,self))  
             for station in line.stations:
                 passive.append(StationIcon(station,self))
+        active.append(FailureSelect(self)) #this goes after the dynamic icons, we hide them behind this widget system
+        active.append(SpeedUp(self))
         self.timer=QTimer() #timer for active components
         self.timer.timeout.connect(self.update) #connect timer to update method
-        self.timer.start(int(CLOCK_TIME*1000)) #set clock speed of timer
+        self.timer.start(int(1000/60)) #set clock speed of timer
 
         self.tenBaud=QTimer() #timer for active components
         self.tenBaud.timeout.connect(self.tenBaudClock) #connect timer to update method
-        self.tenBaud.start(int(CLOCK_TIME*1000)) #set clock speed of timer
+        self.tenBaud.start(int(1000/60)) #set clock speed of timer
     
     def tenBaudClock(self):
         print("10 baud passed")
@@ -287,7 +342,7 @@ class Testbench(QWidget):
         self.input2 = QLineEdit(self)
         self.input2.move(100,300)
 
-        occupybutton = QPushButton("Set occupancy", self)
+        occupybutton = QPushButton("Switch occupancy", self)
         occupybutton.move(100,50)
         occupybutton.clicked.connect(self.switchOccupancy)
 
