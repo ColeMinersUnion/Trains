@@ -71,6 +71,26 @@ class TrackModel:
         self.occupancy[0] = True
         print(Speed, Authority)
         self.shell.set_occupancy(self.occupancy)
+    
+    #handles errors caused by murphy
+    #if there's a block occupancy 4 blocks ahead of the train, stop the train (command speed = 0)
+    def murphy_errors(self, Speed):
+        for i in range(17):
+            if i < 6:
+                if self.occupancy[i+4]==True:
+                    Speed=0
+                else:
+                    Speed=Speed
+            elif i < 12:
+                if self.occupancy[i+4]==True:
+                    Speed=0
+                else:
+                    Speed=Speed
+            else:
+                if self.occupancy[i+4]==True:
+                    Speed=0
+                else:
+                    Speed=Speed
 
     def move_trains(self):
         #moves the train forward in the case of no present switch or to a new super block of track depending upon where the train currently stands and the state of the switch on block 5
