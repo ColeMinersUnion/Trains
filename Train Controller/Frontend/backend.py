@@ -55,17 +55,7 @@ class Backend:
 
     def get_testbench_status(self):
         """Return the current status of the testbench inputs"""
-        return {self.commanded_speed, 
-                self.authority, 
-                self.brake_status, 
-                self.suggested_speed,  
-                self.current_speed, 
-                self.power_output, 
-                self.door_status, 
-                self.lights_status, 
-                self.internal_temperature,  
-                self.headlights_status, 
-                self.speed_limit}
+        return self.commanded_speed, self.authority, self.brake_status, self.suggested_speed, self.current_speed, self.power_output, self.door_status, self.lights_status, self.internal_temperature,  self.headlights_status, self.speed_limit
 
     
     def set_Kp_Ki(self , Kp, Ki):

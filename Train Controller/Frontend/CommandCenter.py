@@ -1,12 +1,12 @@
 # CommandCenter.py
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QHBoxLayout
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QFont
 from Testbench import TestbenchUI
 from backend import Backend
 from EngineerView import EngineerView
-#from LightsAndDoorsUI import LightsAndDoorsUI
-
+from LightsAndDoorsUI import LightsAndDoorsUI
 
 class CommandCenter(QWidget):
     def __init__(self):
@@ -16,16 +16,17 @@ class CommandCenter(QWidget):
         self.testbench_ui.inputs_updated.connect(self.update_values)
         self.engineer_view = EngineerView(self.backend)
         self.engineer_view.Kp_Ki_updated.connect(self.update_values)
-      #  self.lds_ui =  LightsAndDoorsUI(self.backend)
-       # self.lds_ui.LDS_Updated.connect(self.update_values)
-
+        self.lights_and_doors_ui = LightsAndDoorsUI(self.backend)
+        self.lights_and_doors_ui.inputs_updated.connect(self.update_values)
         self.initUI()
 
     def initUI(self):
         self.setWindowTitle("Command Center")
-        self.setGeometry(100, 100, 400, 300)
+        self.setGeometry(100, 100, 800, 600)
 
         layout = QVBoxLayout()
+        font = QFont()
+        font.setPointSize(12)
 
         self.setStyleSheet("""
             QWidget {
@@ -48,50 +49,93 @@ class CommandCenter(QWidget):
                 font-weight: bold;
                 color: #333;
             }
+            QPushButton#emergency_brake {
+                background-color: #FF0000;
+                color: white;
+                border: none;
+                padding: 16px 32px;
+                font-size: 12px;
+                border-radius: 8px;
+            }
+            QPushButton#service_brake {
+                background-color: #FFFF00;
+                color: black;
+                border: none;
+                padding: 16px 32px;
+                font-size: 24px;
+                border-radius: 8px;
+            }
+            QPushButton {
+                min-width: 150px;
+                min-height: 40px;
+            }
+            QLabel {
+                min-height: 30px;
+            }
         """)
 
         # Button to open Testbench UI
         self.testbench_button = QPushButton("Open Testbench", self)
         self.testbench_button.setFixedHeight(40)
+        self.testbench_button.setFont(font)
         self.testbench_button.clicked.connect(self.open_testbench)
         layout.addWidget(self.testbench_button)
 
-        #Button to open Engineer View
+        # Button to open Engineer View
         self.engineer_button = QPushButton("Open Engineer View", self)
         self.engineer_button.clicked.connect(self.open_engineer_view)
         layout.addWidget(self.engineer_button)
 
-        #Button to open LDS
-        #self.lds_button = QPushButton("Open Lights and Doors Override", self)
-        #self.lds_button.clicked.connect(self.open_lds)
-        #layout.addWidget(self.lds_button)
+        self.LDS_button = QPushButton("Open Lights and Doors Mod", self)
+        self.LDS_button.clicked.connect(self.open_lds)
+        layout.addWidget(self.LDS_button)
+
+        # Button to open LDS
+        # self.lds_button = QPushButton("Open Lights and Doors Override", self)
+        # self.lds_button.clicked.connect(self.open_lds)
+        # layout.addWidget(self.lds_button)
 
         # Labels to display speed, authority, and brake status
         self.speed_label = QLabel(f"Speed: {self.backend.commanded_speed}")
         self.authority_label = QLabel(f"Authority: {self.backend.authority}")
         self.brake_status_label = QLabel(f"Brake Status: {self.backend.brake_status}")
         self.suggested_speed_label = QLabel(f"Suggested Speed: {self.backend.suggested_speed}")
-        self.Kp_Label =  QLabel(f"Kp: {self.backend.Kp}")
-        self.Ki_Label =  QLabel(f"Ki: {self.backend.Ki}")
-        self.current_speed_label = QLabel(f"Current Speed: {self.backend.current_speed}")
+        self.Kp_Label = QLabel(f"Kp: {self.backend.Kp}")
+        self.Ki_Label = QLabel(f"Ki: {self.backend.Ki}")
+        self.current_speed_label = QLabel(f"Current Speed: {self.backend.safe_speed()}")
         self.power_output_label = QLabel(f"Power Output: {self.backend.power_output}")
-        self.door_status_label  = QLabel(f"Door Status: {self.backend.door_status}")
-        self.lights_status_label =  QLabel(f"Lights Status: {self.backend.lights_status}")
+        self.door_status_label = QLabel(f"Door Status: {self.backend.door_status}")
+        self.lights_status_label = QLabel(f"Lights Status: {self.backend.lights_status}")
         self.temperature_label = QLabel(f"Internal Temperature: {self.backend.internal_temperature}")
-        self.hl_status_label =  QLabel(f"Headlights Status: {self.backend.headlights_status}")
+        self.hl_status_label = QLabel(f"Headlights Status: {self.backend.headlights_status}")
         self.speed_limit_label = QLabel(f"Speed Limit: {self.backend.speed_limit}")
 
-        for label in [self.speed_label, self.authority_label, self.brake_status_label, self.suggested_speed_label, self.Kp_Label, self.Ki_Label,  self.current_speed_label, self.power_output_label, self.door_status_label, self.lights_status_label, self.temperature_label, self.hl_status_label, self.speed_limit_label]:
+        for label in [self.speed_label, self.authority_label, self.brake_status_label, self.suggested_speed_label, self.Kp_Label, self.Ki_Label, self.current_speed_label, self.power_output_label, self.door_status_label, self.lights_status_label, self.temperature_label, self.hl_status_label, self.speed_limit_label]:
             label.setAlignment(Qt.AlignmentFlag.AlignCenter)
             layout.addWidget(label)
 
-        # Set layout
-        self.setLayout(layout)
+        # Brake buttons
+        brake_layout = QHBoxLayout()
+        self.emergency_brake_button = QPushButton("Emergency Brake")
+        self.emergency_brake_button.setFixedHeight(100)
+        self.emergency_brake_button.setFixedWidth(200)
+        self.emergency_brake_button.setFont(font)
+        self.emergency_brake_button.setStyleSheet("background-color: #FF0000; color: white; border: none; padding: 16px 32px; font-size: 16px; border-radius: 8px;")
+        #self.emergency_brake_button.clicked.connect(self.backend.brake_status)
+        brake_layout.addWidget(self.emergency_brake_button)
 
-    #def update_Kp_Ki_values(self):
-     #   Kp, Ki = self.backend.get_Kp_Ki()
-      #  self.Kp_Label.setText(f"Kp: {Kp}")
-       # self.Ki_Label.setText(f"Ki: {Ki}")
+        self.service_brake_button = QPushButton("Service Brake")
+        self.service_brake_button.setFixedHeight(100)
+        self.service_brake_button.setFixedWidth(200)
+        self.service_brake_button.setFont(font)
+        self.service_brake_button.setStyleSheet("background-color: #db6740; color: white;  border: none; padding: 16px 32px; font-size: 16px;  border-radius: 8px;")
+
+        #self.service_brake_button.clicked.connect(self.backend.brake_status)
+        brake_layout.addWidget(self.service_brake_button)
+
+        layout.addLayout(brake_layout)
+
+        self.setLayout(layout)
 
     def open_testbench(self):
         # Open the Testbench UI
@@ -105,10 +149,10 @@ class CommandCenter(QWidget):
         #self.engineer_view.Kp_Ki_updated.connect(self.update_values)
         self.engineer_view.show()
 
-    #def open_lds(self):
+    def open_lds(self):
         # Open the LDS UI
      #   self.lds_ui = LightsAndDoorsUI(self.backend)
-      #  self.lds_ui.LDS_Updated.connect(self.update_values)
+        self.lights_and_doors_ui.show()
 
     def update_values(self):
         commanded_speed, authority, brake_status, suggested_speed, current_speed, power_output, door_status, lights_status, internal_temperature, headlights_status, speed_limit = self.backend.get_testbench_status()

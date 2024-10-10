@@ -1,55 +1,75 @@
 import sys
 import os
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel
-from PyQt5.QtGui import QPixmap
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtWidgets import QApplication, QWidget, QGroupBox, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QGridLayout
+from PyQt5.QtGui import QPixmap, QFont
 import backend
+from PyQt5.QtCore import pyqtSignal
 
 class LightsAndDoorsUI(QWidget):
-    LDS_Updated  = pyqtSignal()
-
+    inputs_updated = pyqtSignal()
     def __init__(self, backend):
         super().__init__()
         self.backend = backend
         self.initUI()
 
     def initUI(self):
-        layout = QVBoxLayout()
+        self.setWindowTitle("Lights and Doors Module")
+        self.setGeometry(100, 100, 800, 600)
 
-        # Button to toggle lights
-        self.lights_button = QPushButton("Lights: Off", self)
-        self.lights_button.clicked.connect(self.toggle_lights)
-        layout.addWidget(self.lights_button)
+        font = QFont()
+        font.setPointSize(12)
 
-        # Button to toggle doors
-        self.doors_button = QPushButton("Doors: Closed", self)
-        self.doors_button.clicked.connect(self.toggle_doors)
-        layout.addWidget(self.doors_button)
+        # Create a layout for the top row of buttons
+        top_button_layout = QHBoxLayout()
+        top_button1 = QPushButton("Right Doors")
+        top_button1.setFont(font)
+        top_button_layout.addWidget(top_button1)
 
-        # Button to toggle headlights
-        self.headlights_button = QPushButton("Headlights: Off", self)
-        self.headlights_button.clicked.connect(self.toggle_headlights)
-        layout.addWidget(self.headlights_button)
+        # Load the image
+        image_path = os.path.join(os.path.dirname(__file__), "trains.png")
+        image_label = QLabel(self)
+        pixmap = QPixmap(image_path)
+        if pixmap.isNull():
+            print(f"Error: Unable to load image '{image_path}'.")
+        else:
+            image_label.setPixmap(pixmap)
+            image_label.setScaledContents(True)
+            image_label.setMinimumSize(400, 300)
 
-        self.setLayout(layout)
+        image_layout = QGridLayout()
+        left_button = QPushButton("Headlights")
+        left_button.setFont(font)
+        right_button = QPushButton("Internal Lights")
+        right_button.setFont(font)
+        image_layout.addWidget(left_button, 0, 0)
+        image_layout.addWidget(image_label, 0, 1, 2, 2)
+        image_layout.addWidget(right_button, 1, 0)
 
-    def toggle_lights(self):
-        current_status = self.backend.get_lights_status()
-        new_status = not current_status
-        self.backend.set_lights_status(new_status)
-        self.lights_button.setText(f"Lights: {'On' if new_status else 'Off'}")
+        # Create a layout for the bottom row of buttons
+        bottom_button_layout = QHBoxLayout()
+        bottom_button1 = QPushButton("Left Doors")
+        bottom_button1.setFont(font)
+        bottom_button_layout.addWidget(bottom_button1)
 
-    def toggle_doors(self):
-        current_status = self.backend.get_door_status()
-        new_status = not current_status
-        self.backend.set_door_status(new_status)
-        self.doors_button.setText(f"Doors: {'Open' if new_status else 'Closed'}")
+        control_group_box = QGroupBox("Controls")
+        control_layout = QVBoxLayout()
+        control_layout.addLayout(top_button_layout)
+        control_layout.addLayout(image_layout)
+        control_layout.addLayout(bottom_button_layout)
+        control_group_box.setLayout(control_layout)
 
-    def toggle_headlights(self):
-        current_status = self.backend.get_headlights_status()
-        new_status = not current_status
-        self.backend.set_headlights_status(new_status)
-        self.headlights_button.setText(f"Headlights: {'On' if new_status else 'Off'}")
+        status_group_box = QGroupBox("Status")
+        status_layout = QVBoxLayout()
+        status_label = QLabel("Current Status:")
+        status_label.setFont(font)
+        status_layout.addWidget(status_label)
+        status_group_box.setLayout(status_layout)
+
+        # Create a main layout
+        main_layout = QVBoxLayout()
+        main_layout.addWidget(control_group_box)
+        main_layout.addWidget(status_group_box)
+        self.setLayout(main_layout)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
