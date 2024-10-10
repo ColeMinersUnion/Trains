@@ -31,13 +31,13 @@ class SpeedMeter(QWidget):
         global speed
         super().__init__()  
         self.slider = QSlider(Qt.Orientation.Horizontal, window)
-        self.slider.setGeometry(650,0,180,45)
+        self.slider.setGeometry(750,0,180,45)
         self.slider.setMinimum(-100)
         self.slider.setMaximum(200)
         self.slider.valueChanged.connect(self.update)
         
         self.number = QLabel(window)
-        self.number.move(830,0)
+        self.number.move(930,0)
         temp=0
         self.slider.setValue(0)
         self.number.setText(str(speed) + "x")
@@ -316,6 +316,7 @@ class Map(QWidget):
         self.tenBaud=QTimer() #timer for active components
         self.tenBaud.timeout.connect(self.tenBaudClock) #connect timer to update method
         self.tenBaud.start(1) #set clock speed of timer
+        
     
     def tenBaudClock(self):
         global clock
