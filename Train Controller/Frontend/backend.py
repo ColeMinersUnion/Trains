@@ -71,9 +71,9 @@ class Backend:
     
     def safe_speed(self):
         #function that makes sure the current speed is not greater then the speed limit. 
-        if (self.current_speed >  self.speed_limit):
-            self.current_speed = self.commanded_speed
-        return self.current_speed
+        if (self.commanded_speed >  self.speed_limit):
+            self.commanded_speed = self.speed_limit
+        return self.commanded_speed
     def stopping_distance(self):
         if (self.brake_status == False):
             if (self.authority <= 10): #choose value that gives train enough time

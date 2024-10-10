@@ -98,10 +98,10 @@ class TestbenchUI(QWidget):
         # Get the input text
         commanded_speed = int(self.commanded_speed_input.text()) if self.commanded_speed_input.text() != "" else 0
         authority = int(self.authority_input.text()) if self.authority_input.text() != "" else 0
-        brake_status = self.brake_checkbox.isChecked()
-        suggested_speed = int(self.suggested_speed_input.text()) if self.suggested_speed_input.text() != "" else 0
+        brake_status = (self.backend.current_speed > self.backend.speed_limit) or (self.backend.authority < 10) or self.brake_checkbox.isChecked()
+        suggested_speed = self.backend.speed_limit or int(self.suggested_speed_input.text()) if  self.suggested_speed_input.text() != "" else 0
         current_speed = int(self.current_speed_input.text()) if self.current_speed_input.text() != "" else 0
-        power_output = int(self.current_power_input.text()) if self.current_power_input.text() != "" else 0
+        power_output = (self.backend.commanded_speed*10) or int(self.current_power_input.text()) if  self.current_power_input.text() != "" else 0
         door_status = self.door_checkbox.isChecked()
         lights_status = self.light_checkbox.isChecked()
         internal_temperature = int(self.internal_temp_input.text()) if self.internal_temp_input.text() != "" else 0

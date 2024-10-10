@@ -1,7 +1,7 @@
 # CommandCenter.py
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QHBoxLayout
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QFont
 from Testbench import TestbenchUI
 from backend import Backend
@@ -19,6 +19,16 @@ class CommandCenter(QWidget):
         self.lights_and_doors_ui = LightsAndDoorsUI(self.backend)
         self.lights_and_doors_ui.inputs_updated.connect(self.update_values)
         self.initUI()
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.update_values)
+        self.timer.start(1000)  # 1000ms = 1s
+        self.authority_timer = QTimer()
+        self.authority_timer.timeout.connect(self.update_authority)
+        self.authority_timer.start(1000)  # 1000ms = 1s
+        self.brake_applied = False
+        self.speed_decrease_timer = QTimer()
+        self.speed_decrease_timer.timeout.connect(self.update_speed)
+        # ... (rest of your code)
 
     def initUI(self):
         self.setWindowTitle("Command Center")
@@ -34,7 +44,7 @@ class CommandCenter(QWidget):
                 font-family: Arial;
             }
             QPushButton {
-                background-color: #007BFF;
+                background-color: #35c0db;
                 color: white;
                 border: none;
                 padding: 8px 16px;
@@ -48,6 +58,9 @@ class CommandCenter(QWidget):
                 font-size: 16px;
                 font-weight: bold;
                 color: #333;
+                border: 1px solid #ccc;
+                padding: 5px;
+                border-radius: 4px;
             }
             QPushButton#emergency_brake {
                 background-color: #FF0000;
@@ -96,7 +109,7 @@ class CommandCenter(QWidget):
         # layout.addWidget(self.lds_button)
 
         # Labels to display speed, authority, and brake status
-        self.speed_label = QLabel(f"Speed: {self.backend.commanded_speed}")
+        self.speed_label = QLabel(f"Commanded Speed: {self.backend.commanded_speed}")
         self.authority_label = QLabel(f"Authority: {self.backend.authority}")
         self.brake_status_label = QLabel(f"Brake Status: {self.backend.brake_status}")
         self.suggested_speed_label = QLabel(f"Suggested Speed: {self.backend.suggested_speed}")
@@ -110,7 +123,7 @@ class CommandCenter(QWidget):
         self.hl_status_label = QLabel(f"Headlights Status: {self.backend.headlights_status}")
         self.speed_limit_label = QLabel(f"Speed Limit: {self.backend.speed_limit}")
 
-        for label in [self.speed_label, self.authority_label, self.brake_status_label, self.suggested_speed_label, self.Kp_Label, self.Ki_Label, self.current_speed_label, self.power_output_label, self.door_status_label, self.lights_status_label, self.temperature_label, self.hl_status_label, self.speed_limit_label]:
+        for label in [self.speed_label, self.authority_label, self.brake_status_label, self.suggested_speed_label, self.Kp_Label, self.Ki_Label, self.power_output_label, self.door_status_label, self.lights_status_label, self.temperature_label, self.hl_status_label, self.speed_limit_label]:
             label.setAlignment(Qt.AlignmentFlag.AlignCenter)
             layout.addWidget(label)
 
@@ -154,6 +167,32 @@ class CommandCenter(QWidget):
      #   self.lds_ui = LightsAndDoorsUI(self.backend)
         self.lights_and_doors_ui.show()
 
+    def update_authority(self):
+        speed = self.backend.commanded_speed
+        if speed > 0:
+            self.backend.authority -= speed / 10  # decrease authority proportional to speed
+            self.update_values()
+            if self.backend.authority < 10:
+                self.backend.brake_status = 1
+                self.update_values()
+            if self.backend.authority < 0:
+                self.backend.authority = 0
+                self.update_values()
+            self.authority_label.setText(f"Authority: {self.backend.authority:.2f}")
+        else:
+            self.timer.stop()  # stop the timer when speed is 0
+    def update_speed(self):
+        if self.brake_applied:
+            current_speed = self.backend.safe_speed()
+            self.update_values()
+            if current_speed > 0:
+                self.backend.set_safe_speed(current_speed - 1)  # decrease speed by 1 unit every second
+                self.update_values()
+            else:
+                self.backend.set_safe_speed(0)  # set speed to 0 when it reaches 0
+                self.brake_applied = False
+                self.speed_decrease_timer.stop()
+                self.update_values()
     def update_values(self):
         commanded_speed, authority, brake_status, suggested_speed, current_speed, power_output, door_status, lights_status, internal_temperature, headlights_status, speed_limit = self.backend.get_testbench_status()
         Kp, Ki =  self.backend.get_Kp_Ki()
@@ -162,17 +201,17 @@ class CommandCenter(QWidget):
         # Get the latest values from the backend and update the labels
         #result = Backend.get_testbench_status()
         self.speed_label.setText(f"Speed: {commanded_speed}")
-        self.authority_label.setText(f"Authority: {authority}")
-        self.brake_status_label.setText(f"Brake Status: {'Applied' if brake_status else 'Released'}")
+        self.authority_label.setText(f"Authority: {authority:.2f}")
+        self.brake_status_label.setText(f"Brake Status: {'ON' if brake_status else 'OFF'}")
         self.suggested_speed_label.setText(f"Suggested Speed: {suggested_speed}")
         self.Kp_Label.setText(f"Kp: {Kp}")
         self.Ki_Label.setText(f"Ki: {Ki}")
         self.current_speed_label.setText(f"Current Speed: {current_speed}")
         self.power_output_label.setText(f"Power Output: {power_output}")
         self.door_status_label.setText(f"Door Status: {'Open'if door_status else 'Closed'}")
-        self.lights_status_label.setText(f"Lights Status: {'On' if lights_status else 'Off'}")
+        self.lights_status_label.setText(f"Lights Status: {'ON' if lights_status else 'OFF'}")
         self.temperature_label.setText(f"Internal Temperature: {internal_temperature}")
-        self.hl_status_label.setText(f"Headlights Status: {'On' if headlights_status else 'Off'}")
+        self.hl_status_label.setText(f"Headlights Status: {'ON' if headlights_status else 'OFF'}")
         self.speed_limit_label.setText(f"Speed Limit: {speed_limit}")
 
 def main():
