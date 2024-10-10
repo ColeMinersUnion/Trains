@@ -4,9 +4,8 @@ import PyQt6
 from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QLineEdit, QSlider
 from PyQt6.QtGui import QTransform, QPixmap
 from PyQt6.QtCore import Qt,QTimer
-import sys 
 import TrackModelBackend
-from TrackModelBackend import lines,failmode,failnames,speed      
+from TrackModelBackend import lines,failmode,failnames      
 
 passive = [] #no update method, do not react to backend changes
 active = [] #update method, react to backend changes
@@ -23,28 +22,6 @@ tooltipstyle = """QToolTip {
                 color: white; 
                 border: white solid 1px
                 }"""
-
-class SpeedUp(QWidget):
-    def __init__(self,window):
-        super().__init__()
-        self.slider = QSlider(Qt.Orientation.Horizontal, window)
-        self.slider.setGeometry(750,0,180,45)
-        self.slider.setMinimum(1)
-        self.slider.setMaximum(50)
-        self.slider.setTickInterval(1)
-        self.slider.valueChanged.connect(self.update)
-        self.number = QLabel(window)
-        self.number.move(930,0)
-        self.number.setText("1x")
-        self.slider.setValue(1)
-
-
-    def update(self):
-        global speed
-        sliderspeed=self.slider.value()
-        speed = sliderspeed
-        self.number.setText(str(sliderspeed) + "x")
-        self.number.adjustSize()
 
 class HeaterSystem(QWidget):
     def __init__(self,window):
@@ -304,7 +281,6 @@ class Map(QWidget):
             for station in line.stations:
                 passive.append(StationIcon(station,self))
         active.append(FailureSelect(self)) #this goes after the dynamic icons, we hide them behind this widget system
-        active.append(SpeedUp(self))
         self.timer=QTimer() #timer for active components
         self.timer.timeout.connect(self.update) #connect timer to update method
         self.timer.start(int(1000/60)) #set clock speed of timer
@@ -332,16 +308,6 @@ class Testbench(QWidget):
         self.move(1500,0)
         self.setWindowTitle("Track Model Testbench")
 
-        param1=QLabel("Line number",self)
-        param1.move(100,150)
-        self.input1 = QLineEdit(self)
-        self.input1.move(100,200)
-
-        param2=QLabel("Component #",self)
-        param2.move(100,250)
-        self.input2 = QLineEdit(self)
-        self.input2.move(100,300)
-
         occupybutton = QPushButton("Switch occupancy", self)
         occupybutton.move(100,50)
         occupybutton.clicked.connect(self.switchOccupancy)
@@ -354,15 +320,19 @@ class Testbench(QWidget):
         crossingbutton.move(100,100)
         crossingbutton.clicked.connect(self.flipCrossing)
 
+        trainbutton = QPushButton("Spawn/move train", self)
+        trainbutton.move(100,125)
+        trainbutton.clicked.connect(self.moveTrain)
+        
         param1=QLabel("Line number",self)
-        param1.move(100,150)
+        param1.move(100,175)
         self.input1 = QLineEdit(self)
         self.input1.move(100,200)
 
-        param2=QLabel("Component #",self)
+        param2=QLabel("Component # / Length (m) / Displace (m)",self)
         param2.move(100,250)
         self.input2 = QLineEdit(self)
-        self.input2.move(100,300)
+        self.input2.move(100,275)
 
     def switchOccupancy(self):
         line = int(self.input1.text())
@@ -376,13 +346,15 @@ class Testbench(QWidget):
         line = int(self.input1.text())
         comp = int(self.input2.text())
         lines[line].crossings[comp].switch()
+    def moveTrain(self):
+        line = int(self.input1.text())
+        comp = int(self.input2.text())
+        if len(lines[line].trains)==0:
+            print("adding train")
+            lines[line].trains.append(TrackModelBackend.Train(line,0,comp))
+        else:
+            print("moving train:")
+            lines[line].trains[0].addPos(comp)
 
 
-
-app=QApplication(sys.argv)
-map=Map()
-testbench=Testbench()
-map.show()
-testbench.show()
-sys.exit(app.exec())
 

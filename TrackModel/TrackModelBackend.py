@@ -10,7 +10,6 @@ crossingid=[]
 failmode = 0
 failnames = ["None","Rail","Circuit","Power"]
 modelspeed = 10
-speed = 1
 
 class Block:
     #instantiation
@@ -29,8 +28,11 @@ class Block:
         self.x2=x2
         self.y2=y2
         self.occupied = False
-        self.prev = number-1 #will change with crossing instantiation
-        self.next = number+1 #will change with crossing instantiation
+        self.prev = None
+        self.next = None #will change with crossing instantiation
+        if(number>0):
+            self.prev = number-1 #will change with crossing instantiation
+            lines[linenum].blocks[number-1].next = number
         self.center = [(x1+x2)/2,(y1+y2)/2] #center for front end
         self.mag = sqrt(((x2-x1)*(x2-x1))+((y2-y1)*(y2-y1))) #magnitude for front end
         self.angle = atan2((y2-y1),(x2-x1))*180/pi #angle for front end
@@ -50,7 +52,7 @@ class Block:
         self.msg = r    
 
     def toString(self):
-        return self.msg + str(self.occupied) + "\nFailure: " + failnames[self.failure]
+        return self.msg + str(self.occupied) + "\nFailure: " + failnames[self.failure] + "\nConnections: " + str(self.prev) + " " + str(self.next)
     
     def switchOccupancy(self):
         self.occupied = not self.occupied
@@ -59,14 +61,18 @@ class Switch:
     #instantiation
     #note, no three way switches; think V, not Δ
     def __init__(self,linenum,blocks):
+        global lines
         self.linenum = linenum
         self.blocks = blocks
         self.switchid = switchid[linenum]
         switchid[linenum] = switchid[linenum]+1
         self.leftside=True #the first block is the central
+        lines[self.linenum].blocks[self.blocks[1]-1].next=None #cut-off previous blocks
+        lines[self.linenum].blocks[self.blocks[2]-1].next=None
         self.updateEnds()
 
     def updateEnds(self):
+        global lines
         if(self.leftside): #connect 0 to 1
             lines[self.linenum].blocks[self.blocks[0]].next = self.blocks[1]
             lines[self.linenum].blocks[self.blocks[1]].prev = self.blocks[0]
@@ -92,7 +98,6 @@ class Switch:
     def switch(self):
         self.leftside = not self.leftside
         self.updateEnds()
-        print("Updated switch\n")
 
     #get the open block
     def getopen(self):
@@ -147,9 +152,11 @@ class Train:
         self.linenum = linenum
         self.block1 = block1
         self.block2 = block1 #train can occupy multiple blocks
+        self.length=length
         self.velocity = 0
         self.pos = 0
         self.goingUp = True #direction depending if it crosses segment in ascending or descending block order
+        lines[self.linenum].blocks[self.block2].occupied = True
         '''
         msgqueue = 10 Baud messages passed by wayside to train via track
         tenbaud = 10 bauds available after processing the bud limit
@@ -160,22 +167,29 @@ class Train:
         self.beacondata = ""
 
     def addPos(self,x):
+        global lines
         self.pos = self.pos + x
-        if self.pos>(lines[self.linenum].blocks(self.block1).length):
-            self.pos -= self.block.length
-            if(self.goingUp):
-                self.block1=lines[self.linenum].blocks(self.block1).next
-            else:
-                self.block1=lines[self.linenum].blocks(self.block1).prev
-        if self.pos>(lines[self.linenum].blocks(self.block1).length-self.length): 
+        lines[self.linenum].blocks[self.block1].occupied = False
+        lines[self.linenum].blocks[self.block2].occupied = False
+        if self.pos>(lines[self.linenum].blocks[self.block1].length-self.length): 
             self.block2 = self.block1 #move train off old track if up far enough
-        self.beacondata = self.getTransponder(self.block1)
-
-    def getTransponder(self,block):
+        if self.pos>(lines[self.linenum].blocks[self.block1].length):
+            self.pos -= lines[self.linenum].blocks[self.block1].length
+            if(self.goingUp):
+                self.block1=lines[self.linenum].blocks[self.block1].next
+            else:
+                self.block1=lines[self.linenum].blocks[self.block1].prev
+            if self.block1==None:
+                    lines[self.linenum].trains.remove(self)
+                    del self
+                    return
+        lines[self.linenum].blocks[self.block1].occupied = True
+        lines[self.linenum].blocks[self.block2].occupied = True
+        self.beacondata = "" #can't nest transponder function
         for x in lines[self.linenum].transponders:
-            if (x.block==block):
-                return x.data
-        return ""
+            if (x.block==self.block1):
+                self.beacondata = x.data
+        
     
     def queueMessage(self,bool):
         self.msgqueue.append(bool)
