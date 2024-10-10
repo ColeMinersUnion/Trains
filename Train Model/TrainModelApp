@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QPushButton, QTabWidget, QLineEdit, QSpacerItem, QSizePolicy, QHBoxLayout, QGridLayout, QMainWindow
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QPushButton, QTabWidget, QLineEdit, QSpacerItem, QSizePolicy, QHBoxLayout, QGridLayout, QMainWindow, QFrame
 from PyQt5.QtCore import QTimer, Qt, QObject, pyqtSignal, pyqtSlot, QThread
 from PyQt5.QtGui import QFont
 from TrainModelClass import trainModel
@@ -178,61 +178,50 @@ class MurphyView(QWidget):
 class MetricsTab(QWidget):
     def __init__(self, train):
         super().__init__()
-        
+
         self.train = train
 
         main_layout = QHBoxLayout()
         col1_layout = QVBoxLayout()
         col2_layout = QVBoxLayout()
 
-        self.current_speed_label = QLabel()
-        self.current_speed_label.setAlignment(Qt.AlignCenter)
-        self.current_speed_label.setFont(QFont('Arial', 14))
+        def create_styled_label():
+            label = QLabel()
+            label.setAlignment(Qt.AlignCenter)
+            label.setFont(QFont('Arial', 14))
+            label.setFrameStyle(QFrame.Box)
+            label.setLineWidth(2)
+            label.setStyleSheet("border: 2px solid black;")
+            return label
+
+        self.current_speed_label = create_styled_label()
         col1_layout.addWidget(self.current_speed_label)
 
-        self.goal_speed_label = QLabel()
-        self.goal_speed_label.setAlignment(Qt.AlignCenter)
-        self.goal_speed_label.setFont(QFont('Arial', 14))
+        self.goal_speed_label = create_styled_label()
         col1_layout.addWidget(self.goal_speed_label)
 
-        self.acceleration_label = QLabel()
-        self.acceleration_label.setAlignment(Qt.AlignCenter)
-        self.acceleration_label.setFont(QFont('Arial', 14))
+        self.acceleration_label = create_styled_label()
         col1_layout.addWidget(self.acceleration_label)
 
-        self.service_brake_status_label = QLabel()
-        self.service_brake_status_label.setAlignment(Qt.AlignCenter)
-        self.service_brake_status_label.setFont(QFont('Arial', 14))
+        self.service_brake_status_label = create_styled_label()
         col1_layout.addWidget(self.service_brake_status_label)
 
-        self.passenger_count_label = QLabel()
-        self.passenger_count_label.setAlignment(Qt.AlignCenter)
-        self.passenger_count_label.setFont(QFont('Arial', 14))
+        self.passenger_count_label = create_styled_label()
         col1_layout.addWidget(self.passenger_count_label)
 
-        self.weight_label = QLabel()
-        self.weight_label.setAlignment(Qt.AlignCenter)
-        self.weight_label.setFont(QFont('Arial', 14))
+        self.weight_label = create_styled_label()
         col2_layout.addWidget(self.weight_label)
 
-        self.train_length_label = QLabel()
-        self.train_length_label.setAlignment(Qt.AlignCenter)
-        self.train_length_label.setFont(QFont('Arial', 14))
+        self.train_length_label = create_styled_label()
         col2_layout.addWidget(self.train_length_label)
 
-        self.temperature_label = QLabel()
-        self.temperature_label.setAlignment(Qt.AlignCenter)
-        self.temperature_label.setFont(QFont('Arial', 14))
+        self.temperature_label = create_styled_label()
         col2_layout.addWidget(self.temperature_label)
 
-        self.light_status_label = QLabel()
-        self.light_status_label.setAlignment(Qt.AlignCenter)
-        self.light_status_label.setFont(QFont('Arial', 14))
+        self.light_status_label = create_styled_label()
         col2_layout.addWidget(self.light_status_label)
 
-        self.door_status_label = QLabel()
-        self.door_status_label.setAlignment(Qt.AlignCenter)
-        self.door_status_label.setFont(QFont('Arial', 14))
+        self.door_status_label = create_styled_label()
         col2_layout.addWidget(self.door_status_label)
 
         main_layout.addLayout(col1_layout)
@@ -244,7 +233,7 @@ class MetricsTab(QWidget):
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_labels)
-        self.timer.start(500) 
+        self.timer.start(500)
 
     def update_labels(self):
         current_speed = self.train.getCurrentSpeedImperial()
@@ -253,10 +242,34 @@ class MetricsTab(QWidget):
         passenger_count = self.train.currentCapacity
         weight = self.train.getWeightImperial()
         temperature = self.train.getTemp()
-        light_status = "On" if self.train.lightStatus else "Off"
-        door_status = "Open" if self.train.doorStatus else "Closed"
         service_brake_status = "On" if self.train.serviceBrake else "Off"
         train_length = self.train.getLength()
+
+        light_status = "On" if self.train.lightStatus else "Off"
+        if light_status == "On":
+            self.light_status_label.setText("Light Status: On")
+            self.light_status_label.setStyleSheet("color: green; border: 2px solid black;")
+        else:
+            self.light_status_label.setText("Light Status: Off")
+            self.light_status_label.setStyleSheet("color: red; border: 2px solid black;")
+
+        # Update Door Status
+        door_status = "Open" if self.train.doorStatus else "Closed"
+        if door_status == "Open":
+            self.door_status_label.setText("Door Status: Open")
+            self.door_status_label.setStyleSheet("color: blue; border: 2px solid black;")
+        else:
+            self.door_status_label.setText("Door Status: Closed")
+            self.door_status_label.setStyleSheet("color: gray; border: 2px solid black;")
+
+        # Update Service Brake Status
+        service_brake_status = "Enabled" if self.train.serviceBrake else "Off"
+        if service_brake_status == "Enabled":
+            self.service_brake_status_label.setText("Service Brake: Enabled")
+            self.service_brake_status_label.setStyleSheet("color: green; border: 2px solid black;")
+        else:
+            self.service_brake_status_label.setText("Service Brake: Off")
+            self.service_brake_status_label.setStyleSheet("color: red; border: 2px solid black;")
 
         self.current_speed_label.setText(f"Current Speed: {current_speed:.2f} mph")
         self.goal_speed_label.setText(f"Goal Speed: {goal_speed:.2f} mph")
@@ -267,7 +280,7 @@ class MetricsTab(QWidget):
         self.light_status_label.setText(f"Light Status: {light_status}")
         self.door_status_label.setText(f"Door Status: {door_status}")
         self.service_brake_status_label.setText(f"Service Brake: {service_brake_status}")
-        self.train_length_label.setText(f"Train Length: {train_length} ft")  # Set the length
+        self.train_length_label.setText(f"Train Length: {train_length} ft")
 
 
 class TestBench(QWidget):
