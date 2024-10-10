@@ -23,6 +23,30 @@ tooltipstyle = """QToolTip {
                 border: white solid 1px
                 }"""
 
+clock=0
+speed=1
+
+class SpeedMeter(QWidget):
+    def __init__(self,window):
+        global speed
+        super().__init__()  
+        self.slider = QSlider(Qt.Orientation.Horizontal, window)
+        self.slider.setGeometry(650,0,180,45)
+        self.slider.setMinimum(1)
+        self.slider.setMaximum(50)
+        self.slider.valueChanged.connect(self.update)
+        
+        self.number = QLabel(window)
+        self.number.move(830,0)
+        self.number.setText(str(speed) + "x")
+        self.slider.setValue(speed)
+
+    def update(self):
+        global speed
+        speed=self.slider.value()
+        self.number.setText(str(speed) + "x")
+        self.number.adjustSize()
+
 class HeaterSystem(QWidget):
     def __init__(self,window):
         super().__init__()
@@ -281,19 +305,25 @@ class Map(QWidget):
             for station in line.stations:
                 passive.append(StationIcon(station,self))
         active.append(FailureSelect(self)) #this goes after the dynamic icons, we hide them behind this widget system
+        active.append(SpeedMeter(self))
         self.timer=QTimer() #timer for active components
         self.timer.timeout.connect(self.update) #connect timer to update method
         self.timer.start(int(1000/60)) #set clock speed of timer
 
         self.tenBaud=QTimer() #timer for active components
         self.tenBaud.timeout.connect(self.tenBaudClock) #connect timer to update method
-        self.tenBaud.start(int(1000/60)) #set clock speed of timer
+        self.tenBaud.start(1) #set clock speed of timer
     
     def tenBaudClock(self):
-        print("10 baud passed")
-        for l in lines:
-            for t in l.trains:
-                t.tenBaudMessage
+        global clock
+        global speed
+        clock += speed
+        if clock>=100:
+            clock -= 100
+            print("10 baud passed")
+            for l in lines:
+                for t in l.trains:
+                    t.tenBaudMessage
 
         
     
