@@ -106,6 +106,7 @@ class BluePLC:
                     if all(j == False for j in self.train_occ[12:17]):
                         self.maint_occ[i] = True
 
+
         
     def update_crossing(self):
          #checks if the train is within 3 blocks of the crossing, if so sets crossing to true
@@ -162,7 +163,7 @@ class BluePLC:
         self.next_authority = [False for i in range(17)]  
   
         for i in range(17):
-            if self.occupancy[i] == True:    
+            if self.train_occ[i] == True:    
                 if i < 6 and i != 5:
                     if all(j == False for j in self.occupancy[i+1:5]):
                         self.next_authority[i] = True

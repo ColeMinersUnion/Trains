@@ -30,7 +30,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="wayside">
      <attribute name="title">
@@ -84,7 +84,7 @@
          </attribute>
          <row>
           <property name="text">
-           <string>Block 0</string>
+           <string>Yard</string>
           </property>
           <property name="font">
            <font>
@@ -472,16 +472,16 @@
         <height>281</height>
        </rect>
       </property>
-      <layout class="QVBoxLayout" name="ctc_log">
+      <layout class="QVBoxLayout" name="ctcloglayout">
        <item>
         <widget class="QLabel" name="label_7">
          <property name="text">
-          <string>CTC Error Log</string>
+          <string>CTC Log</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QTextBrowser" name="textBrowser"/>
+        <widget class="QTextBrowser" name="ctc_log"/>
        </item>
       </layout>
      </widget>
@@ -503,15 +503,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QListWidget" name="listWidget">
-         <item>
-          <property name="text">
-           <string>Block 0 (Yard)</string>
-          </property>
-          <property name="checkState">
-           <enum>Checked</enum>
-          </property>
-         </item>
+        <widget class="QListWidget" name="maint_list">
          <item>
           <property name="text">
            <string>Block 1</string>
@@ -668,7 +660,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QTableWidget" name="tableWidget_2">
+        <widget class="QTableWidget" name="ctc_elements_table">
          <row>
           <property name="text">
            <string>Switch 5</string>
@@ -1037,12 +1029,12 @@
        <item>
         <widget class="QLabel" name="label_10">
          <property name="text">
-          <string>CTC Switch/Signal/Crossings</string>
+          <string>TM Switch/Signal/Crossings</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QTableWidget" name="tableWidget_3">
+        <widget class="QTableWidget" name="tm_elements_table">
          <row>
           <property name="text">
            <string>Switch 5</string>
@@ -1090,13 +1082,13 @@
         </widget>
        </item>
        <item>
-        <widget class="QListWidget" name="listWidget_2">
+        <widget class="QListWidget" name="murphy_list">
          <item>
           <property name="text">
            <string>Block 1</string>
           </property>
           <property name="checkState">
-           <enum>Unchecked</enum>
+           <enum>Checked</enum>
           </property>
          </item>
          <item>
@@ -1104,7 +1096,7 @@
            <string>Block 2</string>
           </property>
           <property name="checkState">
-           <enum>Unchecked</enum>
+           <enum>Checked</enum>
           </property>
          </item>
          <item>
@@ -1112,7 +1104,7 @@
            <string>Block 3</string>
           </property>
           <property name="checkState">
-           <enum>Unchecked</enum>
+           <enum>Checked</enum>
           </property>
           <property name="flags">
            <set>ItemIsSelectable|ItemIsDragEnabled|ItemIsEnabled</set>
@@ -1123,7 +1115,7 @@
            <string>Block 4</string>
           </property>
           <property name="checkState">
-           <enum>Unchecked</enum>
+           <enum>Checked</enum>
           </property>
          </item>
          <item>
@@ -1131,7 +1123,7 @@
            <string>Block 5</string>
           </property>
           <property name="checkState">
-           <enum>Unchecked</enum>
+           <enum>Checked</enum>
           </property>
          </item>
          <item>
@@ -1139,7 +1131,7 @@
            <string>Block 6</string>
           </property>
           <property name="checkState">
-           <enum>Unchecked</enum>
+           <enum>Checked</enum>
           </property>
          </item>
          <item>
@@ -1147,7 +1139,7 @@
            <string>Block 7</string>
           </property>
           <property name="checkState">
-           <enum>Unchecked</enum>
+           <enum>Checked</enum>
           </property>
          </item>
          <item>
@@ -1155,7 +1147,10 @@
            <string>Block 8</string>
           </property>
           <property name="checkState">
-           <enum>Unchecked</enum>
+           <enum>Checked</enum>
+          </property>
+          <property name="flags">
+           <set>ItemIsUserCheckable|ItemIsEnabled</set>
           </property>
          </item>
          <item>
@@ -1163,7 +1158,7 @@
            <string>Block 9</string>
           </property>
           <property name="checkState">
-           <enum>Unchecked</enum>
+           <enum>Checked</enum>
           </property>
          </item>
          <item>
@@ -1171,7 +1166,7 @@
            <string>Block 10</string>
           </property>
           <property name="checkState">
-           <enum>Unchecked</enum>
+           <enum>Checked</enum>
           </property>
          </item>
          <item>
@@ -1179,7 +1174,7 @@
            <string>Block 11</string>
           </property>
           <property name="checkState">
-           <enum>Unchecked</enum>
+           <enum>Checked</enum>
           </property>
          </item>
          <item>
@@ -1187,7 +1182,7 @@
            <string>Block 12</string>
           </property>
           <property name="checkState">
-           <enum>Unchecked</enum>
+           <enum>Checked</enum>
           </property>
          </item>
          <item>
@@ -1195,7 +1190,7 @@
            <string>Block 13</string>
           </property>
           <property name="checkState">
-           <enum>Unchecked</enum>
+           <enum>Checked</enum>
           </property>
          </item>
          <item>
@@ -1203,7 +1198,7 @@
            <string>Block 14</string>
           </property>
           <property name="checkState">
-           <enum>Unchecked</enum>
+           <enum>Checked</enum>
           </property>
          </item>
          <item>
@@ -1211,7 +1206,7 @@
            <string>Block 15</string>
           </property>
           <property name="checkState">
-           <enum>Unchecked</enum>
+           <enum>Checked</enum>
           </property>
          </item>
          <item>
@@ -1219,7 +1214,7 @@
            <string>Block 16</string>
           </property>
           <property name="checkState">
-           <enum>Unchecked</enum>
+           <enum>Checked</enum>
           </property>
          </item>
         </widget>
@@ -1244,7 +1239,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QTextBrowser" name="textBrowser_5"/>
+        <widget class="QTextBrowser" name="tm_log"/>
        </item>
       </layout>
      </widget>
@@ -1257,7 +1252,7 @@
      <x>0</x>
      <y>0</y>
      <width>896</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuBlue_Line">

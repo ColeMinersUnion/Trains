@@ -10,6 +10,8 @@ class WaysideShell:
         self.tm = TrackModel()
         self.occupancy = [False for i in range(17)]
         self.next_authority = [False for i in range(17)]
+        self.maintenance_occupancy = [False for i in range(17)]
+        self.block_error = [False for i in range(17)]
         self.switch_5 = False
         self.crossing_3 = False
         self.signal_6 = False
@@ -48,12 +50,16 @@ class WaysideShell:
         self.crossing_3 = copy.deepcopy(self.plc.crossing_3)
         self.signal_6 = copy.deepcopy(self.plc.signal_6)
         self.signal_12 = copy.deepcopy(self.plc.signal_12)
+        self.block_error = copy.deepcopy(self.plc.block_error)
 
 
         
     
     def maintenance_blocks(self, blocks):
-        return self.plc.update_maintenance(blocks)
+        self.plc.update_maint_occ(blocks)
+        self.maintenance_occupancy = copy.deepcopy(self.plc.maint_occ)
+        print(self.maintenance_occupancy)
+        self.tm.set_maint_occ(self.maintenance_occupancy) 
     
 
 class TrackModel:
@@ -65,32 +71,22 @@ class TrackModel:
         self.crossing_3 = False
         self.shell = None
         self.trains = []
+        self.speed = 0
+        self.authority = 0
+        self.maint_occ = [False for i in range(17)]
     #takes in commanded speed, commanded authority from the shell
     def dispatch(self, Speed, Authority):
         self.trains.append(0)
         self.occupancy[0] = True
-        print(Speed, Authority)
+        self.speed = Speed
+        self.authority = Authority
         self.shell.set_occupancy(self.occupancy)
     
-    #handles errors caused by murphy
-    #if there's a block occupancy 4 blocks ahead of the train, stop the train (command speed = 0)
-    def murphy_errors(self, Speed):
-        for i in range(17):
-            if i < 6:
-                if self.occupancy[i+4]==True:
-                    Speed=0
-                else:
-                    Speed=Speed
-            elif i < 12:
-                if self.occupancy[i+4]==True:
-                    Speed=0
-                else:
-                    Speed=Speed
-            else:
-                if self.occupancy[i+4]==True:
-                    Speed=0
-                else:
-                    Speed=Speed
+    def update(self):
+        self.switch_5 = copy.deepcopy(self.shell.switch_5)
+        self.signal_6 = copy.deepcopy(self.shell.signal_6)  
+        self.crossing_3 = copy.deepcopy(self.shell.crossing_3)
+        self.signal_12 = copy.deepcopy(self.shell.signal_12)
 
     def move_trains(self):
         #moves the train forward in the case of no present switch or to a new super block of track depending upon where the train currently stands and the state of the switch on block 5
@@ -113,9 +109,26 @@ class TrackModel:
                     self.occupancy[self.trains[i] + 1] = True
                     self.trains[i] += 1
         self.shell.set_occupancy(self.occupancy)
+    
+    def set_maint_occ(self, maint_blocks):
+        for i in range(17):
+            if maint_blocks[i] == True and self.maint_occ[i] == False:
+                self.occupancy[i] = True
+                self.maint_occ[i] = True
+            if maint_blocks[i] == False and self.maint_occ[i] == True:
+                self.occupancy[i] = False
+                self.maint_occ[i] = False
+        
+        self.shell.set_occupancy(self.occupancy)
 
     def murphy_track(self, murphy_list):
-        pass
+        print(murphy_list)
+        for i in range(17):
+            if murphy_list[i] == True:
+                self.occupancy[i] = True
+            else:
+                self.occupancy[i] = False
+
 
 class CTC:
     def __init__(self):
@@ -126,6 +139,7 @@ class CTC:
         self.signal_12 = False
         self.crossing_3 = False
         self.shell = None
+        self.maint_proposed = [False for i in range(17)]
     #dispatches suggested values for speed, authority and switch change to the wayside shell
     def dispatch(self, Speed, Authority, Switch):
         if all(i == False for i in self.occupancy[0:6]):
@@ -137,7 +151,14 @@ class CTC:
             return False
         
     def maintenance(self, maint_blocks):
-        pass
+        self.shell.maintenance_blocks(maint_blocks)
+    
+    def update(self):
+        self.switch_5 = copy.deepcopy(self.shell.switch_5)
+        self.signal_6 = copy.deepcopy(self.shell.signal_6)
+        self.crossing_3 = copy.deepcopy(self.shell.crossing_3)
+        self.signal_12 = copy.deepcopy(self.shell.signal_12)
+        self.block_error = copy.deepcopy(self.shell.block_error)
 
     def set_occupancy(self, occupancy):
         self.occupancy = occupancy
@@ -155,12 +176,17 @@ class Application(object):
         self.ui = uic.loadUi('WaysideShell.ui')
 
         # Sets the maintenance states to unchecked, they need to start checked for the checkboxes to activate
-        for index in range(self.ui.listWidget.count()):
-            item = self.ui.listWidget.item(index)
+        for index in range(self.ui.maint_list.count()):
+            item = self.ui.maint_list.item(index)
+            item.setCheckState(QtCore.Qt.Unchecked)
+
+        for index in range(self.ui.murphy_list.count()):
+            item = self.ui.murphy_list.item(index)
             item.setCheckState(QtCore.Qt.Unchecked)
 
         self.wayside_inputs()
         self.ctc_inputs()
+        self.track_model_inputs()
 
         self.plc_uploaded = False
         # Setup the periodic update
@@ -224,29 +250,81 @@ class Application(object):
     #################CTC Functions###########################
     def ctc_inputs(self):
         self.ui.dispatch_button.clicked.connect(self.dispatch_train)
+        self.ui.maint_list.itemChanged.connect(self.maintenance_change)
+    
+    def update_ctc_tables(self):
+        self.ui.ctc_elements_table.setItem(0,0, QTableWidgetItem(str(self.ctc.switch_5)))
+        self.ui.ctc_elements_table.setItem(1,0, QTableWidgetItem(str(self.ctc.crossing_3)))
+        self.ui.ctc_elements_table.setItem(2,0, QTableWidgetItem(str(self.ctc.signal_6)))
+        self.ui.ctc_elements_table.setItem(3,0, QTableWidgetItem(str(self.ctc.signal_12)))
 
     def dispatch_train(self):
         if self.plc_uploaded == False:
-            print("cannot dispatch without plc")
+            self.ui.ctc_log.append(">>cannot dispatch train without plc")
         else:
             speed = int(self.ui.suggested_speed.text())
             authority = int(self.ui.suggested_auth.text())
             switch = eval(self.ui.suggested_switch.currentText())
             self.ctc.dispatch(speed, authority, switch)
+            self.ui.ctc_log.append(">>Dispatched train with speed: " + str(speed) + " and authority: " + str(authority))
+            self.ui.tm_log.append(">>Dispatched train with speed: " + str(self.tm.speed) + " and authority: " + str(self.tm.authority))
+    
+    def maintenance_change(self):
+        if self.plc_uploaded == False:
+            self.ui.ctc_log.append(">>cannot use maintenance mode without plc")
+        else:
+            maint_blocks = []
+            for i in range(self.ui.maint_list.count()):
+                item = self.ui.maint_list.item(i)
+                if item.checkState() == QtCore.Qt.Checked:
+                    maint_blocks.append(True)
+                else:
+                    maint_blocks.append(False)
+            maint_blocks.insert(0, False)  # Ensure index 0 is always False
+            self.ctc.maintenance(maint_blocks)
+            
 
     #################Track Model Functions####################
 
 
+    def track_model_inputs(self):
+        self.ui.murphy_list.itemChanged.connect(self.murphy_change)
 
     def move_trains(self):
         self.tm.move_trains()
 
-    
+    def murphy_change(self):
+        murphy_list = []
+        for i in range(self.ui.murphy_list.count()):
+            item = self.ui.murphy_list.item(i)
+            if item.checkState() == QtCore.Qt.Checked:
+                murphy_list.append(True)
+            else:
+                murphy_list.append(False)
+        murphy_list.insert(0, False)
+        self.tm.murphy_track(murphy_list)
+        for i in range(len(self.ctc.block_error)):
+            if self.ctc.block_error[i] == True:
+                self.ui.ctc_log.append(">>Block " + str(i) + " has an error")
+
+    def update_tm_tables(self):
+        for i in range(len(self.tm.occupancy)):
+            self.ui.tm_block_table.setItem(i,0, QTableWidgetItem(str(self.tm.occupancy[i])))
+            self.ui.tm_block_table.setItem(i,1, QTableWidgetItem(str(self.shell.next_authority[i])))
+
+        self.ui.tm_elements_table.setItem(0,0, QTableWidgetItem(str(self.tm.switch_5)))
+        self.ui.tm_elements_table.setItem(1,0, QTableWidgetItem(str(self.tm.crossing_3)))
+        self.ui.tm_elements_table.setItem(2,0, QTableWidgetItem(str(self.tm.signal_6)))
+        self.ui.tm_elements_table.setItem(3,0, QTableWidgetItem(str(self.tm.signal_12)))
 
     #################Update UI################################
     
     def update_ui(self):
         self.update_wayside_tables()
+        self.ctc.update()
+        self.update_ctc_tables()
+        self.tm.update()
+        self.update_tm_tables()
         if self.plc_uploaded:
             self.move_trains()
         
