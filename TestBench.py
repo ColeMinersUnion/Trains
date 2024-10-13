@@ -1,21 +1,6 @@
 
-from WaysidePLC import BluePLC
-
-# class Train:
-#     train_id = 0
-#     def __init__(self, speed, authority, plc):
-#         Train.train_id += 1
-#         self.id = Train.train_id
-#         self.speed = speed
-#         self.authority = authority
-#         self.current_block = 0
-#         self.plc = plc
-
-
-#     def move(self):
-#         if(self.plc.next_authority[self.current_block] == True):
-#             self.current_block += 1
-#             print("Train", self.id, " has moved to block ", self.current_block)
+from BluePLC import BluePLC
+from WaysideShell import WaysideShell
 
 def print_PLC(plc):
 
@@ -43,6 +28,24 @@ def print_PLC(plc):
     print("Crossing 3: ", plc.crossing_3)
  
 
+class ctc:
+    def __init__(self):
+        self.occupancy = [False for i in range(17)]
+        self.block_error = [False for i in range(17)]
+        self.switch_5 = False
+        self.signal_6 = False
+        self.signal_12 = False
+        self.crossing_3 = False
+        self.shell = WaysideShell()
+
+    def dispatch(self, Speed, Authority, Switch):
+        if all(i == False for i in self.occupancy[0:6]):
+            self.shell.dispatch(Speed, Authority, Switch)
+            return True
+        else:
+            print("Cannot dispatch train")
+            return False
+            
 def main():
     #Main TestBench Flow
     plc = BluePLC()
@@ -50,7 +53,8 @@ def main():
     trains = []
     print_PLC(plc)
     while True:
-        if plc.occupancy[0] == False and plc.occupancy[1] == False and plc.occupancy[2] == False:
+
+        if all(i == False for i in plc.occupancy[0:6]):
             print("Dispatch Train? (y/n)")
 
             if input() == "y":
@@ -69,13 +73,15 @@ def main():
         
         for i in range(len(trains)):
             if plc.next_authority[trains[i]] == True:
-                tm_occupancy[trains[i]] = False
-                tm_occupancy[trains[i] + 1] = True
                 if trains[i] == 5 and plc.switch_5 == False:
                     print("Train at block", trains[i], " has moved to block ", 12)
                     trains[i] = 12
+                    tm_occupancy[5] = False
+                    tm_occupancy[12] = True
                 else:
                     print("Train at block", trains[i], " has moved to block ", trains[i] + 1)
+                    tm_occupancy[trains[i]] = False
+                    tm_occupancy[trains[i] + 1] = True
                     trains[i] += 1
                 
         
