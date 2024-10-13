@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>896</width>
-    <height>663</height>
+    <width>914</width>
+    <height>649</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -25,12 +25,12 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>901</width>
-      <height>621</height>
+      <width>891</width>
+      <height>601</height>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="wayside">
      <attribute name="title">
@@ -41,8 +41,8 @@
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>371</width>
-        <height>558</height>
+        <width>361</width>
+        <height>551</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="block_occ">
@@ -526,9 +526,6 @@
           </property>
           <property name="checkState">
            <enum>Checked</enum>
-          </property>
-          <property name="flags">
-           <set>ItemIsSelectable|ItemIsDragEnabled|ItemIsEnabled</set>
           </property>
          </item>
          <item>
@@ -1106,9 +1103,6 @@
           <property name="checkState">
            <enum>Checked</enum>
           </property>
-          <property name="flags">
-           <set>ItemIsSelectable|ItemIsDragEnabled|ItemIsEnabled</set>
-          </property>
          </item>
          <item>
           <property name="text">
@@ -1251,13 +1245,13 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>896</width>
+     <width>914</width>
      <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuBlue_Line">
     <property name="title">
-     <string>Test Bench</string>
+     <string>Wayside</string>
     </property>
    </widget>
    <addaction name="menuBlue_Line"/>

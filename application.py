@@ -58,7 +58,6 @@ class WaysideShell:
     def maintenance_blocks(self, blocks):
         self.plc.update_maint_occ(blocks)
         self.maintenance_occupancy = copy.deepcopy(self.plc.maint_occ)
-        print(self.maintenance_occupancy)
         self.tm.set_maint_occ(self.maintenance_occupancy) 
     
 
@@ -94,17 +93,14 @@ class TrackModel:
         self.signal_6 = copy.deepcopy(self.shell.signal_6)
         self.signal_12 = copy.deepcopy(self.shell.signal_12)
         self.crossing_3 = copy.deepcopy(self.shell.crossing_3)
-        if len(self.trains) > 0:
-            print(self.trains[0], self.switch_5)
+
         for i in range(len(self.trains)):
             if self.shell.next_authority[self.trains[i]] == True:
                 if self.trains[i] == 5 and self.switch_5 == False:
-                    print("Train at block", self.trains[i], " has moved to block ", 12)
                     self.trains[i] = 12
                     self.occupancy[5] = False
                     self.occupancy[12] = True
                 else:
-                    print("Train at block", self.trains[i], " has moved to block ", self.trains[i] + 1)
                     self.occupancy[self.trains[i]] = False
                     self.occupancy[self.trains[i] + 1] = True
                     self.trains[i] += 1
@@ -122,7 +118,6 @@ class TrackModel:
         self.shell.set_occupancy(self.occupancy)
 
     def murphy_track(self, murphy_list):
-        print(murphy_list)
         for i in range(17):
             if murphy_list[i] == True:
                 self.occupancy[i] = True
@@ -143,11 +138,9 @@ class CTC:
     #dispatches suggested values for speed, authority and switch change to the wayside shell
     def dispatch(self, Speed, Authority, Switch):
         if all(i == False for i in self.occupancy[0:6]):
-            print("ctc dipatch successful")
             self.shell.dispatch(Speed, Authority, Switch)
             return True
         else:
-            print("Cannot dispatch train")
             return False
         
     def maintenance(self, maint_blocks):
@@ -211,30 +204,31 @@ class Application(object):
     def upload_plc(self):
         file_name = self.ui.plc_file_input.text()
         self.plc_uploaded = self.shell.upload_plc(file_name)
+        self.ui.wayside_log.append(">>PLC uploaded")
     #manual mode functions:
     def manual_switch_5(self):
         if self.plc_uploaded == False:
             self.shell.switch_5 = not self.shell.switch_5
         else:
-            print("In auto mode")
+            self.ui.wayside_log.append(">>Cannot change switch once PLC is uploaded")
     
     def manual_crossing_3(self):
         if self.plc_uploaded == False:
             self.shell.crossing_3 = not self.shell.crossing_3
         else:
-            print("In auto mode")
+            self.ui.wayside_log.append(">>Cannot change switch once PLC is uploaded")
     
     def manual_signal_6(self):
         if self.plc_uploaded == False:
             self.shell.signal_6 = not self.shell.signal_6
         else:
-            print("In auto mode")
+            self.ui.wayside_log.append(">>Cannot change switch once PLC is uploaded")
     
     def manual_signal_12(self):
         if self.plc_uploaded == False:
             self.shell.signal_12 = not self.shell.signal_12
         else:
-            print("In auto mode")
+            self.ui.wayside_log.append(">>Cannot change switch once PLC is uploaded")
     #updates key inputs and outputs on the table in the wayside UI
     def update_wayside_tables(self):
         for i in range(len(self.shell.occupancy)):
