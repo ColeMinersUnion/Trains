@@ -6,7 +6,7 @@ import time
 
 
 class CTCApplication(QMainWindow):
-    def __init__(self, Office):
+    def __init__(self, Office = None):
         super().__init__()
         self.Office = Office
         self.scheduleWidget = SchedulePreviewer()
