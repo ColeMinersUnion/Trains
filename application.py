@@ -1,5 +1,5 @@
-from PyQt5 import QtCore, QtGui, QtWidgets, uic
-from PyQt5.QtWidgets import * 
+from PyQt6 import QtCore, QtGui, QtWidgets, uic
+from PyQt6.QtWidgets import * 
 import importlib
 import copy
 
@@ -171,11 +171,11 @@ class Application(object):
         # Sets the maintenance states to unchecked, they need to start checked for the checkboxes to activate
         for index in range(self.ui.maint_list.count()):
             item = self.ui.maint_list.item(index)
-            item.setCheckState(QtCore.Qt.Unchecked)
+            item.setCheckState(QtCore.Qt.CheckState.Unchecked)
 
         for index in range(self.ui.murphy_list.count()):
             item = self.ui.murphy_list.item(index)
-            item.setCheckState(QtCore.Qt.Unchecked)
+            item.setCheckState(QtCore.Qt.CheckState.Unchecked)
 
         self.wayside_inputs()
         self.ctc_inputs()
@@ -190,7 +190,7 @@ class Application(object):
         self.ui.show()
         self.run()
     def run(self):
-        self.app.exec_()
+        self.app.exec()
 
 
     ################Wayside Functions#########################
