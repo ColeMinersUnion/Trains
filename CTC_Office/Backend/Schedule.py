@@ -1,10 +1,11 @@
 #used to store all routes
 from Train import Train
 
-#Singleton
+#Not Singleton
 class Schedule:
-    def __init__(self):
+    def __init__(self, line: str = ""):
         self.trains = []
+        self.line = line
 
     def addTrain(self, train: Train = None) -> bool:
         if(train != None):

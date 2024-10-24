@@ -11,6 +11,7 @@ class Node: #Also known as a track block
         self.elevation = elevation
         self.cumaltive_elevation = cumulative_elevation
         self.closed = False
+        self.failure = ""
 
     """
     def __init__(self, blockDictionary : dict = {}):
