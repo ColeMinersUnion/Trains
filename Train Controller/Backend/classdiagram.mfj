@@ -1,0 +1,220 @@
+{
+  "_type": "Project",
+  "name": "CommandCenter Diagram",
+  "ownedElements": [
+    {
+      "_type": "UMLModel",
+      "name": "CommandCenterModel",
+      "ownedElements": [
+        {
+          "_type": "UMLClassDiagram",
+          "name": "CommandCenterDiagram",
+          "ownedElements": [
+            {
+              "_type": "UMLClass",
+              "name": "CommandCenter",
+              "attributes": [
+                {
+                  "_type": "UMLAttribute",
+                  "name": "backend",
+                  "type": "Backend"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "name": "testbench_ui",
+                  "type": "TestbenchUI"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "name": "engineer_view",
+                  "type": "EngineerView"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "name": "timer",
+                  "type": "QTimer"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "name": "authority_timer",
+                  "type": "QTimer"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "name": "brake_applied",
+                  "type": "Boolean"
+                },
+                {
+                  "_type": "UMLAttribute",
+                  "name": "speed_decrease_timer",
+                  "type": "QTimer"
+                }
+              ],
+              "operations": [
+                {
+                  "_type": "UMLOperation",
+                  "name": "__init__",
+                  "visibility": "public"
+                },
+                {
+                  "_type": "UMLOperation",
+                  "name": "initUI",
+                  "visibility": "public"
+                },
+                {
+                  "_type": "UMLOperation",
+                  "name": "open_testbench",
+                  "visibility": "public"
+                },
+                {
+                  "_type": "UMLOperation",
+                  "name": "open_engineer_view",
+                  "visibility": "public"
+                },
+                {
+                  "_type": "UMLOperation",
+                  "name": "update_authority",
+                  "visibility": "public"
+                },
+                {
+                  "_type": "UMLOperation",
+                  "name": "update_speed",
+                  "visibility": "public"
+                },
+                {
+                  "_type": "UMLOperation",
+                  "name": "update_values",
+                  "visibility": "public"
+                }
+              ]
+            },
+            {
+              "_type": "UMLClass",
+              "name": "Backend",
+              "operations": [
+                {
+                  "_type": "UMLOperation",
+                  "name": "get_Kp_Ki",
+                  "visibility": "public"
+                },
+                {
+                  "_type": "UMLOperation",
+                  "name": "get_commanded_speed",
+                  "visibility": "public"
+                },
+                {
+                  "_type": "UMLOperation",
+                  "name": "get_authority",
+                  "visibility": "public"
+                },
+                {
+                  "_type": "UMLOperation",
+                  "name": "get_brake_status",
+                  "visibility": "public"
+                },
+                {
+                  "_type": "UMLOperation",
+                  "name": "get_current_speed",
+                  "visibility": "public"
+                },
+                {
+                  "_type": "UMLOperation",
+                  "name": "get_power_output",
+                  "visibility": "public"
+                },
+                {
+                  "_type": "UMLOperation",
+                  "name": "get_doors",
+                  "visibility": "public"
+                },
+                {
+                  "_type": "UMLOperation",
+                  "name": "get_lights",
+                  "visibility": "public"
+                },
+                {
+                  "_type": "UMLOperation",
+                  "name": "get_internal_temp",
+                  "visibility": "public"
+                },
+                {
+                  "_type": "UMLOperation",
+                  "name": "get_hl",
+                  "visibility": "public"
+                },
+                {
+                  "_type": "UMLOperation",
+                  "name": "get_speed_limit",
+                  "visibility": "public"
+                }
+              ]
+            },
+            {
+              "_type": "UMLClass",
+              "name": "TestbenchUI",
+              "operations": [
+                {
+                  "_type": "UMLOperation",
+                  "name": "show",
+                  "visibility": "public"
+                }
+              ]
+            },
+            {
+              "_type": "UMLClass",
+              "name": "EngineerView",
+              "operations": [
+                {
+                  "_type": "UMLOperation",
+                  "name": "show",
+                  "visibility": "public"
+                }
+              ]
+            }
+          ],
+          "_relations": [
+            {
+              "_type": "UMLAssociation",
+              "end1": {
+                "_type": "UMLAssociationEnd",
+                "reference": "CommandCenter",
+                "multiplicity": "1"
+              },
+              "end2": {
+                "_type": "UMLAssociationEnd",
+                "reference": "Backend",
+                "multiplicity": "1"
+              }
+            },
+            {
+              "_type": "UMLAssociation",
+              "end1": {
+                "_type": "UMLAssociationEnd",
+                "reference": "CommandCenter",
+                "multiplicity": "1"
+              },
+              "end2": {
+                "_type": "UMLAssociationEnd",
+                "reference": "TestbenchUI",
+                "multiplicity": "1"
+              }
+            },
+            {
+              "_type": "UMLAssociation",
+              "end1": {
+                "_type": "UMLAssociationEnd",
+                "reference": "CommandCenter",
+                "multiplicity": "1"
+              },
+              "end2": {
+                "_type": "UMLAssociationEnd",
+                "reference": "EngineerView",
+                "multiplicity": "1"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

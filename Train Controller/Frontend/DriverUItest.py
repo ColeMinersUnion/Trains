@@ -8,7 +8,7 @@ from backend import Backend
 from EngineerView import EngineerView
 from LightsAndDoorsUI import LightsAndDoorsUI
 
-class CommandCenter(QWidget):
+class DriverUI(QWidget):
     def __init__(self):
         super().__init__()
         self.backend = Backend()

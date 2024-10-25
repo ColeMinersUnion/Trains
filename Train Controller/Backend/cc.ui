@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ui version="4.0">
+ <class>CommandCenter</class>
+ <widget class="QWidget" name="CommandCenter">
+  <property name="windowTitle">
+   <string>Command Center</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QGroupBox" name="modeGroupBox">
+     <property name="title">
+      <string>Mode Selection</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QRadioButton" name="manualModeRadioButton">
+        <property name="text">
+         <string>Manual Mode</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="automaticModeRadioButton">
+        <property name="text">
+         <string>Automatic Mode</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="manualInput1">
+        <property name="placeholderText">
+         <string>Input 1</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="manualInput2">
+        <property name="placeholderText">
+         <string>Input 2</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="testbench_button">
+     <property name="text">
+      <string>Open Testbench</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="engineer_button">
+     <property name="text">
+      <string>Open Engineer View</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="emergencyBrakeButton">
+     <property name="text">
+      <string>Emergency Brake</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="serviceBrakeButton">
+     <property name="text">
+      <string>Service Brake</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="speed_label">
+     <property name="text">
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="authorityLabel">
+     <property name="text">
+      <string>Authority: 0</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="brakeStatusLabel">
+     <property name="text">
+      <string>Brake Status: OFF</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="suggestedSpeedLabel">
+     <property name="text">
+      <string>Suggested Speed: 0</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="currentSpeedLabel">
+     <property name="text">
+      <string>Current Speed: 0</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="powerOutputLabel">
+     <property name="text">
+      <string>Power Output: 0</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="doorStatusLabel">
+     <property name="text">
+      <string>Door Status: CLOSED</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="lightsStatusLabel">
+     <property name="text">
+      <string>Lights Status: OFF</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="internalTemperatureLabel">
+     <property name="text">
+      <string>Internal Temperature: 0°C</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="headlightsStatusLabel">
+     <property name="text">
+      <string>Headlights Status: OFF</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="speedLimitLabel">
+     <property name="text">
+      <string>Speed Limit: 0</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="kpLabel">
+     <property name="text">
+      <string>Kp: 0</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="kiLabel">
+     <property name="text">
+      <string>Ki: 0</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -3,7 +3,7 @@ import sys
 from PyQt5.QtWidgets import QApplication, QCheckBox, QMainWindow, QLabel, QWidget, QVBoxLayout, QLineEdit, QPushButton, QTextEdit, QLayout
 #from backend import Backend #importing backend logic
 from PyQt5.QtCore import pyqtSignal
-from backend import Backend
+from Backend import Backend
 
 class EngineerView(QWidget):
     Kp_Ki_updated = pyqtSignal()
@@ -42,8 +42,8 @@ class EngineerView(QWidget):
     def submit_inputs(self):
         # Get the input text
         Kp = int(self.Kp_input.text()) if self.Kp_input.text() != "" else 0
-        Ki = int(self.Ki_input.text()) if self.Ki_input.text() != "" else 0
-
+        Ki =  int(self.Ki_input.text()) if self.Ki_input.text() != "" else 0
+        print(f"testing bench")
         self.backend.set_Kp_Ki(Kp, Ki)
         #self.status_label.setText(
         #f"Speed: {self.backend.commanded_speed}\n"

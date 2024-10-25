@@ -6,22 +6,62 @@
 import os
 class Backend:
     def __init__(self):
-        self.commanded_speed = 0
+        self.cmd_speed_driver = 0
+        self.cmd_speed_TM = 0
+        self.cmd_speed = 0
         self.authority = 0
-        self.brake_status = False
-        self.suggested_speed = 0
+        self.ebrake_cmd = False
+        self.sbrake_cmd = False
         self.current_speed = 0
-        self.power_output = 0
-        self.door_status = False #0 = closed,  1 = open
-        self.lights_status = False  #0 = off,  1 = on
-        self.internal_temperature = 0
-        self.headlights_status = False   #0 = off,  1 = on
+        self.power_output = 0 #?
+        self.curr__door_status = False #0 = closed,  1 = open
+        self.cmd_door_driver = False
+        self.cmd_door = False
+        self.curr_lights_status = False  #0 = off,  1 = on
+        self.cmd_lights_driver = False
+        self.cmd_lights = False
+        self.curr_internal_temperature = 0
+        self.cmd_temp_driver = 0
+        self.curr_headlights_status = False   #0 = off,  1 = on
+        self.cmd_hl_driver = False
+        self.cmd_hl = False
         self.Kp = 0
         self.Ki = 0
         self.speed_limit = 0
+        self.beacon_auth = 0
+        self.beacon_data = [0]
         #distance to underground
 
+    #getters and setters for all vars
+    def get_cmd_speed(self):
+        return self.cmd_speed
+    def set_cmd_speed(self, cmd_speed_driver, cmd_speed_TM):
+        self.cmd_speed_driver = cmd_speed_driver
+        self.cmd_speed_TM =  cmd_speed_TM
 
+        #TODO set cmd speed from the driver ui 
+        #if driver value, then set to that unless its above speed limit 
+        #if below a certain authority, then set cmd speed to 0 
+        #self.cmd_speed = cmd_speed_driver or cmd_speed_TM
+
+    def set_auth(self, authority):
+        self.authority =  authority
+    def get_auth(self):
+        return self.authority
+    def  set_ebrake(self, ebrake_status):
+
+        
+    
+        
+    #power function
+    #read in values from testbench
+    #read in values from engineer view
+    #read in values from driver UI
+    #calculate stopping distance
+    #decode beacon data 
+    #send commands?
+
+    
     def set_testbench_inputs(self, commanded_speed, authority, brake_status, suggested_speed, current_speed, power_output, door_status, lights_status, internal_temperature, headlights_status, speed_limit):
 
         """Set inputs for the testbench."""
@@ -57,7 +97,6 @@ class Backend:
         """Return the current status of the testbench inputs"""
         return self.commanded_speed, self.authority, self.brake_status, self.suggested_speed, self.current_speed, self.power_output, self.door_status, self.lights_status, self.internal_temperature,  self.headlights_status, self.speed_limit
 
-    
     def set_Kp_Ki(self , Kp, Ki):
         self.Kp = Kp
         self.Ki = Ki

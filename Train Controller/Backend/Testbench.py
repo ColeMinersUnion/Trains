@@ -2,7 +2,7 @@ import PyQt5
 import sys
 from PyQt5.QtWidgets import QApplication, QCheckBox, QMainWindow, QLabel, QWidget, QVBoxLayout, QLineEdit, QPushButton, QTextEdit, QLayout
 from PyQt5.QtCore import pyqtSignal, QTimer
-from backend import Backend
+from Backend import Backend
 
 class TestbenchUI(QWidget):
     inputs_updated = pyqtSignal()
@@ -46,12 +46,6 @@ class TestbenchUI(QWidget):
         self.current_speed_input.setPlaceholderText("Enter Current Speed")
         layout.addWidget(QLabel("Current Speed:"))
         layout.addWidget(self.current_speed_input)
-
-        #input field for current power output
-        self.current_power_input = QLineEdit(self)
-        self.current_power_input.setPlaceholderText("Enter Current Power Output")
-        layout.addWidget(QLabel("Current Power Output:"))
-        layout.addWidget(self.current_power_input)
 
         #input field for door status
         self.door_checkbox = QCheckBox("Door Open", self)
@@ -98,17 +92,16 @@ class TestbenchUI(QWidget):
         # Get the input text
         commanded_speed = int(self.commanded_speed_input.text()) if self.commanded_speed_input.text() != "" else 0
         authority = int(self.authority_input.text()) if self.authority_input.text() != "" else 0
-        brake_status = self.brake_checkbox.isChecked()
-        suggested_speed = int(self.suggested_speed_input.text()) if  self.suggested_speed_input.text() != "" else 0
+        brake_status = (self.backend.current_speed > self.backend.speed_limit) or (self.backend.authority < 10) or self.brake_checkbox.isChecked()
+        suggested_speed = self.backend.speed_limit or int(self.suggested_speed_input.text()) if  self.suggested_speed_input.text() != "" else 0
         current_speed = int(self.current_speed_input.text()) if self.current_speed_input.text() != "" else 0
-        power_output = int(self.current_power_input.text()) if  self.current_power_input.text() != "" else 0
         door_status = self.door_checkbox.isChecked()
         lights_status = self.light_checkbox.isChecked()
         internal_temperature = int(self.internal_temp_input.text()) if self.internal_temp_input.text() != "" else 0
         headlights_status = self.hl_checkbox.isChecked()
         speed_limit = int(self.speed_limit_input.text()) if self.speed_limit_input.text() != "" else 0
 
-        self.backend.update_testbench_status(commanded_speed, authority, brake_status, suggested_speed, current_speed, power_output, door_status, lights_status, internal_temperature, headlights_status, speed_limit)
+        self.backend.update_testbench_status(commanded_speed, authority, brake_status, suggested_speed, current_speed, door_status, lights_status, internal_temperature, headlights_status, speed_limit)
 
         #self.status_label.setText(
         #f"Speed: {self.backend.commanded_speed}\n"
