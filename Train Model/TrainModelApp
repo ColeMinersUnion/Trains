@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QPushButton, QTabWidget, QLineEdit, QSpacerItem, QSizePolicy, QHBoxLayout, QGridLayout, QMainWindow, QFrame
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QPushButton, QTabWidget, QLineEdit, QSpacerItem, QSizePolicy, QHBoxLayout, QGridLayout
 from PyQt5.QtCore import QTimer, Qt, QObject, pyqtSignal, pyqtSlot, QThread
 from PyQt5.QtGui import QFont
 from TrainModelClass import trainModel
@@ -73,8 +73,6 @@ class PassengerView(QWidget):
         self.station_box.setText(station_name)
 
     def toggle_emergency_brake(self):
-        if self.train.brakeFailure:
-            return
 
         self.train.eBrakeToggle()
         self.brake_button.setText("Emergency Brake: ON" if self.train.emergencyBrake else "Emergency Brake: OFF")
@@ -178,51 +176,57 @@ class MurphyView(QWidget):
 class MetricsTab(QWidget):
     def __init__(self, train):
         super().__init__()
-
+        
         self.train = train
 
         main_layout = QHBoxLayout()
         col1_layout = QVBoxLayout()
         col2_layout = QVBoxLayout()
 
-        def create_styled_label():
-            label = QLabel()
-            label.setAlignment(Qt.AlignCenter)
-            label.setFont(QFont('Arial', 14))
-            label.setFrameStyle(QFrame.Box)
-            label.setLineWidth(2)
-            label.setStyleSheet("border: 2px solid black;")
-            return label
-
-        self.current_speed_label = create_styled_label()
+        self.current_speed_label = QLabel()
+        self.current_speed_label.setAlignment(Qt.AlignCenter)
+        self.current_speed_label.setFont(QFont('Arial', 14))
         col1_layout.addWidget(self.current_speed_label)
 
-        self.goal_speed_label = create_styled_label()
-        col1_layout.addWidget(self.goal_speed_label)
-
-        self.acceleration_label = create_styled_label()
+        self.acceleration_label = QLabel()
+        self.acceleration_label.setAlignment(Qt.AlignCenter)
+        self.acceleration_label.setFont(QFont('Arial', 14))
         col1_layout.addWidget(self.acceleration_label)
 
-        self.service_brake_status_label = create_styled_label()
-        col1_layout.addWidget(self.service_brake_status_label)
-
-        self.passenger_count_label = create_styled_label()
+        self.passenger_count_label = QLabel()
+        self.passenger_count_label.setAlignment(Qt.AlignCenter)
+        self.passenger_count_label.setFont(QFont('Arial', 14))
         col1_layout.addWidget(self.passenger_count_label)
 
-        self.weight_label = create_styled_label()
-        col2_layout.addWidget(self.weight_label)
+        self.weight_label = QLabel()
+        self.weight_label.setAlignment(Qt.AlignCenter)
+        self.weight_label.setFont(QFont('Arial', 14))
+        col1_layout.addWidget(self.weight_label)
 
-        self.train_length_label = create_styled_label()
-        col2_layout.addWidget(self.train_length_label)
-
-        self.temperature_label = create_styled_label()
+        self.temperature_label = QLabel()
+        self.temperature_label.setAlignment(Qt.AlignCenter)
+        self.temperature_label.setFont(QFont('Arial', 14))
         col2_layout.addWidget(self.temperature_label)
 
-        self.light_status_label = create_styled_label()
+        self.light_status_label = QLabel()
+        self.light_status_label.setAlignment(Qt.AlignCenter)
+        self.light_status_label.setFont(QFont('Arial', 14))
         col2_layout.addWidget(self.light_status_label)
 
-        self.door_status_label = create_styled_label()
-        col2_layout.addWidget(self.door_status_label)
+        self.left_door_status_label = QLabel()
+        self.left_door_status_label.setAlignment(Qt.AlignCenter)
+        self.left_door_status_label.setFont(QFont('Arial', 14))
+        col2_layout.addWidget(self.left_door_status_label)
+
+        self.right_door_status_label = QLabel()
+        self.right_door_status_label.setAlignment(Qt.AlignCenter)
+        self.right_door_status_label.setFont(QFont('Arial', 14))
+        col2_layout.addWidget(self.right_door_status_label)
+
+        self.service_brake_status_label = QLabel()
+        self.service_brake_status_label.setAlignment(Qt.AlignCenter)
+        self.service_brake_status_label.setFont(QFont('Arial', 14))
+        col2_layout.addWidget(self.service_brake_status_label)
 
         main_layout.addLayout(col1_layout)
         main_layout.addLayout(col2_layout)
@@ -233,54 +237,28 @@ class MetricsTab(QWidget):
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_labels)
-        self.timer.start(500)
+        self.timer.start(500) 
 
     def update_labels(self):
         current_speed = self.train.getCurrentSpeedImperial()
-        goal_speed = self.train.getGoalSpeedImperial()
         acceleration = self.train.getAccelerationImperial()
         passenger_count = self.train.currentCapacity
         weight = self.train.getWeightImperial()
         temperature = self.train.getTemp()
-        service_brake_status = "On" if self.train.serviceBrake else "Off"
-        train_length = self.train.getLength()
-
         light_status = "On" if self.train.lightStatus else "Off"
-        if light_status == "On":
-            self.light_status_label.setText("Light Status: On")
-            self.light_status_label.setStyleSheet("color: green; border: 2px solid black;")
-        else:
-            self.light_status_label.setText("Light Status: Off")
-            self.light_status_label.setStyleSheet("color: red; border: 2px solid black;")
-
-        # Update Door Status
-        door_status = "Open" if self.train.doorStatus else "Closed"
-        if door_status == "Open":
-            self.door_status_label.setText("Door Status: Open")
-            self.door_status_label.setStyleSheet("color: blue; border: 2px solid black;")
-        else:
-            self.door_status_label.setText("Door Status: Closed")
-            self.door_status_label.setStyleSheet("color: gray; border: 2px solid black;")
-
-        # Update Service Brake Status
-        service_brake_status = "Enabled" if self.train.serviceBrake else "Off"
-        if service_brake_status == "Enabled":
-            self.service_brake_status_label.setText("Service Brake: Enabled")
-            self.service_brake_status_label.setStyleSheet("color: green; border: 2px solid black;")
-        else:
-            self.service_brake_status_label.setText("Service Brake: Off")
-            self.service_brake_status_label.setStyleSheet("color: red; border: 2px solid black;")
+        left_door_status = "Open" if self.train.leftDoorStatus else "Closed"
+        right_door_status = "Open" if self.train.rightDoorStatus else "Closed"
+        service_brake_status = "On" if self.train.serviceBrake else "Off"
 
         self.current_speed_label.setText(f"Current Speed: {current_speed:.2f} mph")
-        self.goal_speed_label.setText(f"Goal Speed: {goal_speed:.2f} mph")
         self.acceleration_label.setText(f"Acceleration: {acceleration:.2f} ft/s²")
         self.passenger_count_label.setText(f"Passenger Count: {passenger_count} passengers")
         self.weight_label.setText(f"Weight: {weight:.2f} lbs")
         self.temperature_label.setText(f"Temperature: {temperature:.2f} °F")
         self.light_status_label.setText(f"Light Status: {light_status}")
-        self.door_status_label.setText(f"Door Status: {door_status}")
+        self.left_door_status_label.setText(f"Left Door Status: {left_door_status}")
+        self.right_door_status_label.setText(f"Right Door Status: {right_door_status}")
         self.service_brake_status_label.setText(f"Service Brake: {service_brake_status}")
-        self.train_length_label.setText(f"Train Length: {train_length} ft")
 
 
 class TestBench(QWidget):
@@ -292,23 +270,17 @@ class TestBench(QWidget):
 
         layout = QGridLayout()
 
-        # Goal Speed
-        goal_speed_label = QLabel("Goal Speed (mph):")
-        self.goal_speed_input = QLineEdit()
-        self.goal_speed_button = QPushButton("Set Goal Speed")
-        self.goal_speed_button.clicked.connect(self.set_goal_speed)
+        # Power Command
+        power_command_label = QLabel("Power Command (Watts):")
+        self.power_command_input = QLineEdit()
+        self.power_command_button = QPushButton("Set Power Command")
+        self.power_command_button.clicked.connect(self.set_power_command)
 
         # Temperature
         temperature_label = QLabel("Temperature (°F):")
         self.temperature_input = QLineEdit()
         self.temperature_button = QPushButton("Set Temperature")
         self.temperature_button.clicked.connect(self.set_temperature)
-
-        # Command Speed
-        command_speed_label = QLabel("Command Speed (m/s):")
-        self.command_speed_input = QLineEdit()
-        self.command_speed_button = QPushButton("Set Command Speed")
-        self.command_speed_button.clicked.connect(self.set_command_speed)
 
         # Authority
         authority_label = QLabel("Authority:")
@@ -336,22 +308,22 @@ class TestBench(QWidget):
         light_toggle_button = QPushButton("Toggle Lights")
         light_toggle_button.clicked.connect(self.toggle_lights)
 
-        # Door Status
-        door_toggle_button = QPushButton("Toggle Doors")
-        door_toggle_button.clicked.connect(self.toggle_doors)
+        # Left Door Status
+        left_door_toggle_button = QPushButton("Toggle Left Doors")
+        left_door_toggle_button.clicked.connect(self.toggle_left_doors)
+
+        # Left Door Status
+        right_door_toggle_button = QPushButton("Toggle Right Doors")
+        right_door_toggle_button.clicked.connect(self.toggle_right_doors)
 
         # Layout for input fields and buttons
-        layout.addWidget(goal_speed_label, 0, 0)
-        layout.addWidget(self.goal_speed_input, 0, 1)
-        layout.addWidget(self.goal_speed_button, 0, 2)
+        layout.addWidget(power_command_label, 0, 0)
+        layout.addWidget(self.power_command_input, 0, 1)
+        layout.addWidget(self.power_command_button, 0, 2)
 
         layout.addWidget(temperature_label, 1, 0)
         layout.addWidget(self.temperature_input, 1, 1)
         layout.addWidget(self.temperature_button, 1, 2)
-
-        layout.addWidget(command_speed_label, 2, 0)
-        layout.addWidget(self.command_speed_input, 2, 1)
-        layout.addWidget(self.command_speed_button, 2, 2)
 
         layout.addWidget(authority_label, 3, 0)
         layout.addWidget(self.authority_input, 3, 1)
@@ -366,25 +338,25 @@ class TestBench(QWidget):
         layout.addWidget(self.add_passengers_button, 5, 2)
 
         layout.addWidget(light_toggle_button, 6, 0, 1, 2)
-        layout.addWidget(door_toggle_button, 6, 2, 1, 2)
+        layout.addWidget(left_door_toggle_button, 6, 1, 1, 2)
+        layout.addWidget(right_door_toggle_button, 6, 2, 1, 2)
         layout.addWidget(self.service_brake_button, 7, 0, 1, 2)
 
         self.setLayout(layout)
 
     def update_inputs(self):
-        self.goal_speed_input.setText(f"{self.train.getGoalSpeedImperial():.2f}")
+        self.power_command_input.setText(f"{self.train.getPowerCommand():.2f}")
         self.temperature_input.setText(f"{self.train.getTemp():.2f}")
-        self.command_speed_input.setText(f"{self.train.getCommandSpeed():.2f}")
         self.authority_input.setText(f"{self.train.getAuthority():.2f}")
         self.next_station_input.setText(self.train.nextStation)
         self.add_passengers_input.setText(f"{self.train.currentCapacity}")
 
-    def set_goal_speed(self):
+    def set_power_command(self):
         if self.train.signalFailure:
             return
         try:
-            goal_speed = float(self.goal_speed_input.text())
-            self.train.setGoalSpeed(goal_speed)
+            power_command = float(self.power_command_input.text())
+            self.train.setPowerCommand(power_command)
             self.metrics_tab.update_labels()
 
             main_window = self.parent()
@@ -392,7 +364,7 @@ class TestBench(QWidget):
                 main_window.start_speed_calculation()
 
         except ValueError:
-            print("Invalid input for goal speed")
+            print("Invalid input for Power Command")
 
     def set_temperature(self):
         temp = float(self.temperature_input.text())
@@ -434,8 +406,12 @@ class TestBench(QWidget):
         self.train.lightToggle()
         self.metrics_tab.update_labels()
 
-    def toggle_doors(self):
-        self.train.doorToggle()
+    def toggle_left_doors(self):
+        self.train.leftDoorToggle()
+        self.metrics_tab.update_labels()
+
+    def toggle_right_doors(self):
+        self.train.rightDoorToggle()
         self.metrics_tab.update_labels()
 
     def toggle_service_brake(self):
@@ -451,37 +427,31 @@ class TestBench(QWidget):
                 main_window.start_speed_calculation()
                 self.train.speedCalculations()
 
-class TrainWindow(QTabWidget):
-    def __init__(self, train_model):
+class MainWindow(QTabWidget):
+    def __init__(self):
         super().__init__()
-        self.train = train_model
+        self.train = trainModel()
         self.train_tab = PassengerView(self.train)
         self.failure_tab = MurphyView(self.train)
         self.metrics_tab = MetricsTab(self.train)
         self.test_bench = TestBench(self.train, self.metrics_tab, self.train_tab)
 
-        # Add the tabs to the new window
         self.addTab(self.train_tab, "Passenger View")
         self.addTab(self.failure_tab, "Murphy View")
         self.addTab(self.metrics_tab, "Metrics")
         self.addTab(self.test_bench, "Test Bench")
 
-        # Start the worker in a thread for this train model
+        self.calculation_timer = QTimer(self)
+        self.calculation_timer.timeout.connect(self.start_speed_calculation)
+        self.calculation_timer.start(500)  # Every 500ms
+
         self.thread = QThread()
         self.worker = Worker(self.train)
         self.worker.moveToThread(self.thread)
 
-        self.worker.finished.connect(self.thread.quit)
-        self.worker.finished.connect(self.thread.wait)  # Ensure the thread finishes properly
+        self.worker.finished.connect(self.thread.deleteLater)
         self.thread.started.connect(self.worker.run)
-
-        # Start the thread
-        self.thread.start()
-
-        # Set up a timer for speed calculations
-        self.calculation_timer = QTimer(self)
-        self.calculation_timer.timeout.connect(self.start_speed_calculation)
-        self.calculation_timer.start(500)  # Every 500ms
+        self.thread.finished.connect(self.on_calculation_finished)
 
     def start_speed_calculation(self):
         if not self.thread.isRunning():
@@ -491,49 +461,19 @@ class TrainWindow(QTabWidget):
 
             self.worker.finished.connect(self.thread.quit)
             self.thread.started.connect(self.worker.run)
+            self.thread.finished.connect(self.on_calculation_finished)
 
             self.thread.start()
 
-    def closeEvent(self, event):
-        # Stop the thread and wait for it to finish before closing the window
-        self.calculation_timer.stop()
-        self.thread.quit()
-        self.thread.wait()
-        event.accept()  # Accept the close event
-
     def on_calculation_finished(self):
-        # Print statement for debugging
         #print("Speed calculation finished")
         self.metrics_tab.update_labels()
-
-
-class MainWindow(QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.train_windows = [] 
-        self.initUI()
-
-    def initUI(self):
-        self.setWindowTitle("Train Control System")
-        self.setGeometry(100, 100, 300, 200)
-
-        self.add_train_button = QPushButton("Add Train", self)
-        self.add_train_button.clicked.connect(self.create_train_window)
-        self.add_train_button.setGeometry(50, 50, 200, 50)
-
-    def create_train_window(self):
-        train = trainModel()
-        train_window = TrainWindow(train) 
-        self.train_windows.append(train_window)
-
-        train_window.setWindowTitle(f"Train {len(self.train_windows)}")
-        train_window.resize(800, 600)
-        train_window.show()
 
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()
+    window.setWindowTitle("Train Model")
+    window.resize(800, 600)
     window.show()
     sys.exit(app.exec_())
-
