@@ -8,15 +8,15 @@ class SwitchQueue:
         self.queue.append(route)
             
     def dequeue(self):
-        if len(self.queue) > 0:
-            return self.queue.pop(0)
-        else:
+        try:
+            self.queue.pop(0)
+        except:
             return None
         
     def peek(self):
-        if len(self.queue) > 0:
+        try:
             return self.queue[0]
-        else:
+        except:
             return None
             
     
