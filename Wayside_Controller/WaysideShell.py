@@ -18,22 +18,9 @@ class WaysideShell:
             return False
 
     
-        blue_plc = getattr(plc, file_name)         
-        self.plc = blue_plc()
+        input_plc = getattr(plc, file_name)         
+        self.plc = input_plc()
         self.plc.say_hi()
         return True
 
-
-    def dispatch(self, speed, authority, switch):
-        self.tm.dispatch(speed, authority)
-        self.plc.dispatch(switch)
-
-
-    def get_blocks(self):
-        return self.plc.get_blocks()
     
-    def set_occupancy(self, occupancy):
-        self.plc.update_track(occupancy)
-    
-    def maintenance_blocks(self, blocks):
-        return self.plc.update_maintenance(blocks)
