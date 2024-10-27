@@ -11,7 +11,7 @@ class CTC_Office:
         if cls._instance is None:
             cls._instance = super(CTC_Office, cls).__new__(cls)
             # Put any initialization here.
-            cls.line = None            #Graph
+            cls.line = []              #Graph
             cls.Schedule = Schedule()  #Schedule
             cls.num_trains = 0         #int
             cls.nextID = 0
@@ -25,6 +25,13 @@ class CTC_Office:
         except:
             print("Blue Line Init Failed")
             return False
+        
+    def addGreenLine(cls):
+        return True
+    
+    def addRedLine(cls):
+        return True
+    
     
     def breakTrack(cls, block_index : int = 0) -> bool:
         if(block_index == 0):

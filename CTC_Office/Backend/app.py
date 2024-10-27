@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 from CTC import CTC_Office
 
@@ -12,6 +12,12 @@ Office.addBlueLine()
 def addTrain():
     Station = request.json['Station']
     Office.addTrain([Station])
+    return 200, "Train has been added"
+
+@api.route('/api/closeTrack', methods=["POST"])
+def closeTrack():
+    return jsonify({""})
+
 
 
 if(__name__ == '__main__'):
