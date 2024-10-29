@@ -5,7 +5,7 @@ class GreenYardPLC:
         self.switch_57 = False
         self.switch_63 = False
         self.maintenance = [False for i in range(36)]
-
+        self.signal_57 = False
     def update_occupancy(self, new_occ):
         self.occupancy = new_occ
     
@@ -19,8 +19,10 @@ class GreenYardPLC:
         for i in range(6, 17):
             if any(self.occupancy[17:22]) and self.switch_57 == True:
                 self.authority[i] = False
+                signal_57 = False
             else:
-                self.authority[i] = True     
+                self.authority[i] = True
+                signal_57 = True   
 
         for i in range(17, 22):
             if any(self.occupancy[22:28]) or self.switch_63 == False:
