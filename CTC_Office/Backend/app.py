@@ -1,9 +1,23 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from CTC import CTC_Office
+from werkzeug.utils import secure_filename
+import os
 
+#*API CONFIG --
+UPLOAD_FOLDER = '/path/to/the/uploads'
+ALLOWED_EXTENSIONS = {'xlxs', 'csv', 'json'}
 api = Flask(__name__)
 cors = CORS(api, resources={r"/api": {"origins":"*"}})
+api.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+#*--
+
+#*Used for checking whether the file could be malicious
+#*Taken from FLASK API documentation. 
+#https://flask.palletsprojects.com/en/stable/patterns/fileuploads/#a-gentle-introduction
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 Office = CTC_Office()
 Office.addBlueLine()
@@ -27,8 +41,20 @@ def block_maintenance():
             maintenance.append(True)
         else:
             maintenance.append(False)
-    return {"blocks":maintenance}
+    return jsonify({"blocks":maintenance}), 200
 
+@api.route('api/schedule/file', methods=['GET', 'POST'])
+def ScheduleFile():
+    if 'file' not in request.files:
+        return jsonify({"Status":"No file submitted"}), 400
+    file = request.files['file']
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(api.config['UPLOAD_FOLDER'], filename))
+        Office.uploadSchedule(filename)
+        return jsonify({"Status":"Schedule Uploaded"}), 200
+    else:
+        return jsonify({"Status":"Schedule Failed"}), 500
 
 
 

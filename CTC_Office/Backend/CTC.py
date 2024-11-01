@@ -1,6 +1,7 @@
 from Train import Train
 from TrainSchedule import TrainSchedule
 from Schedule import Schedule
+from ScheduleParser import readSchedule
 
 #! Top level Backend object to be instantiated in the application. 
 #? ALso should become a singleton when I learn how those work
@@ -32,6 +33,16 @@ class CTC_Office:
     def addRedLine(cls):
         return True
     
+    def uploadSchedule(cls, fn):
+        TrainList = readSchedule(fn)
+        for t in TrainList:
+            tempSchedule = TrainSchedule(t["Line"], t["Stations"])
+            tempSchedule.makeRoutes()
+            tempTrain = Train(tempSchedule, t["Line"], cls.nextID)
+            cls.num_trains += 1
+            cls.nextID += 1
+            cls.Schedule.addTrain(tempTrain)
+        return True
     
     def breakTrack(cls, block_index : int = 0) -> bool:
         if(block_index == 0):
@@ -63,11 +74,11 @@ class CTC_Office:
         else:
             return False
         
-    def addTrain(cls, stations: list = []) -> bool:
+    def addTrain(cls, line, stations: list = []) -> bool:
         if(stations == []):
             return False #Train isn't going anywhere
         #Add a schedule
-        newTrainSchedule = TrainSchedule(cls.line, stations)
+        newTrainSchedule = TrainSchedule(line, stations)
         newTrainSchedule.makeRoutes()
         #Make a train to wrap the schedule
         newTrain = Train(newTrainSchedule, cls.line, cls.nextID)
