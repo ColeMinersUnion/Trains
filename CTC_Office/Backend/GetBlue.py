@@ -1,7 +1,7 @@
 from Node import Node
 from Graph import Graph
 
-def Blue(broken : bool = False):
+def Blue(broken : bool = True):
     BlueLine = Graph()
     #*Section A
     BlueLine.graph.append(Node(index=0, line="Blue", section="A", block_length=0, block_grade=0, speed_limit=50, infrastructure="Yard", elevation=0, cumulative_elevation=0, connections=[1]))
@@ -32,7 +32,7 @@ def Blue(broken : bool = False):
     return BlueLine
 
 if(__name__ == '__main__'):
-    blue = Blue()
+    blue = Blue(True)
     for i in blue.graph:
         print(str(i)) 
 
