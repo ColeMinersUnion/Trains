@@ -166,7 +166,7 @@ class Application(object):
         self.ctc.shell = self.shell
         self.tm.shell = self.shell
 
-        self.ui = uic.loadUi('WaysideShell.ui')
+        self.ui = uic.loadUi('Wayside_Controller/WaysideShell.ui')
 
         # Sets the maintenance states to unchecked, they need to start checked for the checkboxes to activate
         for index in range(self.ui.maint_list.count()):

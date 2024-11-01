@@ -1,13 +1,11 @@
 import importlib
 import copy
-from application import CTC
-from application import TrackModel
+
 
 class WaysideShell:
     def __init__(self):
         self.plc = None
-        self.ctc = CTC()
-        self.tm = TrackModel()
+        self.region = {"Line": "Green", "Region": (41, 77)}
         self.occupancy = [False for i in range(36)]
         self.authority = [True for i in range(28)]
         self.switch_57 = False
@@ -48,3 +46,6 @@ class WaysideShell:
 
     def update(self, tm_occupancy):
         self.occupancy = tm_occupancy
+
+    def maintenance_blocks(self, blocks):
+        print(blocks)
