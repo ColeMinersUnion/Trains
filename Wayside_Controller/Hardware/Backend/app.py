@@ -4,24 +4,45 @@ from WaysideHardwareShell import WaysideShell
 
 app = Flask(__name__)
 wayside = WaysideShell()
+
+#CTC -> Wayside Methods
 #http://localhost:8000/block/maintenance 
 @app.route('/block/maintenance', methods=['POST'])
 def maintain(): 
     try:
         blocks = request.json
         print(blocks['blocks'])
+
+        #TODO: Call Shell Maintenence Function
+
         return jsonify({'message': 'Maintenance blocks updated'}), 200
     except:
         return jsonify({'error': 'Internal Server Error'}), 500
     
-@app.route('/block/occupancy', methods=['POST'])
-def get_signals():
+
+#http://localhost:8000/block/dispatch
+@app.route('/dispatch' , methods=['POST'])
+def dispatch():
     try:
-        blocks = request.json['blocks']
+        dispatch = request.json
+        print(dispatch['dispatch'])
+        #TODO: Call Shell Dispatch Function
+    except:
+        return jsonify({'error': 'Internal Server Error'}), 500
+    
+
+#http://localhost:8000/block/occupancy
+@app.route('/block/occupancy', methods=['POST'])
+def occupancies():
+    try:
+        blocks = request.json
+        print(blocks['blocks'])
         wayside.update(blocks)
         return jsonify({'message': 'Block occupancy updated'}), 200
     except:
         return jsonify({'error': 'Internal Server Error'}), 500
+
+
 
 
 if (__name__ == '__main__'):
