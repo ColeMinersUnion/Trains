@@ -26,248 +26,11 @@
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="wayside">
+      <widget class="QWidget" name="Blue_Line">
        <attribute name="title">
-        <string>Wayside</string>
+        <string>Green Line</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="0" column="0" rowspan="3">
-         <layout class="QVBoxLayout" name="block_occ">
-          <item>
-           <widget class="QLabel" name="label_20">
-            <property name="font">
-             <font>
-              <pointsize>11</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>Track Occupancy and Authority</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QTableWidget" name="wayside_block_table">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="verticalScrollBarPolicy">
-             <enum>Qt::ScrollBarAsNeeded</enum>
-            </property>
-            <property name="horizontalScrollBarPolicy">
-             <enum>Qt::ScrollBarAlwaysOff</enum>
-            </property>
-            <property name="sizeAdjustPolicy">
-             <enum>QAbstractScrollArea::AdjustToContents</enum>
-            </property>
-            <property name="showGrid">
-             <bool>true</bool>
-            </property>
-            <property name="sortingEnabled">
-             <bool>false</bool>
-            </property>
-            <property name="cornerButtonEnabled">
-             <bool>true</bool>
-            </property>
-            <attribute name="horizontalHeaderCascadingSectionResizes">
-             <bool>false</bool>
-            </attribute>
-            <row>
-             <property name="text">
-              <string>Block 0</string>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>6</pointsize>
-              </font>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 1</string>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>6</pointsize>
-              </font>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 2</string>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>6</pointsize>
-              </font>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 3</string>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>6</pointsize>
-              </font>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 4</string>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>6</pointsize>
-              </font>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 5</string>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>6</pointsize>
-              </font>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 6</string>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>6</pointsize>
-              </font>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 7</string>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>6</pointsize>
-              </font>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 8</string>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>6</pointsize>
-              </font>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 9</string>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>6</pointsize>
-              </font>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 10</string>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>6</pointsize>
-              </font>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 11</string>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>6</pointsize>
-              </font>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 12</string>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>6</pointsize>
-              </font>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 13</string>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>6</pointsize>
-              </font>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 14</string>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>6</pointsize>
-              </font>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 15</string>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>6</pointsize>
-              </font>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 16</string>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>6</pointsize>
-              </font>
-             </property>
-            </row>
-            <column>
-             <property name="text">
-              <string>State</string>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>6</pointsize>
-              </font>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Authority</string>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>6</pointsize>
-              </font>
-             </property>
-            </column>
-           </widget>
-          </item>
-         </layout>
-        </item>
         <item row="0" column="1">
          <layout class="QVBoxLayout" name="verticalLayout">
           <item>
@@ -292,7 +55,7 @@
                </font>
               </property>
               <property name="text">
-               <string>Switch 5</string>
+               <string>Switch 58</string>
               </property>
              </widget>
             </item>
@@ -304,7 +67,7 @@
                </font>
               </property>
               <property name="text">
-               <string>Crossing 3</string>
+               <string>Switch 63</string>
               </property>
              </widget>
             </item>
@@ -316,7 +79,7 @@
                </font>
               </property>
               <property name="text">
-               <string>Signal 6</string>
+               <string>Signal 58</string>
               </property>
              </widget>
             </item>
@@ -328,7 +91,7 @@
                </font>
               </property>
               <property name="text">
-               <string>Signal 12</string>
+               <string>Signal 63</string>
               </property>
              </widget>
             </item>
@@ -364,22 +127,48 @@
           </item>
          </layout>
         </item>
-        <item row="0" column="2" rowspan="3">
-         <layout class="QVBoxLayout" name="wayside_log_2">
+        <item row="2" column="1">
+         <layout class="QVBoxLayout" name="track_state_3">
           <item>
-           <widget class="QLabel" name="label_13">
+           <widget class="QLabel" name="label_21">
             <property name="font">
              <font>
               <pointsize>11</pointsize>
              </font>
             </property>
             <property name="text">
-             <string>Wayside Log</string>
+             <string>Track Element States</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QTextBrowser" name="wayside_log"/>
+           <widget class="QTableWidget" name="wayside_elements_table">
+            <row>
+             <property name="text">
+              <string>Switch 58</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Switch 63</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Signal 58</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Signal 63</string>
+             </property>
+            </row>
+            <column>
+             <property name="text">
+              <string>State</string>
+             </property>
+            </column>
+           </widget>
           </item>
          </layout>
         </item>
@@ -418,45 +207,272 @@
           </item>
          </layout>
         </item>
-        <item row="2" column="1">
-         <layout class="QVBoxLayout" name="track_state_3">
+        <item row="0" column="2" rowspan="3">
+         <layout class="QVBoxLayout" name="wayside_log_2">
           <item>
-           <widget class="QLabel" name="label_21">
+           <widget class="QLabel" name="label_13">
             <property name="font">
              <font>
               <pointsize>11</pointsize>
              </font>
             </property>
             <property name="text">
-             <string>Track Element States</string>
+             <string>Wayside Log</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QTableWidget" name="wayside_elements_table">
+           <widget class="QTextBrowser" name="wayside_log"/>
+          </item>
+         </layout>
+        </item>
+        <item row="0" column="0" rowspan="3">
+         <layout class="QVBoxLayout" name="block_occ">
+          <item>
+           <widget class="QLabel" name="label_20">
+            <property name="font">
+             <font>
+              <pointsize>11</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>Track Occupancy and Authority</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTableWidget" name="wayside_block_table">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>900</height>
+             </size>
+            </property>
+            <property name="verticalScrollBarPolicy">
+             <enum>Qt::ScrollBarAsNeeded</enum>
+            </property>
+            <property name="horizontalScrollBarPolicy">
+             <enum>Qt::ScrollBarAlwaysOff</enum>
+            </property>
+            <property name="sizeAdjustPolicy">
+             <enum>QAbstractScrollArea::AdjustToContents</enum>
+            </property>
+            <property name="showGrid">
+             <bool>true</bool>
+            </property>
+            <property name="sortingEnabled">
+             <bool>false</bool>
+            </property>
+            <property name="cornerButtonEnabled">
+             <bool>true</bool>
+            </property>
+            <attribute name="horizontalHeaderCascadingSectionResizes">
+             <bool>false</bool>
+            </attribute>
             <row>
              <property name="text">
-              <string>Switch 5</string>
+              <string>Block 41</string>
              </property>
             </row>
             <row>
              <property name="text">
-              <string>Crossing 3</string>
+              <string>Block 42</string>
              </property>
             </row>
             <row>
              <property name="text">
-              <string>Signal 6</string>
+              <string>Block 43</string>
              </property>
             </row>
             <row>
              <property name="text">
-              <string>Signal 11</string>
+              <string>Block 44</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 45</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 46</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 47</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 48</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 49</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 50</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 51</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 52</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 53</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 54</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 55</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 56</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 57</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 58</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 59</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 60</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 61</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 62</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 63</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 64</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 65</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 66</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 67</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 68</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 69</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 70</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 71</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 72</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 73</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 74</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 75</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 76</string>
              </property>
             </row>
             <column>
              <property name="text">
               <string>State</string>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>6</pointsize>
+              </font>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Authority</string>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>6</pointsize>
+              </font>
              </property>
             </column>
            </widget>
@@ -464,6 +480,462 @@
          </layout>
         </item>
        </layout>
+      </widget>
+      <widget class="QWidget" name="Red_Line">
+       <attribute name="title">
+        <string>Red Line</string>
+       </attribute>
+       <widget class="QWidget" name="gridLayoutWidget">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>381</width>
+          <height>1129</height>
+         </rect>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_3">
+         <item row="0" column="0">
+          <layout class="QVBoxLayout" name="block_occ_4">
+           <item>
+            <widget class="QTableWidget" name="wayside_block_table_4">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>900</height>
+              </size>
+             </property>
+             <property name="verticalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOn</enum>
+             </property>
+             <property name="horizontalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOff</enum>
+             </property>
+             <property name="sizeAdjustPolicy">
+              <enum>QAbstractScrollArea::AdjustToContents</enum>
+             </property>
+             <property name="showGrid">
+              <bool>true</bool>
+             </property>
+             <property name="sortingEnabled">
+              <bool>false</bool>
+             </property>
+             <property name="cornerButtonEnabled">
+              <bool>true</bool>
+             </property>
+             <attribute name="horizontalHeaderCascadingSectionResizes">
+              <bool>false</bool>
+             </attribute>
+             <row>
+              <property name="text">
+               <string>Block 41</string>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Block 42</string>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Block 43</string>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Block 44</string>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Block 45</string>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Block 46</string>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Block 47</string>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Block 48</string>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Block 49</string>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Block 50</string>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Block 51</string>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Block 52</string>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Block 53</string>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Block 54</string>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Block 55</string>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Block 56</string>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Block 57</string>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Block 58</string>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Block 59</string>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Block 60</string>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Block 61</string>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Block 62</string>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Block 63</string>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Block 64</string>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Block 65</string>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Block 66</string>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Block 67</string>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Block 68</string>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Block 69</string>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Block 70</string>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Block 71</string>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Block 72</string>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Block 73</string>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Block 74</string>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Block 75</string>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+             </row>
+             <row>
+              <property name="text">
+               <string>Block 76</string>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+             </row>
+             <column>
+              <property name="text">
+               <string>State</string>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Authority</string>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+             </column>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_36">
+             <property name="baseSize">
+              <size>
+               <width>500</width>
+               <height>500</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>11</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Track Occupancy and Authority</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
       </widget>
      </widget>
     </item>
