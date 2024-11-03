@@ -13,6 +13,15 @@ class Schedule:
             return True
         return False
     
+    def addStop(self, trainID: int, stop: str) -> bool:
+        for t in self.trains:
+            if t.id == trainID:
+                t.schedule.addStop(stop)
+                t.makeRoutes()
+                break
+        return True
+
+    
     
 
 
