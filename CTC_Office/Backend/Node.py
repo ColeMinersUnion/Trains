@@ -1,5 +1,5 @@
 class Node: #Also known as a track block
-    def __init__(self, index : float = 0.0, line: str = "", section: str = "", block_length : int = 0, block_grade : int = 0, speed_limit : int = 0, infrastructure : str = "", elevation : int = 0, cumulative_elevation : int = 0, connections: list = []):
+    def __init__(self, index : float = 0.0, line: str = "", section: str = "", block_length : float = 0, block_grade : float = 0, speed_limit : int = 0, infrastructure : str = "", elevation : float = 0, cumulative_elevation : float = 0, connections: list = []):
         self.index = int(index) #!Block number
         self.infrastructure = infrastructure
         self.connections = connections
@@ -10,8 +10,10 @@ class Node: #Also known as a track block
         self.speed_limit = speed_limit
         self.elevation = elevation
         self.cumaltive_elevation = cumulative_elevation
-        self.closed = False
+        self.closed = False #!
+        self.maintenance = False
         self.failure = ""
+        self.activeConnections = -1 #!Active node that a block is pointing to
 
     """
     def __init__(self, blockDictionary : dict = {}):
