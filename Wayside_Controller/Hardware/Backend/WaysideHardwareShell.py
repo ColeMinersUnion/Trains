@@ -1,4 +1,4 @@
-import importlib
+import importlib.util
 import copy
 
 
@@ -13,18 +13,16 @@ class WaysideShell:
         self.maintenance = [False for i in range(36)]
         self.signal_57 = False
 
-    def upload_plc(self, file_name):
-        try:
-            plc = importlib.import_module(file_name)
+    def upload_plc(self, file_path):
+        # Load the module from the specified file
+        spec = importlib.util.spec_from_file_location("module.name", file_path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
 
-        except ImportError:
-            print(f"Error: Module '{file_name}' not found.")
-            return False
-
-    
-        input_plc = getattr(plc, file_name)         
-        self.plc = input_plc()
-        self.plc.say_hi()
+        # Retrieve the class from the module
+        plc = getattr(module, "PLC")
+        self.plc = plc()
+        self.plc.say_hello()
         return True
 
     def update_plc(self):

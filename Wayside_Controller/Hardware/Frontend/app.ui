@@ -189,7 +189,11 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout">
             <item>
-             <widget class="QLineEdit" name="plc_file_input"/>
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string>Upload PLC</string>
+              </property>
+             </widget>
             </item>
             <item>
              <widget class="QPushButton" name="plc_upload_button">

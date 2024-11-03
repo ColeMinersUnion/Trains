@@ -1,4 +1,4 @@
-class GreenYardPLC:
+class PLC:
     def __init__(self):
         self.occupancy = [False for i in range(36)]
         self.authority = [True for i in range(28)]
@@ -111,3 +111,6 @@ class GreenYardPLC:
 
         if self.maintenance[63] == True and self.maintenance[64] == True:
             self.switch_63 = sw63
+
+    def say_hello(self):
+        print("Hello")
