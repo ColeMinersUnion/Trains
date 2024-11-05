@@ -9,7 +9,7 @@ class WaysideShell:
         self.plc = None
         self.region = {"Line": "Green", "Region": (41, 77)}
         self.occupancy = [False for i in range(36)]
-        self.authority = [True for i in range(28)]
+        self.authority = [False for i in range(28)]
         self.switch_57 = False
         self.switch_63 = False
         self.maintenance = [False for i in range(36)]
@@ -33,22 +33,23 @@ class WaysideShell:
         "occupancy": self.occupancy,
         "switch_bool": self.switch_bool,
         "maintenance": self.maintenance,
-        "signal_57": self.signal_57,
-        "signal_63": self.signal_63,
         "exit": self.exit
         }
    
-        try:
-            self.client_socket.sendall(json.dumps(data).encode('utf-8'))
 
-            response = self.client_socket.recv(4096)
-            print("data received")
-            return json.loads(response.decode('utf-8'))
+        self.client_socket.sendall(json.dumps(data).encode('utf-8'))
+
+        response = self.client_socket.recv(4096)
+        print("data received")
+        return json.loads(response.decode('utf-8'))
         
-        finally:
-            self.client_socket.close()
+
 
 
 if __name__ == "__main__":
     wayside = WaysideShell()
-    wayside.send()
+    while True:
+        if(input("press q to quit, press anything else to keep going") == "q"):
+            wayside.exit = True
+            data = wayside.send()
+            print(data)

@@ -15,8 +15,6 @@ def main():
 
     while True:
         data = client_socket.recv(4096)
-        if not data:
-            break
         received_data = json.loads(data.decode('utf-8'))
         print(received_data)
 
