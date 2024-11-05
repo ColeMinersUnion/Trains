@@ -6,6 +6,7 @@ class PLC:
         self.switch_63 = False
         self.maintenance = [False for i in range(36)]
         self.signal_57 = False
+        
     def update_occupancy(self, new_occ):
         self.occupancy = new_occ
     

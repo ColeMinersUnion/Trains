@@ -1,6 +1,8 @@
 import importlib.util
 import copy
-
+import socket
+import json
+from time import time
 
 class WaysideShell:
     def __init__(self):
@@ -12,38 +14,33 @@ class WaysideShell:
         self.switch_63 = False
         self.maintenance = [False for i in range(36)]
         self.signal_57 = False
+        self.signal_63 = False
 
-    def upload_plc(self, file_path):
-        # Load the module from the specified file
-        spec = importlib.util.spec_from_file_location("module.name", file_path)
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
+        self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.server_ip = '192.168.137.222'
+        self.server_port = 12345
+        
+        
+    def send(self):
+        data = {
+        "authority": self.authority,
+        "signal_57": self.signal_57,
+        }
+        start = time()
+        self.client_socket.connect((self.server_ip, self.server_port))
+        end = time()
+        print(f"Connected to server {end - start} seconds")    
+        try:
+            self.client_socket.sendall(json.dumps(data).encode('utf-8'))
 
-        # Retrieve the class from the module
-        plc = getattr(module, "PLC")
-        self.plc = plc()
-        self.plc.say_hello()
-        return True
+            response = self.client_socket.recv(4096)
+            print("data received")
+            return json.loads(response.decode('utf-8'))
+        
+        finally:
+            self.client_socket.close()
 
-    def update_plc(self):
-        self.plc.update_occupancy(self.occupancy)
-        self.plc.update_authority()
-        self.authority = copy.deepcopy(self.plc.authority)
-        self.switch_57 = copy.deepcopy(self.plc.switch_57)
-        self.switch_63 = copy.deepcopy(self.plc.switch_63) 
-        self.signal_57 = copy.deepcopy(self.plc.signal_57)
 
-    def suggest_switch(self, switch_suggestion):
-        result = self.plc.update_switches(switch_suggestion)
-        self.plc.update_authority()
-        self.authority = copy.deepcopy(self.plc.authority)
-        self.switch_57 = copy.deepcopy(self.plc.switch_57)
-        self.switch_63 = copy.deepcopy(self.plc.switch_63) 
-        self.signal_57 = copy.deepcopy(self.plc.signal_57)
-        return result
-
-    def update(self, tm_occupancy):
-        self.occupancy = tm_occupancy
-
-    def maintenance_blocks(self, blocks):
-        print(blocks)
+if __name__ == "__main__":
+    wayside = WaysideShell()
+    wayside.send()
