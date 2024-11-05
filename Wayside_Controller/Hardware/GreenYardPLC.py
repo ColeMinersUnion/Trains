@@ -6,9 +6,16 @@ class PLC:
         self.switch_63 = False
         self.maintenance = [False for i in range(36)]
         self.signal_57 = False
-        
-    def update_occupancy(self, new_occ):
-        self.occupancy = new_occ
+        self.signal_63 = False
+
+
+    def update(self, occ, sw, maint):
+        self.occupancy = occ
+        self.update_maintenance(maint)
+        self.update_switches(sw)
+        self.update_signals()
+        self.update_authority()
+      
     
     def update_authority(self):
         for i in range(6):
@@ -51,6 +58,17 @@ class PLC:
                 self.switch_57 = False
                 self.switch_63 = False
                 return True
+            
+    def update_signals(self):
+        if self.switch_57 == True:
+            self.signal_57 = True
+        else:
+            self.signal_57 = False
+
+        if self.switch_63 == True:
+            self.signal_63 = True
+        else:
+            self.signal_63 = False
     
     def update_maintenance(self, new_maint):
         for i in range(6):

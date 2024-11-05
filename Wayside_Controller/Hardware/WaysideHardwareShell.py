@@ -15,21 +15,29 @@ class WaysideShell:
         self.maintenance = [False for i in range(36)]
         self.signal_57 = False
         self.signal_63 = False
+        self.exit = False
+        self.switch_bool = True
 
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_ip = '192.168.137.222'
         self.server_port = 12345
-        
-        
+
+        start = time()
+        self.client_socket.connect((self.server_ip, self.server_port))
+        end = time()    
+        print(f"Connected to server {end - start} seconds") 
+
     def send(self):
         data = {
         "authority": self.authority,
+        "occupancy": self.occupancy,
+        "switch_bool": self.switch_bool,
+        "maintenance": self.maintenance,
         "signal_57": self.signal_57,
+        "signal_63": self.signal_63,
+        "exit": self.exit
         }
-        start = time()
-        self.client_socket.connect((self.server_ip, self.server_port))
-        end = time()
-        print(f"Connected to server {end - start} seconds")    
+   
         try:
             self.client_socket.sendall(json.dumps(data).encode('utf-8'))
 
