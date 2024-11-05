@@ -49,7 +49,10 @@ class WaysideShell:
 if __name__ == "__main__":
     wayside = WaysideShell()
     while True:
-        if(input("press q to quit, press anything else to keep going") == "q"):
+        message = input("Press enter to send data, press q to quit: ")
+        if message == "q":
             wayside.exit = True
-            data = wayside.send()
-            print(data)
+            wayside.send()
+            break
+        else:
+            wayside.send()
