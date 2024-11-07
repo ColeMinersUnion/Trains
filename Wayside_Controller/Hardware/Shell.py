@@ -7,7 +7,7 @@ import sys
 from time import time
 from GreenYardPLC import PLC
 
-class WaysideShell:
+class WaysideShell():
     tm_ws_occupancy = pyqtSignal(list)
     ws_tm_authority = pyqtSignal(list)
     ws_tm_switch_58 = pyqtSignal(bool)
@@ -17,7 +17,6 @@ class WaysideShell:
     ws_tm_dispatch = pyqtSignal(tuple)
     def __init__(self):
         self.plc = None
-        self.region = {"Line": "Green", "Region": (41, 77)}
         self.occupancy = [False for i in range(36)]
         self.authority = [False for i in range(28)]
         self.switch_58 = False
@@ -40,7 +39,17 @@ class WaysideShell:
     def dispatch(self, spd, auth):
         self.ws_tm_dispatch.emit((spd, auth))
 
+    
 
+    def toggle_switch_58(self):
+        self.switch_58 = not self.switch_58
+    
+    def toggle_switch_62(self):
+        self.switch_62 = not self.switch_62
 
-
+    def toggle_signal_58(self):
+        self.signal_58 = not self.signal_58
+    
+    def toggle_signal_62(self):
+        self.signal_62 = not self.signal_62
 

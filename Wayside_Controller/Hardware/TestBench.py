@@ -1,22 +1,41 @@
 from PyQt6 import QtCore, QtGui, QtWidgets, uic
+from PyQt6.QtCore import pyqtSignal, QObject
 from PyQt6.QtWidgets import * 
 import importlib
 import copy
 import sys
-sys.path.insert(0, 'Wayside_Controller/Hardware/Backend')
+
 from Shell import WaysideShell
+
+
+class TrackModel():
+    tm_ws_occupancy = pyqtSignal(list)
+
+    def __init__(self):
+
+        self.occupancy = [False for i in range(36)]
+
+    def send_occ(self):
+        self.tm_ws_occupancy
+
+
+
 
 class Application(object):
     def __init__(self, app):
         self.app = app
         self.shell = WaysideShell()
+        self.tm = TrackModel()
 
         self.ui = uic.loadUi('Wayside_Controller/Hardware/app.ui')
         self.tbui = uic.loadUi('Wayside_Controller/Hardware/testbench.ui')
-        for index in range(self.ui.murphy_list.count()):
-            item = self.ui.murphy_list.item(index)
+        for index in range(self.tbui.occ_list.count()):
+            item = self.tbui.occ_list.item(index)
             item.setCheckState(QtCore.Qt.CheckState.Unchecked)
             
+
+          
+        self.tbui.occ_list.itemChanged.connect(self.update_tm)
         self.user_inputs()
         
         # Setup the periodic update
@@ -28,6 +47,15 @@ class Application(object):
         self.tbui.show()
         self.run()
         
+    def update_tm(self):
+        occ_list = []
+        for i in range(self.tbui.occ_list.count()):
+            item = self.tbui.occ_list.item(i)
+            if item.checkState() == QtCore.Qt.Checked:
+                occ_list.append(True)
+            else:
+                occ_list.append(False)
+                self.tm.occupancy = copy.deepcopy(occ_list)
 
     def run(self):
         self.app.exec()
