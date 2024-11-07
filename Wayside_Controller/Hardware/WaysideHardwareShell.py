@@ -35,6 +35,10 @@ class WaysideShell:
         end = time()    
         print(f"Connected to server {end - start} seconds") 
 
+
+
+
+
     def send(self):
         data = {
         "authority": self.authority,
