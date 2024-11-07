@@ -2,19 +2,27 @@ import importlib.util
 import copy
 import socket
 import json
+from PyQt6.QtCore import pyqtSignal, QObject
+import sys
 from time import time
 
 class WaysideShell:
+    tm_ws_occupancy = pyqtSignal(list)
+    ws_tm_authority = pyqtSignal(list)
+    ws_tm_switch_58 = pyqtSignal(bool)
+    ws_tm_switch_62 = pyqtSignal(bool)
+    ws_tm_signal_58 = pyqtSignal(bool)
+    ws_tm_signal_62 = pyqtSignal(bool)
     def __init__(self):
         self.plc = None
         self.region = {"Line": "Green", "Region": (41, 77)}
         self.occupancy = [False for i in range(36)]
         self.authority = [False for i in range(28)]
-        self.switch_57 = False
-        self.switch_63 = False
+        self.switch_58 = False
+        self.switch_62 = False
         self.maintenance = [False for i in range(36)]
-        self.signal_57 = False
-        self.signal_63 = False
+        self.signal_58 = False
+        self.signal_62 = False
         self.exit = False
         self.switch_bool = True
 
