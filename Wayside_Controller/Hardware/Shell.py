@@ -11,7 +11,7 @@ class WaysideWindow(QMainWindow):
     
     def __init__(self):
         super().__init__()
-        uic.loadUi("app.ui", self)
+        uic.loadUi("Wayside_Controller/Hardware/app.ui", self)
         self.plc = PLC()
         self.occupancy = [False for i in range(151)]
         self.authority = [False for i in range(151)]
@@ -25,6 +25,8 @@ class WaysideWindow(QMainWindow):
 
         #reads inputs from the user
         self.user_inputs()
+
+        # Disables manual mode if the track is occupied
 
 
         # Setup the periodic update
@@ -41,7 +43,7 @@ class WaysideWindow(QMainWindow):
 
     
     def toggle_switch_58(self):
-        self.switch_58 = not self.switch_58
+            self.switch_58 = not self.switch_58
     
     def toggle_switch_62(self):
         self.switch_62 = not self.switch_62
@@ -81,6 +83,16 @@ class WaysideWindow(QMainWindow):
         else:
             self.wayside_elements_table.setItem(3,0, QTableWidgetItem("Red"))
 
+        if(any(self.occupancy[41:77])):
+            self.manual_sw58_button.setEnabled(False)
+            self.manual_sw62_button.setEnabled(False)
+            self.manual_sig58_button.setEnabled(False)
+            self.manual_sig62_button.setEnabled(False)
+        else:
+            self.manual_sw58_button.setEnabled(True)
+            self.manual_sw62_button.setEnabled(True)
+            self.manual_sig58_button.setEnabled(True)
+            self.manual_sig62_button.setEnabled(True)
 
     @pyqtSlot(list)
     def update_occupancy(self, new_occ):
@@ -92,3 +104,13 @@ class WaysideWindow(QMainWindow):
     def send_dispatch(self, dispatch):
         self.ws_tm_dispatch.emit(dispatch)
         
+
+    @pyqtSlot(int)
+    def update_switch(self, exit_block):
+        if exit_block == 0:
+            self.switch_bool = False
+        else:
+            self.switch_bool = True
+        self.occupancy, self.authority, sw_success, self.switch_58, self.switch_62, self.maintenance = self.plc.update(self.occupancy, self.switch_bool, self.maintenance, self.maintenance)
+        self.ws_tm_authority.emit(self.authority)
+        self.update_ui()

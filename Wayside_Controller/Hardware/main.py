@@ -14,6 +14,7 @@ def main():
     # Connect the signal from sender to the slot in receiver
     tm_window.tm_ws_occupancy.connect(ws_window.update_occupancy)
     ws_window.ws_tm_authority.connect(tm_window.update_authority)
+    tm_window.ctc_ws_suggested_switch.connect(ws_window.update_switch)
     # Show both windows
     ws_window.show()
     tm_window.show()
