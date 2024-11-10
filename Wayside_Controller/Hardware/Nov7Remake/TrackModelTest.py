@@ -11,8 +11,8 @@ class TrackModelWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         uic.loadUi("testbench.ui", self)
-        self.occupancy = [False for i in range(36)]
-        self.authority = [False for i in range(28)]
+        self.occupancy = [False for i in range(151)]
+        self.authority = [False for i in range(151)]
 
         for index in range(self.occ_list.count()):
             item = self.occ_list.item(index)
@@ -26,9 +26,9 @@ class TrackModelWindow(QMainWindow):
         for i in range(self.occ_list.count()):
             item = self.occ_list.item(i)
             if item.checkState() == Qt.CheckState.Checked:
-                self.occupancy[i] = True
+                self.occupancy[i + 41] = True
             else:
-                self.occupancy[i] = False
+                self.occupancy[i + 41] = False
         self.tm_ws_occupancy.emit(self.occupancy)
 
     @pyqtSlot(list)

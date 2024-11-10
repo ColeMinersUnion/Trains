@@ -17,11 +17,11 @@ class PLC:
         
         sw_success, sw58, sw62 = self.update_switches(occ, sw)
         occ, maint_curr = self.update_maintenance(occ, maint_prop, maint_curr)
-        auth = self.update_authority(occ)
+        auth = self.update_authority(occ, sw58, sw62)
 
         return occ, auth, sw_success, sw58, sw62, maint_curr
 
-    def update_switches(occ, sw):
+    def update_switches(self, occ, sw):
         if sw == False:
             if(any(occ[58:63])):
                 return False, True, True
@@ -31,7 +31,7 @@ class PLC:
         elif sw == True:
             return True, True, True
     
-    def update_maintenance(occ, maint_prop, maint_curr):
+    def update_maintenance(self, occ, maint_prop, maint_curr):
         for i in range(47, 58):
             if maint_prop[i] == False and maint_curr[i] == True:
                 maint_curr[i] = False
@@ -94,22 +94,22 @@ class PLC:
         
         return occ, maint_curr
 
-    def update_authority(occ, sw58, sw62):
+    def update_authority(self, occ, sw58, sw62):
         auth = [True for i in range(151)]
 
         for i in range(41, 47):
-            if any(occ[i:58]):
+            if any(occ[47:58]):
                 auth[i] = False
            
         for i in range(47, 58):
-            if any(occ[i:58]) and sw58 == True:
+            if any(occ[58:63]) and sw58 == True:
                 auth[i] = False
 
         for i in range(58, 63):
-            if any(occ[i:63]) or sw62 == False:
+            if any(occ[63:69]) or sw62 == False:
                 auth[i] = False
 
         for i in range(63, 69):
-            if any(occ[i:69]):
+            if any(occ[69:77]):
                 auth[i] = False
         return auth
