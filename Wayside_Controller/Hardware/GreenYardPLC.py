@@ -1,135 +1,115 @@
+
+#Hardware zones
+# ----
+# 41-46
+# ----
+# 47-57
+# 58-62 (Switch 57-Yard/57-58)
+# 63-68 (Switch yard-63/62-63)
+# ----
+# 69-76
+# ----
 class PLC:
     def __init__(self):
-        self.occupancy = [False for i in range(36)]
-        self.authority = [True for i in range(28)]
-        self.switch_57 = False
-        self.switch_63 = False
-        self.maintenance = [False for i in range(36)]
-        self.signal_57 = False
-        self.signal_63 = False
+        pass
 
-
-    def update(self, occ, sw, maint):
-        self.occupancy = occ
-        self.update_maintenance(maint)
-        self.update_switches(sw)
-        self.update_signals()
-        self.update_authority()
-      
-    
-    def update_authority(self):
-        for i in range(6):
-            if any(self.occupancy[6:17]):
-                self.authority[i] = False
-            else:
-                self.authority[i] = True
-
-        for i in range(6, 17):
-            if any(self.occupancy[17:22]) and self.switch_57 == True:
-                self.authority[i] = False
-                self.signal_57 = False
-            else:
-                self.authority[i] = True
-                self.signal_57 = True   
-
-        for i in range(17, 22):
-            if any(self.occupancy[22:28]) or self.switch_63 == False:
-                self.authority[i] = False
-            else:
-                self.authority[i] = True    
-
-        for i in range(22, 28):
-            if any(self.occupancy[28:]):
-                self.authority[i] = False
-            else:
-                self.authority[i] = True    
-
-    def update_switches(self, suggested_switch):
-        if suggested_switch == True:
-            self.switch_57 = True
-            self.switch_63 = True
-            return True
-        elif suggested_switch == False:
-            if any(self.occupancy[17:22]):
-                self.switch_57 = True
-                self.switch_63 = True
-                return False
-            else:
-                self.switch_57 = False
-                self.switch_63 = False
-                return True
-            
-    def update_signals(self):
-        if self.switch_57 == True:
-            self.signal_57 = True
-        else:
-            self.signal_57 = False
-
-        if self.switch_63 == True:
-            self.signal_63 = True
-        else:
-            self.signal_63 = False
-    
-    def update_maintenance(self, new_maint):
-        for i in range(6):
-            if new_maint[i] == True and self.maintenance[i] == False:
-                maint_safety = True
-                for j in range(17):
-                    if self.occupancy[j] == True and self.maintenance[j] == False:
-                        maint_safety = False
-                        break
-                if maint_safety == True:
-                    self.maintenance[i] = True
-                    self.occupancy[i] = True
-            elif new_maint[i] == False and self.maintenance[i] == True:
-                self.maintenance[i] = False
-                self.occupancy[i] = False
-            
-        for i in range(6, 17):
-            if new_maint[i] == True and self.maintenance[i] == False:
-                maint_safety = True
-                for j in range(6, 22):
-                    if self.occupancy[j] == True and self.maintenance[j] == False:
-                        maint_safety = False
-                        break
-                if maint_safety == True:
-                    self.maintenance[i] = True
-                    self.occupancy[i] = True
-            elif new_maint[i] == False and self.maintenance[i] == True:
-                self.maintenance[i] = False
-                self.occupancy[i] = False
+    def update(self, occ, sw, maint_prop, maint_curr):
         
-        for i in range(17, 22):
-            if new_maint[i] == True and self.maintenance[i] == False:
-                maint_safety = True
-                for j in range(17, 28):
-                    if self.occupancy[j] == True and self.maintenance[j] == False:
-                        maint_safety = False
-                        break
-                if maint_safety == True:
-                    self.maintenance[i] = True
-                    self.occupancy[i] = True
-            elif new_maint[i] == False and self.maintenance[i] == True:
-                self.maintenance[i] = False
-                self.occupancy[i] = False
+        sw_success, sw58, sw62 = self.update_switches(occ, sw)
+        occ, maint_curr = self.update_maintenance(occ, maint_prop, maint_curr)
+        auth = self.update_authority(occ, sw58, sw62)
+
+        return occ, auth, sw_success, sw58, sw62, maint_curr
+
+    def update_switches(self, occ, sw):
+        if sw == False:
+            if(any(occ[58:63])):
+                return False, True, True
+            else:
+                return True, False, False
         
-        for i in range(22, 28):
-            if new_maint[i] == True and self.maintenance[i] == False:
+        elif sw == True:
+            return True, True, True
+    
+    def update_maintenance(self, occ, maint_prop, maint_curr):
+        for i in range(47, 58):
+            if maint_prop[i] == False and maint_curr[i] == True:
+                maint_curr[i] = False
+                occ[i] = False
+            elif maint_prop[i] == True and maint_curr[i] == False:
+
                 maint_safety = True
-                for j in range(22, 36):
-                    if self.occupancy[j] == True and self.maintenance[j] == False:
+                for j in range(41, 58):
+                    if occ[j] == True and maint_curr[j] == False:
                         maint_safety = False
                         break
                 if maint_safety == True:
-                    self.maintenance[i] = True
-                    self.occupancy[i] = True
+                    maint_curr[i] = True
+                    occ[i] = True
+        
+        for i in range(58, 62):
+            if maint_prop[i] == False and maint_curr[i] == True:
+                maint_curr[i] = False
+                occ[i] = False
+            elif maint_prop[i] == True and maint_curr[i] == False:
 
-    def maintenance_switch(self, sw57, sw63):
-        if self.maintenance[57] == True and self.maintenance[58] == True:
-            self.switch_57 = sw57
+                maint_safety = True
+                for j in range(47, 63):
+                    if occ[j] == True and maint_curr[j] == False:
+                        maint_safety = False
+                        break
+                if maint_safety == True:
+                    maint_curr[i] = True
+                    occ[i] = True
 
-        if self.maintenance[63] == True and self.maintenance[64] == True:
-            self.switch_63 = sw63
+        for i in range(63, 69):
+            if maint_prop[i] == False and maint_curr[i] == True:
+                maint_curr[i] = False
+                occ[i] = False
+            elif maint_prop[i] == True and maint_curr[i] == False:
 
-    def say_hello(self):
-        print("Hello")
+                maint_safety = True
+                for j in range(58, 69):
+                    if occ[j] == True and maint_curr[j] == False:
+                        maint_safety = False
+                        break
+                if maint_safety == True:
+                    maint_curr[i] = True
+                    occ[i] = True
+
+        for i in range(69, 77):
+            if maint_prop[i] == False and maint_curr[i] == True:
+                maint_curr[i] = False
+                occ[i] = False
+            elif maint_prop[i] == True and maint_curr[i] == False:
+
+                maint_safety = True
+                for j in range(63, 77):
+                    if occ[j] == True and maint_curr[j] == False:
+                        maint_safety = False
+                        break
+                if maint_safety == True:
+                    maint_curr[i] = True
+                    occ[i] = True
+        
+        return occ, maint_curr
+
+    def update_authority(self, occ, sw58, sw62):
+        auth = [True for i in range(151)]
+
+        for i in range(41, 47):
+            if any(occ[47:58]):
+                auth[i] = False
+           
+        for i in range(47, 58):
+            if any(occ[58:63]) and sw58 == True:
+                auth[i] = False
+
+        for i in range(58, 63):
+            if any(occ[63:69]) or sw62 == False:
+                auth[i] = False
+
+        for i in range(63, 69):
+            if any(occ[69:77]):
+                auth[i] = False
+        return auth
