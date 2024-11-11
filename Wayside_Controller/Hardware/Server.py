@@ -22,15 +22,13 @@ def main():
                     print("Client disconnected")
                     break
 
-            plc.update(received_data.get("occupancy"), received_data.get("switch_bool"), received_data.get("maintenance"))
+            occupancy, authority, sw_success, switch_58, switch_62, maintenance = plc.update(received_data["occupancy"], received_data["switch_bool"], received_data["proposed_maintenance"], received_data["current_maintenance"])
             response = {
-                "authority": plc.authority,
-                "occupancy": plc.occupancy,
-                "switch_57": plc.switch_57,
-                "switch_63": plc.switch_63,
-                "maintenance": plc.maintenance,
-                "signal_57": plc.signal_57,
-                "signal_63": plc.signal_63,
+                "authority": authority,
+                "occupancy": occupancy,
+                "switch_58": switch_58,
+                "switch_62": switch_62,
+                "maintenance": maintenance,
             }
             client_socket.sendall(json.dumps(response).encode('utf-8'))
 

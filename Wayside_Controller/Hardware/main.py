@@ -1,7 +1,7 @@
 # app.py
 import sys
 from PyQt6.QtWidgets import QApplication
-from Shell import WaysideWindow
+from HardwareShell import WaysideWindow
 from TrackModelTest import TrackModelWindow
 
 def main():
