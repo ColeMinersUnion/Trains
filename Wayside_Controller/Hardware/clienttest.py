@@ -1,8 +1,11 @@
 import socket
+from time import time
 
-client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_ip = '192.168.137.222'
+server_port = 12345
 
-client.connect(('192.169.137.222', 9999))  
-
-client.send('Hello from the client!'.encode())
-print(client.recv(1024).decode())
+start = time()
+client_socket.connect((server_ip, server_port))
+end = time()    
+print(f"Connected to server {end - start} seconds") 
