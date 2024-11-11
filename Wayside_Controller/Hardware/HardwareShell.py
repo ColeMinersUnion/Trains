@@ -59,7 +59,7 @@ class WaysideWindow(QMainWindow):
 
         self.client_socket.sendall(json.dumps(data).encode('utf-8'))
 
-        response = self.client_socket.recv(4096)
+        response = self.client_socket.recv(8192)
         print("data received")
         received_data = json.loads(response.decode('utf-8'))
         self.occupancy = received_data["occupancy"]
@@ -78,7 +78,7 @@ class WaysideWindow(QMainWindow):
 
     
     def toggle_switch_58(self):
-            self.switch_58 = not self.switch_58
+        self.switch_58 = not self.switch_58
     
     def toggle_switch_62(self):
         self.switch_62 = not self.switch_62
@@ -150,3 +150,8 @@ class WaysideWindow(QMainWindow):
         self.send(self.occupancy, self.switch_bool, self.maintenance, self.maintenance)
         self.ws_tm_authority.emit(self.authority)
         self.update_ui()
+
+
+if __name__ == "__main__":
+    ws = WaysideWindow()
+    ws.client_socket.sendall("Hello, World!")
