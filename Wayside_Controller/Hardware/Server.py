@@ -7,7 +7,7 @@ from GreenYardPLC import PLC
 def main():
     plc = PLC()
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind(('0.0.0.0', 12345))
+    server_socket.bind(('0.0.0.0', 123))
     server_socket.listen(5)
     print("Server is listening")
 
@@ -26,21 +26,27 @@ def main():
             decoded_json = ""
             try:
               decoded_json = json.loads(message_data)
+              print(decoded_json)
+
+
+              match decoded_json["input"]:
+                  
+                  case "tm_occupancy":
+                    new_auth = plc.update_authority(decoded_json["data"])
+                    response = {
+                        "response": "tm_occupancy",
+                        "auth": new_auth
+                    }
+                    json_data = json.dumps(response)
+                    length_prefix = f"{len(json_data):<10}"  # Fixed 10-byte length prefix
+                    client_socket.sendall(length_prefix.encode('utf-8') + json_data.encode('utf-8'))
+                
+
+
             except json.JSONDecodeError:
                 print("failed to decode Json", message_data)
                 
-            try:
-                occupancy, authority, sw_success, switch_58, switch_62, maintenance = plc.update(decoded_json["occupancy"], decoded_json["switch_bool"], decoded_json["proposed_maintenance"], decoded_json["current_maintenance"])
-                response = {
-                    "authority": authority,
-                    "occupancy": occupancy,
-                    "switch_58": switch_58,
-                    "switch_62": switch_62,
-                    "maintenance": maintenance,
-                }
-                client_socket.sendall(json.dumps(response).encode('utf-8'))
-            except UnboundLocalError:
-                print("Failed to decode JSON:")
+            
 
     finally:
          client_socket.close()

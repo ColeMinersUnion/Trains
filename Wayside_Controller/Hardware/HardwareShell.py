@@ -10,11 +10,10 @@ from time import time
 
 class WaysideWindow(QMainWindow):
     ws_tm_authority = pyqtSignal(list)
-    ws_tm_dispatch = pyqtSignal(tuple)
     
     def __init__(self):
         super().__init__()
-        uic.loadUi("Wayside_Controller/Hardware/app.ui", self)
+        uic.loadUi("app.ui", self)
 
         self.occupancy = [False for i in range(151)]
         self.authority = [False for i in range(151)]
@@ -25,6 +24,7 @@ class WaysideWindow(QMainWindow):
         self.signal_62 = False
         self.exit = False
         self.switch_bool = True
+
 
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_ip = '192.168.137.222'
@@ -46,30 +46,30 @@ class WaysideWindow(QMainWindow):
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.update_ui)  # Function to update the UI
         self.timer.start(15)  # Updates every 1.5 seconds 
-        
-    def send(self, occupancy, switch_bool, maint_prop, maint_curr):
-        data = {
-        "occupancy": occupancy,
-        "switch_bool": switch_bool,
-        "proposed_maintenance": maint_prop,
-        "current_maintenance": maint_curr,
-        "exit": self.exit
-        }
+
+
+    def send(self, data):
    
         json_data = json.dumps(data)
         length_prefix = f"{len(json_data):<10}"  # Fixed 10-byte length prefix
         self.client_socket.sendall(length_prefix.encode('utf-8') + json_data.encode('utf-8'))
 
-        response = self.client_socket.recv(8096)
-        print("data received")
-        received_data = json.loads(response.decode('utf-8'))
-        self.occupancy = received_data["occupancy"]
-        self.authority = received_data["authority"]
-        self.switch_58 = received_data["switch_58"]
-        self.switch_62 = received_data["switch_62"]
-        self.maintenance = received_data["maintenance"]
 
+    def receive(self):
+        length_prefix = self.client_socket.recv(10).decode('utf-8').strip()
+        message_length = int(length_prefix)
+        message_data = self.client_socket.recv(message_length).decode('utf-8')
+        decoded_json = ""
+
+        try:
+            decoded_json = json.loads(message_data)
+            print(decoded_json)
+            return decoded_json
+
+        except json.JSONDecodeError:
+            print("failed to decode Json", message_data)
     
+
 
     def user_inputs(self):
         self.manual_sw58_button.clicked.connect(self.toggle_switch_58)
@@ -79,17 +79,17 @@ class WaysideWindow(QMainWindow):
 
     
     def toggle_switch_58(self):
-        self.switch_58 = not self.switch_58
-    
+        data = self.package_data(self.occupancy, self.switch_bool, self.maintenance, self.maintenance, self.maintenance, True, not self.switch_58, self.switch_62, self.signal_58, self.signal_62)
+        self.send(data)
     def toggle_switch_62(self):
-        self.switch_62 = not self.switch_62
-
+        data = self.package_data(self.occupancy, self.switch_bool, self.maintenance, self.maintenance, self.maintenance, True, self.switch_58, not self.switch_62, self.signal_58, self.signal_62)
+        self.send(data)
     def toggle_signal_58(self):
-        self.signal_58 = not self.signal_58
-    
+        data = self.package_data(self.occupancy, self.switch_bool, self.maintenance, self.maintenance, self.maintenance, True, self.switch_58, self.switch_62, not self.signal_58, self.signal_62)
+        self.send(data)
     def toggle_signal_62(self):
-        self.signal_62 = not self.signal_62
-
+        data = self.package_data(self.occupancy, self.switch_bool, self.maintenance, self.maintenance, self.maintenance, True, self.switch_58, self.switch_62, self.signal_58, not self.signal_62)
+        self.send(data)
 
 
     def update_ui(self):
@@ -131,16 +131,26 @@ class WaysideWindow(QMainWindow):
             self.manual_sig58_button.setEnabled(True)
             self.manual_sig62_button.setEnabled(True)
 
+
     @pyqtSlot(list)
     def update_occupancy(self, new_occ):
         # Slot to update the label text
-        self.send(new_occ, self.switch_bool, self.maintenance, self.maintenance)
+        self.send_occupancy(new_occ)
         self.ws_tm_authority.emit(self.authority)
 
-    @pyqtSlot(tuple)
-    def send_dispatch(self, dispatch):
-        self.ws_tm_dispatch.emit(dispatch)
-        
+
+    def send_occupancy(self, occupancy):
+        self.occupancy = occupancy
+        data = {
+            "input" : "tm_occupancy",
+            "occupancy": occupancy
+        }
+        self.send(data)
+        decoded_json = self.receive()
+        self.authority = decoded_json["auth"]
+        self.ws_tm_authority.emit(self.authority)
+
+   
 
     @pyqtSlot(int)
     def update_switch(self, exit_block):
