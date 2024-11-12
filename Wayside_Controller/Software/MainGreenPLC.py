@@ -4,6 +4,7 @@
 #class to hardcode green line        
 class GreenPLC:
     def __init__(self):
+       
         #track switches
         self.switch_13 = True
         self.switch_28 = False
@@ -35,14 +36,14 @@ class GreenPLC:
                         self.occupancies[122:143], #W
                         self.occupancies[144:150]] #XYZ '''
     
-    #intakes new occupancies from track model
-    def updates(self, occupancy):
+    #intakes new occupancies from track model and switch defaults from the shell
+    def update_values(self, occupancy, sw77, sw85, sw28, sw13):
         #update signals, switches, crossings then authority
-        self.update_switch(occupancy)
-        self.update_signal()
-        self.update_crossing(occupancy)
-        self.update_authority(occupancy)
-        
+        switch77, switch85, switch28, switch13 = self.update_switch(occupancy, sw77, sw85, sw28, sw13)
+        signal77, signal85, signal28, signal13 = self.update_signal(switch77, switch85, switch28, switch13)
+        crossing19, crossing108 = self.update_crossing(occupancy)
+        authority=self.update_authority(occupancy)
+        return authority, switch77, switch85, switch28, switch13, signal77, signal85, signal28, signal13, crossing19, crossing108
 
     def maintenance(self):
         #if theres an occupancy in the region, no maintenance or manual mode, it's disabled
@@ -52,20 +53,30 @@ class GreenPLC:
     def say_hi(self):
         print("PLC Uploaded Successfully")
     
-    def update_signal(self):
+    def update_signal(self, sw77, sw85, sw28, sw13):
+        self.switch_77=sw77
+        self.switch_85=sw85
+        self.switch_28=sw28
+        self.switch_13=sw13
         #update signals according to default path (they turn on when the switch changes from 'default' setting)
         if self.switch_77==True:
             self.signal_77=True
-        else: self.signal_77=False
+        else: 
+            self.signal_77=False
         if self.switch_85==False:
             self.signal_85=True
-        else: self.signal_85=False
+        else: 
+            self.signal_85=False
         if self.switch_28==True:
             self.signal_28=True
-        else: self.signal_28=False
+        else: 
+            self.signal_28=False
         if self.switch_13==False:
             self.signal_13=True
-        else: self.switch_13=False
+        else: 
+            self.signal_13=False
+        return self.signal_77, self.signal_85, self.signal_28, self.signal_13
+
     
     def update_crossing(self, occupancy):
         #checks if the train is within 3 blocks of the crossings, if so sets crossings to true
@@ -79,26 +90,34 @@ class GreenPLC:
         else:
             self.crossing_108=False
 
-    def update_switch(self, occupancy):
+        return self.crossing_19, self.crossing_108
+
+    def update_switch(self, occupancy, switch_77, switch_85, switch_28, switch_13):
         #enforce default path (ie switch 77 can only switch to zone R when a train is present in NOPQ zone, and switch back when the train has left R)
         #switches on greenline: 13, 28, 77, 85
         #switch 77 (right then left, false then true)
-        if any(occupancy[77:100]==True) and self.switch_77==False:
-            self.switch_77=True
-        else: self.switch_77=False
+        if any(occupancy[78:100]==True) and switch_77==False:
+            switch_77=True
+        else: 
+            switch_77=False
         #switch 85 (left then right, true then false)
-        if any(occupancy[86:100]==True) and self.switch_85==True:
-            self.switch_85=False
-        else: self.switch_85=True
+        if any(occupancy[86:100]==True) and switch_85==True:
+            switch_85=False
+        else: 
+            switch_85=True
         #switch 28 (right then left, false then true)
-        if any(occupancy[1:27]==True) and self.switch_28==False:
-            self.switch_28=True
-        else: self.switch_28=False
+        if any(occupancy[1:27]==True) and switch_28==False:
+            switch_28=True
+        else: 
+            switch_28=False
         #switch 13 (left then right, true then false)
-        if any(occupancy[1:12]==True) and self.switch_13==True:
-            self.switch_13=False
-        else: self.switch_13=True
+        if any(occupancy[1:12]==True) and switch_13==True:
+            switch_13=False
+        else: 
+            switch_13=True
         
+        return switch_77, switch_85, switch_28, switch_13
+
     
     #coding the default path along the green line
     #determines if each occupied block has the authority to move to the next block, this is layout dependent so it is hardcoded
@@ -781,3 +800,5 @@ class GreenPLC:
         else:
             authority[46]=True
         #end of zone I for main wayside
+
+        return authority
