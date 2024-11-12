@@ -56,10 +56,11 @@ class WaysideWindow(QMainWindow):
         "exit": self.exit
         }
    
+        json_data = json.dumps(data)
+        length_prefix = f"{len(json_data):<10}"  # Fixed 10-byte length prefix
+        self.client_socket.sendall(length_prefix.encode('utf-8') + json_data.encode('utf-8'))
 
-        self.client_socket.sendall(json.dumps(data).encode('utf-8'))
-
-        response = self.client_socket.recv(8192)
+        response = self.client_socket.recv(8096)
         print("data received")
         received_data = json.loads(response.decode('utf-8'))
         self.occupancy = received_data["occupancy"]
