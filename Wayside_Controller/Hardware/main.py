@@ -8,7 +8,6 @@ def main():
 
     ws_window = WaysideWindow()
     # Instantiate the windows
-    ws_window  = WaysideWindow()
     tm_window = TrackModelWindow()
 
     # Connect the signal from sender to the slot in receiver

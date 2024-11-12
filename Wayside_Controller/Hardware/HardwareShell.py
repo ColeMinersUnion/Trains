@@ -13,7 +13,7 @@ class WaysideWindow(QMainWindow):
     
     def __init__(self):
         super().__init__()
-        uic.loadUi("app.ui", self)
+        uic.loadUi("Wayside_Controller/Hardware/app.ui", self)
 
         self.occupancy = [False for i in range(151)]
         self.authority = [False for i in range(151)]
@@ -28,16 +28,19 @@ class WaysideWindow(QMainWindow):
 
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_ip = '192.168.137.222'
-        self.server_port = 12345
+        self.server_port = 9000
 
         start = time()
         self.client_socket.connect((self.server_ip, self.server_port))
         end = time()    
         print(f"Connected to server {end - start} seconds") 
-
-
+        data = {
+            "input" : "say_hi"
+        }
+        self.send(data)
+        decoded_json = self.receive()
         #reads inputs from the user
-        self.user_inputs()
+        #self.user_inputs()
 
         
 
@@ -49,7 +52,6 @@ class WaysideWindow(QMainWindow):
 
 
     def send(self, data):
-   
         json_data = json.dumps(data)
         length_prefix = f"{len(json_data):<10}"  # Fixed 10-byte length prefix
         self.client_socket.sendall(length_prefix.encode('utf-8') + json_data.encode('utf-8'))
@@ -63,7 +65,6 @@ class WaysideWindow(QMainWindow):
 
         try:
             decoded_json = json.loads(message_data)
-            print(decoded_json)
             return decoded_json
 
         except json.JSONDecodeError:
@@ -71,25 +72,25 @@ class WaysideWindow(QMainWindow):
     
 
 
-    def user_inputs(self):
-        self.manual_sw58_button.clicked.connect(self.toggle_switch_58)
-        self.manual_sw62_button.clicked.connect(self.toggle_switch_62)
-        self.manual_sig58_button.clicked.connect(self.toggle_signal_58)
-        self.manual_sig62_button.clicked.connect(self.toggle_signal_62)
+    # def user_inputs(self):
+    #     self.manual_sw58_button.clicked.connect(self.toggle_switch_58)
+    #     self.manual_sw62_button.clicked.connect(self.toggle_switch_62)
+    #     self.manual_sig58_button.clicked.connect(self.toggle_signal_58)
+    #     self.manual_sig62_button.clicked.connect(self.toggle_signal_62)
 
     
-    def toggle_switch_58(self):
-        data = self.package_data(self.occupancy, self.switch_bool, self.maintenance, self.maintenance, self.maintenance, True, not self.switch_58, self.switch_62, self.signal_58, self.signal_62)
-        self.send(data)
-    def toggle_switch_62(self):
-        data = self.package_data(self.occupancy, self.switch_bool, self.maintenance, self.maintenance, self.maintenance, True, self.switch_58, not self.switch_62, self.signal_58, self.signal_62)
-        self.send(data)
-    def toggle_signal_58(self):
-        data = self.package_data(self.occupancy, self.switch_bool, self.maintenance, self.maintenance, self.maintenance, True, self.switch_58, self.switch_62, not self.signal_58, self.signal_62)
-        self.send(data)
-    def toggle_signal_62(self):
-        data = self.package_data(self.occupancy, self.switch_bool, self.maintenance, self.maintenance, self.maintenance, True, self.switch_58, self.switch_62, self.signal_58, not self.signal_62)
-        self.send(data)
+    # def toggle_switch_58(self):
+    #     data = self.package_data(self.occupancy, self.switch_bool, self.maintenance, self.maintenance, self.maintenance, True, not self.switch_58, self.switch_62, self.signal_58, self.signal_62)
+    #     self.send(data)
+    # def toggle_switch_62(self):
+    #     data = self.package_data(self.occupancy, self.switch_bool, self.maintenance, self.maintenance, self.maintenance, True, self.switch_58, not self.switch_62, self.signal_58, self.signal_62)
+    #     self.send(data)
+    # def toggle_signal_58(self):
+    #     data = self.package_data(self.occupancy, self.switch_bool, self.maintenance, self.maintenance, self.maintenance, True, self.switch_58, self.switch_62, not self.signal_58, self.signal_62)
+    #     self.send(data)
+    # def toggle_signal_62(self):
+    #     data = self.package_data(self.occupancy, self.switch_bool, self.maintenance, self.maintenance, self.maintenance, True, self.switch_58, self.switch_62, self.signal_58, not self.signal_62)
+    #     self.send(data)
 
 
     def update_ui(self):

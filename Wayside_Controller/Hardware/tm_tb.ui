@@ -568,7 +568,7 @@
       <layout class="QVBoxLayout" name="verticalLayout_2"/>
      </item>
      <item row="0" column="2">
-      <widget class="QTableWidget" name="wayside_elements_table">
+      <widget class="QTableWidget" name="tm_elements_table">
        <row>
         <property name="text">
          <string>Switch 58</string>

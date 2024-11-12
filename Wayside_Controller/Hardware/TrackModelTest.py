@@ -9,7 +9,7 @@ class TrackModelWindow(QMainWindow):
     tm_ws_occupancy = pyqtSignal(list)
     def __init__(self):
         super().__init__()
-        uic.loadUi("tm_tb.ui", self)
+        uic.loadUi("Wayside_Controller/Hardware/tm_tb.ui", self)
         self.occupancy = [False for i in range(151)]
         self.authority = [False for i in range(151)]
         self.switch_58 = False
@@ -21,6 +21,10 @@ class TrackModelWindow(QMainWindow):
             item = self.occ_list.item(index)
             item.setCheckState(QtCore.Qt.CheckState.Unchecked)
 
+
+        self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(self.update_ui)  # Function to update the UI
+        self.timer.start(15)  # Updates every 1.5 seconds 
 
         self.occ_list.itemChanged.connect(self.occupancy_change)
         
