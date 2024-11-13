@@ -55,7 +55,6 @@ class PLC:
         for i in range(47, 58):
             if maint_prop[i] == False and self.maintenance[i] == True:
                 self.maintenance[i] = False
-                self.occupancy[i] = False
             elif maint_prop[i] == True and self.maintenance[i] == False:
 
                 maint_safety = True
@@ -65,12 +64,10 @@ class PLC:
                         break
                 if maint_safety == True:
                     self.maintenance[i] = True
-                    self.occupancy[i] = True
         
         for i in range(58, 62):
             if maint_prop[i] == False and self.maintenance[i] == True:
                 self.maintenance[i] = False
-                self.occupancy[i] = False
             elif maint_prop[i] == True and self.maintenance[i] == False:
 
                 maint_safety = True
@@ -80,12 +77,10 @@ class PLC:
                         break
                 if maint_safety == True:
                     self.maintenance[i] = True
-                    self.occupancy[i] = True
 
         for i in range(63, 69):
             if maint_prop[i] == False and self.maintenance[i] == True:
                 self.maintenance[i] = False
-                self.occupancy[i] = False
             elif maint_prop[i] == True and self.maintenance[i] == False:
 
                 maint_safety = True
@@ -95,7 +90,6 @@ class PLC:
                         break
                 if maint_safety == True:
                     self.maintenance[i] = True
-                    self.occupancy[i] = True
 
         for i in range(69, 77):
             if maint_prop[i] == False and self.maintenance[i] == True:
@@ -110,9 +104,8 @@ class PLC:
                         break
                 if maint_safety == True:
                     self.maintenance[i] = True
-                    self.occupancy[i] = True
+
         
-        self.update_authority(self.occupancy)
         
 
 
@@ -138,3 +131,9 @@ class PLC:
         self.authority = auth
         self.update_signals()
         return self.authority
+    
+if __name__ == "__main__":
+    plc = PLC()
+    test_maint = [False for i in range(151)]
+    test_maint[47] = True
+    plc.ctc_update_maintenance(test_maint)

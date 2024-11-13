@@ -77,13 +77,9 @@ def main():
                         result = plc.ctc_update_maintenance(decoded_json["maint"])
                         response = {
                             "response": "ctc_maintenance",
-                            "auth": plc.authority,
-                            "occ": plc.occupancy,
                             "maint": plc.maintenance,
-                            "sig58": plc.sig58,
-                            "sig62": plc.sig62
                         }
-                        
+
                     case "say_hi":
                         response = {"response": "server connect"}
                         

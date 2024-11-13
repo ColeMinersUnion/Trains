@@ -142,18 +142,13 @@ class WaysideWindow(QMainWindow):
     def update_maintenance(self, maint_prop):
         data = {
             "input" : "ctc_maintenance",
-            "maintenance": maint_prop
+            "maint": maint_prop
         }
         self.send(data)
         decoded_json = self.receive()
-
-        self.authority = decoded_json["auth"]
-        self.occupancy = decoded_json["occ"]
         self.maintenance = decoded_json["maint"]
-        self.signal_58 = decoded_json["sig58"]
-        self.signal_62 = decoded_json["sig62"]
-        self.ws_tm_authority.emit(self.authority)
         self.ws_tm_maintenance.emit(self.maintenance)
+        self.ws_ctc_maintenance.emit(self.maintenance)
 
     @pyqtSlot(int)
     def update_switch(self, exit_block):

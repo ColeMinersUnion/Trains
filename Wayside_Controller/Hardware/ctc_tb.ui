@@ -271,7 +271,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QListWidget" name="occ_list_2">
+        <widget class="QListWidget" name="maint_list">
          <item>
           <property name="text">
            <string>Block 41</string>

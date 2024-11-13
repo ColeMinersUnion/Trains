@@ -89,4 +89,5 @@ class TrackModelWindow(QMainWindow):
                 self.maintenance[i] = False
                 self.occupancy[i] = False
         
+        self.tm_ws_occupancy.emit(self.occupancy)
         
