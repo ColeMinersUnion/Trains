@@ -35,7 +35,7 @@ class PLC:
             self.sw62 = True
             result = True
 
-        return result, self.sw58, self.sw62
+        return result
     
 
     
