@@ -39,7 +39,15 @@ def main():
                             "auth": new_auth
                         }
                     
-                    
+                    case "ctc_suggested_switch":
+                        result = plc.ctc_suggested_switch(decoded_json["switch"])
+                        response = {
+                            "response": "ctc_suggested_switch",
+                            "result": result,
+                            "sw58": plc.sw58,
+                            "sw62": plc.sw62
+                        }
+                        
                     case "say_hi":
                         response = {"response": "server connect"}
                         

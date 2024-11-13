@@ -25,15 +25,17 @@ class PLC:
             if(any(self.occupancy[58:63])):
                 self.sw58 = True
                 self.sw62 = True
+                result = False
             else:
                 self.sw58 = False
                 self.sw62 = False
-        
+                result = True
         elif sw == True:
             self.sw58 = True
             self.sw62 = True
+            result = True
 
-        return self.sw58, self.sw62
+        return result, self.sw58, self.sw62
     
 
     

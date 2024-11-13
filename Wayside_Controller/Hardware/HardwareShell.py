@@ -10,6 +10,8 @@ from time import time
 
 class WaysideWindow(QMainWindow):
     ws_tm_authority = pyqtSignal(list)
+    ws_ctc_switch_result = pyqtSignal(list)
+    ws_tm_switch_changes = pyqtSignal(list)
     
     def __init__(self):
         super().__init__()
@@ -22,8 +24,7 @@ class WaysideWindow(QMainWindow):
         self.maintenance = [False for i in range(151)]
         self.signal_58 = False
         self.signal_62 = False
-        self.exit = False
-        self.switch_bool = True
+
 
 
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -133,6 +134,7 @@ class WaysideWindow(QMainWindow):
             self.manual_sig62_button.setEnabled(True)
 
 
+
     @pyqtSlot(list)
     def update_occupancy(self, new_occ):
         # Slot to update the label text
@@ -155,13 +157,24 @@ class WaysideWindow(QMainWindow):
 
     @pyqtSlot(int)
     def update_switch(self, exit_block):
+        sw = False
         if exit_block == 0:
-            self.switch_bool = False
-        else:
-            self.switch_bool = True
-        self.send(self.occupancy, self.switch_bool, self.maintenance, self.maintenance)
-        self.ws_tm_authority.emit(self.authority)
-        self.update_ui()
+            sw = False
+        elif exit_block == 76:
+            sw = True
+        
+        data = {
+            "input" : "ctc_suggested_switch",
+            "switch": sw
+        }
+        self.send(data)
+        decoded_json = self.receive()
+        result = decoded_json["result"]
+        self.switch_58 = decoded_json["sw58"]
+        self.switch_62 = decoded_json["sw62"]
+        self.ws_ctc_switch_result.emit([result, self.switch_58, self.switch_62])
+        self.ws_tm_switch_changes.emit({"switch_58": self.switch_58, "switch_62": self.switch_62})
+
 
 
 if __name__ == "__main__":
