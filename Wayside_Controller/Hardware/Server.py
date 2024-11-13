@@ -17,6 +17,10 @@ def main():
     GPIO.setup(24, GPIO.OUT) # Switch58 false
     GPIO.setup(22, GPIO.OUT) # Switch62 true
     GPIO.setup(27, GPIO.OUT) # Switch62 false
+    GPIO.setup(5, GPIO.OUT) #Sig58False
+    GPIO.setup(12, GPIO.OUT) #Sig58True
+    GPIO.setup(6, GPIO.OUT) #Sig62False
+    GPIO.setup(13, GPIO.OUT) #Sig62True
     try:
         client_socket, addr = server_socket.accept()
         print(f"connection from {addr} has been established")
@@ -25,6 +29,11 @@ def main():
             GPIO.output(24, not plc.sw58)
             GPIO.output(22, plc.sw62)
             GPIO.output(27, not plc.sw62)
+            GPIO.output(5, not plc.sig58)
+            GPIO.output(12, plc.sig58)
+            GPIO.output(6, not plc.sig62)
+            GPIO.output(13, plc.sig62)
+            
             length_prefix = client_socket.recv(10).decode('utf-8').strip()
             print(length_prefix)
             if not length_prefix:
@@ -81,6 +90,11 @@ def main():
         GPIO.output(24, False)
         GPIO.output(22, False)
         GPIO.output(27, False)
+        GPIO.output(5, False)
+        GPIO.output(12, False)
+        GPIO.output(6, False)
+        GPIO.output(13, False)
+
         client_socket.close()
         server_socket.close()
         print("Connection closed")
