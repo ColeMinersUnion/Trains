@@ -74,6 +74,8 @@ class TrackModelWindow(QMainWindow):
     def update_track(self, new_track):
         self.switch_58 = new_track["switch_58"]
         self.switch_62 = new_track["switch_62"]
+        self.signal_58 = new_track["signal_58"]
+        self.signal_62 = new_track["signal_62"]
 
 
 

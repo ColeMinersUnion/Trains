@@ -10,8 +10,8 @@ from time import time
 
 class WaysideWindow(QMainWindow):
     ws_tm_authority = pyqtSignal(list)
-    ws_ctc_switch_result = pyqtSignal(list)
-    ws_tm_switch_changes = pyqtSignal(dict)
+    ws_ctc_switch_result = pyqtSignal(dict)
+    ws_tm_update_track = pyqtSignal(dict)
     
     def __init__(self):
         super().__init__()
@@ -151,6 +151,8 @@ class WaysideWindow(QMainWindow):
         self.send(data)
         decoded_json = self.receive()
         self.authority = decoded_json["auth"]
+        self.signal_58 = decoded_json["sig58"]
+        self.signal_62 = decoded_json["sig62"]
         self.ws_tm_authority.emit(self.authority)
 
    
@@ -172,8 +174,11 @@ class WaysideWindow(QMainWindow):
         result = decoded_json["result"]
         self.switch_58 = decoded_json["sw58"]
         self.switch_62 = decoded_json["sw62"]
-        self.ws_ctc_switch_result.emit([result, self.switch_58, self.switch_62])
-        self.ws_tm_switch_changes.emit({"switch_58": self.switch_58, "switch_62": self.switch_62})
+        self.signal_58 = decoded_json["sig58"]
+        self.signal_62 = decoded_json["sig62"]
+        self.ws_ctc_switch_result.emit({"result": result, "switch_58": self.switch_58, "switch_62": self.switch_62, "signal_58": self.signal_58, "signal_62": self.signal_62})
+        self.ws_tm_update_track.emit({"switch_58": self.switch_58, "switch_62": self.switch_62})
+        self.ws_tm_authority.emit(self.authority)
 
 
 

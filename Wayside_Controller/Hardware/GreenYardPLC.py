@@ -34,9 +34,21 @@ class PLC:
             self.sw58 = True
             self.sw62 = True
             result = True
-
+        self.update_signals()
+        self.update_authority(self.occupancy)
         return result
     
+    def update_signals(self):
+        if any(self.occupancy[58:63]):
+            self.sig58 = False
+        else:
+            self.sig58 = True
+
+        if any(self.occupancy[63:69]) or self.sw62 == False:
+            self.sig62 = False
+        else:
+            self.sig62 = True
+
 
     
     def ctc_update_maintenance(self, maint_prop):
@@ -124,4 +136,5 @@ class PLC:
             if any(occ[69:77]):
                 auth[i] = False
         self.authority = auth
+        self.update_signals()
         return self.authority

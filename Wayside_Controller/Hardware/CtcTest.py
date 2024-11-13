@@ -63,13 +63,15 @@ class CTCWindow(QMainWindow):
 
     @pyqtSlot(list)
     def update_switch(self, data):
-        result = data[0]
+        result = data["result"]
         if result:
             print("Change successful")
         else:
             print("Change failed")
-        self.switch_58 = data[1]
-        self.switch_62 = data[2]
+        self.switch_58 = data["switch_58"]
+        self.switch_62 = data["switch_62"]
+        self.signal_58 = data["signal_58"]
+        self.signal_62 = data["signal_62"]
        
 
 
