@@ -82,6 +82,346 @@
             </attribute>
             <row>
              <property name="text">
+              <string>Block 1</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 2</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 3</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 4</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 5</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 6</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 7</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 8</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 9</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 10</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 11</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 12</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 13</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 14</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 15</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 16</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 17</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 18</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 19</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 20</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 21</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 22</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 23</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 24</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 25</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 26</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 27</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 28</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 29</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 30</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 31</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 32</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 33</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 34</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 35</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 36</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 37</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 38</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 39</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 40</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 41</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 42</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 43</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 44</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 45</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 46</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 47</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 48</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 49</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 50</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 51</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 52</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 53</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 54</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 55</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 56</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 57</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 58</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 59</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 60</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 61</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 62</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 63</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 64</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 65</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 66</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 67</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Block 68</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
               <string>Block 69</string>
              </property>
             </row>
@@ -490,211 +830,6 @@
               <string>Block 150</string>
              </property>
             </row>
-            <row>
-             <property name="text">
-              <string>Block 1</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 2</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 3</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 4</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 5</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 6</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 7</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 8</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 9</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 10</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 11</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 12</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 13</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 14</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 15</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 16</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 17</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 18</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 19</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 20</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 21</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 22</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 23</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 24</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 25</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 26</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 27</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 28</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 29</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 30</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 31</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 32</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 33</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 34</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 35</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 36</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 37</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 38</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 39</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 40</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Block 41</string>
-             </property>
-            </row>
             <column>
              <property name="text">
               <string>State</string>
@@ -719,6 +854,8 @@
           </item>
          </layout>
         </item>
+
+
         <item row="1" column="1">
          <layout class="QVBoxLayout" name="track_state_3">
           <item>
@@ -775,6 +912,16 @@
               <string>Signal 85</string>
              </property>
             </row>
+            <row>
+             <property name="text">
+              <string>Crossing 19</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Crossing 108</string>
+             </property>
+            </row>
             <column>
              <property name="text">
               <string>State</string>
@@ -784,6 +931,7 @@
           </item>
          </layout>
         </item>
+        
         <item row="0" column="1">
          <layout class="QVBoxLayout" name="verticalLayout">
           <item>
@@ -849,7 +997,7 @@
              </widget>
             </item>
             <item row="4" column="0">
-             <widget class="QLabel" name="label_16">
+             <widget class="QLabel" name="label_17">
               <property name="font">
                <font>
                 <pointsize>9</pointsize>
@@ -861,7 +1009,7 @@
              </widget>
             </item>
             <item row="5" column="0">
-             <widget class="QLabel" name="label_16">
+             <widget class="QLabel" name="label_18">
               <property name="font">
                <font>
                 <pointsize>9</pointsize>
@@ -873,7 +1021,7 @@
              </widget>
             </item>
             <item row="6" column="0">
-             <widget class="QLabel" name="label_16">
+             <widget class="QLabel" name="label_19">
               <property name="font">
                <font>
                 <pointsize>9</pointsize>
@@ -885,7 +1033,7 @@
              </widget>
             </item>
             <item row="7" column="0">
-             <widget class="QLabel" name="label_16">
+             <widget class="QLabel" name="label_20">
               <property name="font">
                <font>
                 <pointsize>9</pointsize>
@@ -896,6 +1044,31 @@
               </property>
              </widget>
             </item>
+            <item row="8" column="0">
+             <widget class="QLabel" name="label_21">
+              <property name="font">
+               <font>
+                <pointsize>9</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>Crossing 19</string>
+              </property>
+             </widget>
+            </item>
+            <item row="9" column="0">
+             <widget class="QLabel" name="label_22">
+              <property name="font">
+               <font>
+                <pointsize>9</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>Crossing 108</string>
+              </property>
+             </widget>
+            </item>
+
             <item row="0" column="1">
              <widget class="QPushButton" name="manual_sw13_button">
               <property name="text">
@@ -952,11 +1125,87 @@
               </property>
              </widget>
             </item>
+            <item row="8" column="1">
+             <widget class="QPushButton" name="manual_cr19_button">
+              <property name="text">
+               <string>Toggle</string>
+              </property>
+             </widget>
+            </item>
+            <item row="9" column="1">
+             <widget class="QPushButton" name="manual_cr108_button">
+              <property name="text">
+               <string>Toggle</string>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
          </layout>
         </item>
         
+        <item row="2" column="1">
+         <layout class="QVBoxLayout" name="verticalLayout">
+          <item>
+           <widget class="QLabel" name="label_17">
+            <property name="font">
+             <font>
+              <pointsize>11</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>Update PLC</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QGridLayout" name="formLayout">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_8">
+              <property name="font">
+               <font>
+                <pointsize>9</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>Upload PLC: </string>
+              </property>
+             </widget>
+            </item>
+            
+            <item row="0" column="1">
+             <widget class="QLineEdit" name="manual_sw13_button">
+              <property name="text">
+               <string>Upload PLC file here</string>
+              </property>
+             </widget>
+            </item>
+            
+
+            <item row="0" column="2">
+             <widget class="QPushButton" name="manual_plc_button">
+              <property name="text">
+               <string>Upload PLC</string>
+              </property>
+             </widget>
+            </item>
+            
+            
+            
+           
+           </layout>
+          </item>
+         </layout>
+        </item>
+
+        
+
+
+
+
+
+
+
         <item row="0" column="2" rowspan="2">
          <layout class="QVBoxLayout" name="wayside_log_2">
           <item>
