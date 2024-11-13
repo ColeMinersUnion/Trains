@@ -113,7 +113,7 @@ class PLC:
                     self.occupancy[i] = True
         
         self.update_authority(self.occupancy)
-        return self.occupancy, self.authority, self.maintenance
+        
 
 
     def update_authority(self, occ):

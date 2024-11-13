@@ -7,17 +7,22 @@ import copy
 
 class CTCWindow(QMainWindow):
     ctc_ws_sugg_switch = pyqtSignal(int)
+    ctc_ws_maintenance = pyqtSignal(list)
     def __init__(self):
         super().__init__()
         uic.loadUi("Wayside_Controller/Hardware/ctc_tb.ui", self)
         self.occupancy = [False for i in range(151)]
-        self.authority = [False for i in range(151)]
+        self.maintenance = [False for i in range(151)]
         self.switch_58 = False
         self.switch_62 = False
         self.signal_58 = False
         self.signal_62 = False
 
+        for index in range(self.maint_list.count()):
+            item = self.maint_list.item(index)
+            item.setCheckState(QtCore.Qt.CheckState.Unchecked)
 
+        self.maint_list.itemChanged.connect(self.maintenance_change)
 
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.update_ui)  # Function to update the UI
@@ -25,6 +30,18 @@ class CTCWindow(QMainWindow):
 
         self.yard_button.clicked.connect(self.toggle_yard)
         self.blk76_button.clicked.connect(self.toggle_blk76)
+
+    def maintenance_change(self):
+        maint_prop = [False for i in range(151)]
+        for i in range(self.maint_list.count()):
+            item = self.maint_list.item(i)
+            if item.checkState() == Qt.CheckState.Checked:
+                maint_prop[i + 41] = True
+            else:
+                maint_prop[i + 41] = False
+        self.ctc_ws_maintenance.emit(maint_prop)
+
+
 
     def toggle_yard(self):
         self.ctc_ws_sugg_switch.emit(0)
@@ -38,7 +55,7 @@ class CTCWindow(QMainWindow):
             self.ctc_block_table.setItem(i-41, 0, QTableWidgetItem(str(self.occupancy[i])))   
 
         for i in range(41, 69):
-            self.ctc_block_table.setItem(i-41,1, QTableWidgetItem(str(self.authority[i])))
+            self.ctc_block_table.setItem(i-41,1, QTableWidgetItem(str(self.maintenance[i])))
 
         if(self.switch_58):
             self.ctc_elements_table.setItem(0,0, QTableWidgetItem("57 -> 58"))
@@ -72,6 +89,14 @@ class CTCWindow(QMainWindow):
         self.switch_62 = data["switch_62"]
         self.signal_58 = data["signal_58"]
         self.signal_62 = data["signal_62"]
+
+    @pyqtSlot(list)
+    def update_occupancy(self, new_occ):
+        self.occupancy = new_occ
+
+    @pyqtSlot(list)
+    def update_maintenance(self, new_maint):
+        self.maintenance = new_maint
        
 
 
