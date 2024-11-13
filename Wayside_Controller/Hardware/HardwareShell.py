@@ -11,7 +11,7 @@ from time import time
 class WaysideWindow(QMainWindow):
     ws_tm_authority = pyqtSignal(list)
     ws_ctc_switch_result = pyqtSignal(list)
-    ws_tm_switch_changes = pyqtSignal(list)
+    ws_tm_switch_changes = pyqtSignal(dict)
     
     def __init__(self):
         super().__init__()

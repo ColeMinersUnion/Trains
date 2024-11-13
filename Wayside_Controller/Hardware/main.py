@@ -21,7 +21,8 @@ def main():
     # Show both windows
     ws_window.show()
     tm_window.show()
-
+    ctc_window.show()
+    
     sys.exit(app.exec())
 
 if __name__ == "__main__":
