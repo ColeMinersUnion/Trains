@@ -15,13 +15,16 @@ def main():
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(23, GPIO.OUT) # Switch58 true
     GPIO.setup(24, GPIO.OUT) # Switch58 false
-
+    GPIO.setup(22, GPIO.OUT) # Switch62 true
+    GPIO.setup(27, GPIO.OUT) # Switch62 false
     try:
         client_socket, addr = server_socket.accept()
         print(f"connection from {addr} has been established")
         while True:
             GPIO.output(23, plc.sw58)
             GPIO.output(24, not plc.sw58)
+            GPIO.output(22, plc.sw62)
+            GPIO.output(27, not plc.sw62)
             length_prefix = client_socket.recv(10).decode('utf-8').strip()
             print(length_prefix)
             if not length_prefix:
@@ -67,9 +70,13 @@ def main():
             
 
     finally:
-         client_socket.close()
-         server_socket.close()
-         print("Connection closed")
+        GPIO.output(23, False)
+        GPIO.output(24, False)
+        GPIO.output(22, False)
+        GPIO.output(27, False)
+        client_socket.close()
+        server_socket.close()
+        print("Connection closed")
 
 
 if __name__ == "__main__":
