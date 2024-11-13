@@ -177,7 +177,7 @@ class WaysideWindow(QMainWindow):
         self.signal_58 = decoded_json["sig58"]
         self.signal_62 = decoded_json["sig62"]
         self.ws_ctc_switch_result.emit({"result": result, "switch_58": self.switch_58, "switch_62": self.switch_62, "signal_58": self.signal_58, "signal_62": self.signal_62})
-        self.ws_tm_update_track.emit({"switch_58": self.switch_58, "switch_62": self.switch_62})
+        self.ws_tm_update_track.emit({"switch_58": self.switch_58, "switch_62": self.switch_62, "signal_58": self.signal_58, "signal_62": self.signal_62})
         self.ws_tm_authority.emit(self.authority)
 
 

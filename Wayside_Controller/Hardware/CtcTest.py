@@ -61,8 +61,8 @@ class CTCWindow(QMainWindow):
             self.ctc_elements_table.setItem(3,0, QTableWidgetItem("Red"))     
     
 
-    @pyqtSlot(list)
-    def update_switch(self, data):
+    @pyqtSlot(dict)
+    def update_track(self, data):
         result = data["result"]
         if result:
             print("Change successful")

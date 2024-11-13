@@ -16,8 +16,8 @@ def main():
     tm_window.tm_ws_occupancy.connect(ws_window.update_occupancy)
     ws_window.ws_tm_authority.connect(tm_window.update_authority)
     ctc_window.ctc_ws_sugg_switch.connect(ws_window.update_switch)
-    ws_window.ws_ctc_switch_result.connect(ctc_window.update_switch)
-    ws_window.ws_tm_switch_changes.connect(tm_window.update_track)
+    ws_window.ws_ctc_switch_result.connect(ctc_window.update_track)
+    ws_window.ws_tm_update_track.connect(tm_window.update_track)
     # Show both windows
     ws_window.show()
     tm_window.show()
