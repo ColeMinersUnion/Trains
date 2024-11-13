@@ -1,0 +1,616 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>805</width>
+    <height>700</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QWidget" name="gridLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>22</x>
+      <y>29</y>
+      <width>611</width>
+      <height>902</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Set Occupancy</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QListWidget" name="occ_list">
+         <item>
+          <property name="text">
+           <string>Block 41</string>
+          </property>
+          <property name="checkState">
+           <enum>Checked</enum>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Block 42</string>
+          </property>
+          <property name="checkState">
+           <enum>Checked</enum>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Block 43</string>
+          </property>
+          <property name="checkState">
+           <enum>Checked</enum>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Block 44</string>
+          </property>
+          <property name="checkState">
+           <enum>Checked</enum>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Block 45</string>
+          </property>
+          <property name="checkState">
+           <enum>Checked</enum>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Block 46</string>
+          </property>
+          <property name="checkState">
+           <enum>Checked</enum>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Block 47</string>
+          </property>
+          <property name="checkState">
+           <enum>Checked</enum>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Block 48</string>
+          </property>
+          <property name="checkState">
+           <enum>Checked</enum>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Block 49</string>
+          </property>
+          <property name="checkState">
+           <enum>Checked</enum>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Block 50</string>
+          </property>
+          <property name="checkState">
+           <enum>Checked</enum>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Block 51</string>
+          </property>
+          <property name="checkState">
+           <enum>Checked</enum>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Block 52</string>
+          </property>
+          <property name="checkState">
+           <enum>Checked</enum>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Block 53</string>
+          </property>
+          <property name="checkState">
+           <enum>Checked</enum>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Block 54</string>
+          </property>
+          <property name="checkState">
+           <enum>Checked</enum>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Block 55</string>
+          </property>
+          <property name="checkState">
+           <enum>Checked</enum>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Block 56</string>
+          </property>
+          <property name="checkState">
+           <enum>Checked</enum>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Block 57</string>
+          </property>
+          <property name="checkState">
+           <enum>Checked</enum>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Block 58</string>
+          </property>
+          <property name="checkState">
+           <enum>Checked</enum>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Block 59</string>
+          </property>
+          <property name="checkState">
+           <enum>Checked</enum>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Block 60</string>
+          </property>
+          <property name="checkState">
+           <enum>Checked</enum>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Block 61</string>
+          </property>
+          <property name="checkState">
+           <enum>Checked</enum>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Block 62</string>
+          </property>
+          <property name="checkState">
+           <enum>Checked</enum>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Block 63</string>
+          </property>
+          <property name="checkState">
+           <enum>Checked</enum>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Block 64</string>
+          </property>
+          <property name="checkState">
+           <enum>Checked</enum>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Block 65</string>
+          </property>
+          <property name="checkState">
+           <enum>Checked</enum>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Block 66</string>
+          </property>
+          <property name="checkState">
+           <enum>Checked</enum>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Block 67</string>
+          </property>
+          <property name="checkState">
+           <enum>Checked</enum>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Block 68</string>
+          </property>
+          <property name="checkState">
+           <enum>Checked</enum>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Block 69</string>
+          </property>
+          <property name="checkState">
+           <enum>Checked</enum>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Block 70</string>
+          </property>
+          <property name="checkState">
+           <enum>Checked</enum>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Block 71</string>
+          </property>
+          <property name="checkState">
+           <enum>Checked</enum>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Block 72</string>
+          </property>
+          <property name="checkState">
+           <enum>Checked</enum>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Block 73</string>
+          </property>
+          <property name="checkState">
+           <enum>Checked</enum>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Block 74</string>
+          </property>
+          <property name="checkState">
+           <enum>Checked</enum>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Block 75</string>
+          </property>
+          <property name="checkState">
+           <enum>Checked</enum>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Block 76</string>
+          </property>
+          <property name="checkState">
+           <enum>Checked</enum>
+          </property>
+         </item>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="0" column="1">
+      <widget class="QTableWidget" name="tm_block_table">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>900</height>
+        </size>
+       </property>
+       <property name="verticalScrollBarPolicy">
+        <enum>Qt::ScrollBarAsNeeded</enum>
+       </property>
+       <property name="horizontalScrollBarPolicy">
+        <enum>Qt::ScrollBarAlwaysOff</enum>
+       </property>
+       <property name="sizeAdjustPolicy">
+        <enum>QAbstractScrollArea::AdjustToContents</enum>
+       </property>
+       <property name="showGrid">
+        <bool>true</bool>
+       </property>
+       <property name="sortingEnabled">
+        <bool>false</bool>
+       </property>
+       <property name="cornerButtonEnabled">
+        <bool>true</bool>
+       </property>
+       <attribute name="horizontalHeaderCascadingSectionResizes">
+        <bool>false</bool>
+       </attribute>
+       <row>
+        <property name="text">
+         <string>Block 41</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Block 42</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Block 43</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Block 44</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Block 45</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Block 46</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Block 47</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Block 48</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Block 49</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Block 50</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Block 51</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Block 52</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Block 53</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Block 54</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Block 55</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Block 56</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Block 57</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Block 58</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Block 59</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Block 60</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Block 61</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Block 62</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Block 63</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Block 64</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Block 65</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Block 66</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Block 67</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Block 68</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Block 69</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Block 70</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Block 71</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Block 72</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Block 73</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Block 74</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Block 75</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Block 76</string>
+        </property>
+       </row>
+       <column>
+        <property name="text">
+         <string>State</string>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>6</pointsize>
+         </font>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Authority</string>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>6</pointsize>
+         </font>
+        </property>
+       </column>
+      </widget>
+     </item>
+     <item row="0" column="3">
+      <layout class="QVBoxLayout" name="verticalLayout_2"/>
+     </item>
+     <item row="0" column="2">
+      <widget class="QTableWidget" name="tm_elements_table">
+       <row>
+        <property name="text">
+         <string>Switch 58</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Switch 62</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Signal 58</string>
+        </property>
+       </row>
+       <row>
+        <property name="text">
+         <string>Signal 62</string>
+        </property>
+       </row>
+       <column>
+        <property name="text">
+         <string>State</string>
+        </property>
+       </column>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>805</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
