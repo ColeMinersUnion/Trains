@@ -21,14 +21,20 @@ class CTC_Office:
     def addBlueLine(cls):
         try:
             from GetBlue import Blue
-            cls.line = Blue(broken=False)
+            cls.line["Blue"] = Blue(broken=False)
             return True
         except:
             print("Blue Line Init Failed")
             return False
         
     def addGreenLine(cls):
-        return True
+        try:
+            from GetGreen import Green
+            cls.line["Green"] = Green()
+            return True
+        except:
+            print("Green Line Init Failed")
+            return False
     
     def addRedLine(cls):
         return True

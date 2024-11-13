@@ -1,6 +1,6 @@
 from Graph import Graph, Node
 #I know it's long. I don't care. It was easier to hard code this than struggle with the excel file.
-def getGreen() -> Graph:
+def Green() -> Graph:
     Greenline = Graph()
     #?Section A
     Greenline.graph.append(Node(index=0, line="Green", section="A", block_length=0, block_grade=0, speed_limit=50, infrastructure="Yard", elevation=0, cumulative_elevation=0, connections=[63])) #!I may run into issues where I'm routing through the yard. 
@@ -142,34 +142,73 @@ def getGreen() -> Graph:
     Greenline.graph.append(Node(index=99, line="Green", section="Q", block_length=75, block_grade=0, speed_limit=25, infrastructure="", elevation=0, cumulative_elevation=0, connections=[100]))
     Greenline.graph.append(Node(index=100, line="Green", section="Q", block_length=75, block_grade=0, speed_limit=25, infrastructure="", elevation=0, cumulative_elevation=0, connections=[85]))
 
+    #?Section R
+    Greenline.graph.append(Node(index=101, line="Green", section="R", block_length=35, block_grade=0, speed_limit=26, infrastructure="", elevation=0, cumulative_elevation=0, connections=[102]))
 
+    #?Section S
+    Greenline.graph.append(Node(index=102, line="Green", section="S", block_length=100, block_grade=0, speed_limit=28, infrastructure="Switch", elevation=0, cumulative_elevation=0, connections=[103]))
+    Greenline.graph.append(Node(index=103, line="Green", section="S", block_length=100, block_grade=0, speed_limit=28, infrastructure="", elevation=0, cumulative_elevation=0, connections=[104]))
+    Greenline.graph.append(Node(index=104, line="Green", section="S", block_length=80, block_grade=0, speed_limit=28, infrastructure="", elevation=0, cumulative_elevation=0, connections=[105]))
 
+    #?Section T
+    Greenline.graph.append(Node(index=105, line="Green", section="T", block_length=100, block_grade=0, speed_limit=28, infrastructure="Station: Dormont", elevation=0, cumulative_elevation=0, connections=[106]))
+    Greenline.graph.append(Node(index=106, line="Green", section="T", block_length=100, block_grade=0, speed_limit=28, infrastructure="", elevation=0, cumulative_elevation=0, connections=[107]))
+    Greenline.graph.append(Node(index=107, line="Green", section="T", block_length=90, block_grade=0, speed_limit=28, infrastructure="", elevation=0, cumulative_elevation=0, connections=[108]))
+    Greenline.graph.append(Node(index=108, line="Green", section="T", block_length=100, block_grade=0, speed_limit=28, infrastructure="Crossing", elevation=0, cumulative_elevation=0, connections=[109]))
+    Greenline.graph.append(Node(index=109, line="Green", section="T", block_length=100, block_grade=0, speed_limit=28, infrastructure="", elevation=0, cumulative_elevation=0, connections=[110]))
 
+    #?Section U
+    Greenline.graph.append(Node(index=110, line="Green", section="U", block_length=100, block_grade=0, speed_limit=30, infrastructure="", elevation=0, cumulative_elevation=0, connections=[111]))
+    Greenline.graph.append(Node(index=111, line="Green", section="U", block_length=100, block_grade=0, speed_limit=30, infrastructure="", elevation=0, cumulative_elevation=0, connections=[112]))
+    Greenline.graph.append(Node(index=112, line="Green", section="U", block_length=100, block_grade=0, speed_limit=30, infrastructure="", elevation=0, cumulative_elevation=0, connections=[113]))
+    Greenline.graph.append(Node(index=113, line="Green", section="U", block_length=100, block_grade=0, speed_limit=30, infrastructure="", elevation=0, cumulative_elevation=0, connections=[114]))
+    Greenline.graph.append(Node(index=114, line="Green", section="U", block_length=162, block_grade=0, speed_limit=30, infrastructure="Station: Glenbury", elevation=0, cumulative_elevation=0, connections=[115]))
+    Greenline.graph.append(Node(index=115, line="Green", section="U", block_length=100, block_grade=0, speed_limit=30, infrastructure="", elevation=0, cumulative_elevation=0, connections=[116]))
+    Greenline.graph.append(Node(index=116, line="Green", section="U", block_length=100, block_grade=0, speed_limit=30, infrastructure="", elevation=0, cumulative_elevation=0, connections=[117]))
 
+    #?Section V
+    Greenline.graph.append(Node(index=117, line="Green", section="V", block_length=50, block_grade=0, speed_limit=15, infrastructure="", elevation=0, cumulative_elevation=0, connections=[118]))
+    Greenline.graph.append(Node(index=118, line="Green", section="V", block_length=50, block_grade=0, speed_limit=15, infrastructure="", elevation=0, cumulative_elevation=0, connections=[119]))
+    Greenline.graph.append(Node(index=119, line="Green", section="V", block_length=50, block_grade=0, speed_limit=15, infrastructure="", elevation=0, cumulative_elevation=0, connections=[120]))
+    Greenline.graph.append(Node(index=120, line="Green", section="V", block_length=50, block_grade=0, speed_limit=15, infrastructure="", elevation=0, cumulative_elevation=0, connections=[121]))
+    Greenline.graph.append(Node(index=121, line="Green", section="V", block_length=50, block_grade=0, speed_limit=15, infrastructure="", elevation=0, cumulative_elevation=0, connections=[122]))
 
+    #?Section W (UNDERGROUND)
+    Greenline.graph.append(Node(index=122, line="Green", section="W", block_length=50, block_grade=0, speed_limit=20, infrastructure="Underground", elevation=0, cumulative_elevation=0, connections=[123]))
+    Greenline.graph.append(Node(index=123, line="Green", section="W", block_length=50, block_grade=0, speed_limit=20, infrastructure="Underground, Station: Overbrook", elevation=0, cumulative_elevation=0, connections=[124]))
+    Greenline.graph.append(Node(index=124, line="Green", section="W", block_length=50, block_grade=0, speed_limit=20, infrastructure="Underground", elevation=0, cumulative_elevation=0, connections=[125]))
+    Greenline.graph.append(Node(index=125, line="Green", section="W", block_length=50, block_grade=0, speed_limit=20, infrastructure="Underground", elevation=0, cumulative_elevation=0, connections=[126]))
+    Greenline.graph.append(Node(index=126, line="Green", section="W", block_length=50, block_grade=0, speed_limit=20, infrastructure="Underground", elevation=0, cumulative_elevation=0, connections=[127]))
+    Greenline.graph.append(Node(index=127, line="Green", section="W", block_length=50, block_grade=0, speed_limit=20, infrastructure="Underground", elevation=0, cumulative_elevation=0, connections=[128]))
+    Greenline.graph.append(Node(index=128, line="Green", section="W", block_length=50, block_grade=0, speed_limit=20, infrastructure="Underground", elevation=0, cumulative_elevation=0, connections=[129]))
+    Greenline.graph.append(Node(index=129, line="Green", section="W", block_length=50, block_grade=0, speed_limit=20, infrastructure="Underground", elevation=0, cumulative_elevation=0, connections=[130]))
+    Greenline.graph.append(Node(index=130, line="Green", section="W", block_length=50, block_grade=0, speed_limit=20, infrastructure="Underground", elevation=0, cumulative_elevation=0, connections=[131]))
+    Greenline.graph.append(Node(index=131, line="Green", section="W", block_length=50, block_grade=0, speed_limit=20, infrastructure="Underground", elevation=0, cumulative_elevation=0, connections=[132]))
+    Greenline.graph.append(Node(index=132, line="Green", section="W", block_length=50, block_grade=0, speed_limit=20, infrastructure="Underground, Station: Inglewood", elevation=0, cumulative_elevation=0, connections=[133]))
+    Greenline.graph.append(Node(index=133, line="Green", section="W", block_length=50, block_grade=0, speed_limit=20, infrastructure="Underground", elevation=0, cumulative_elevation=0, connections=[134]))
+    Greenline.graph.append(Node(index=134, line="Green", section="W", block_length=50, block_grade=0, speed_limit=20, infrastructure="Underground", elevation=0, cumulative_elevation=0, connections=[135]))
+    Greenline.graph.append(Node(index=135, line="Green", section="W", block_length=50, block_grade=0, speed_limit=20, infrastructure="Underground", elevation=0, cumulative_elevation=0, connections=[136]))
+    Greenline.graph.append(Node(index=136, line="Green", section="W", block_length=50, block_grade=0, speed_limit=20, infrastructure="Underground", elevation=0, cumulative_elevation=0, connections=[137]))
+    Greenline.graph.append(Node(index=137, line="Green", section="W", block_length=50, block_grade=0, speed_limit=20, infrastructure="Underground", elevation=0, cumulative_elevation=0, connections=[138]))
+    Greenline.graph.append(Node(index=138, line="Green", section="W", block_length=50, block_grade=0, speed_limit=20, infrastructure="Underground", elevation=0, cumulative_elevation=0, connections=[139]))
+    Greenline.graph.append(Node(index=139, line="Green", section="W", block_length=50, block_grade=0, speed_limit=20, infrastructure="Underground", elevation=0, cumulative_elevation=0, connections=[140]))
+    Greenline.graph.append(Node(index=140, line="Green", section="W", block_length=50, block_grade=0, speed_limit=20, infrastructure="Underground", elevation=0, cumulative_elevation=0, connections=[141]))
+    Greenline.graph.append(Node(index=141, line="Green", section="W", block_length=50, block_grade=0, speed_limit=20, infrastructure="Underground, Station: Central", elevation=0, cumulative_elevation=0, connections=[142]))
+    Greenline.graph.append(Node(index=142, line="Green", section="W", block_length=50, block_grade=0, speed_limit=20, infrastructure="Underground", elevation=0, cumulative_elevation=0, connections=[143]))
+    Greenline.graph.append(Node(index=143, line="Green", section="W", block_length=50, block_grade=0, speed_limit=20, infrastructure="Underground", elevation=0, cumulative_elevation=0, connections=[144]))
 
+    #?Section X
+    Greenline.graph.append(Node(index=144, line="Green", section="X", block_length=50, block_grade=0, speed_limit=20, infrastructure="", elevation=0, cumulative_elevation=0, connections=[145]))
+    Greenline.graph.append(Node(index=145, line="Green", section="X", block_length=50, block_grade=0, speed_limit=20, infrastructure="", elevation=0, cumulative_elevation=0, connections=[146]))
+    Greenline.graph.append(Node(index=146, line="Green", section="X", block_length=50, block_grade=0, speed_limit=20, infrastructure="", elevation=0, cumulative_elevation=0, connections=[147]))
 
+    #?Section Y
+    Greenline.graph.append(Node(index=147, line="Green", section="Y", block_length=50, block_grade=0, speed_limit=20, infrastructure="", elevation=0, cumulative_elevation=0, connections=[148]))
+    Greenline.graph.append(Node(index=148, line="Green", section="Y", block_length=184, block_grade=0, speed_limit=20, infrastructure="", elevation=0, cumulative_elevation=0, connections=[149]))
+    Greenline.graph.append(Node(index=149, line="Green", section="Y", block_length=40, block_grade=0, speed_limit=20, infrastructure="", elevation=0, cumulative_elevation=0, connections=[150]))
 
-
-
-
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
+    #?Section Z
+    Greenline.graph.append(Node(index=150, line="Green", section="Z", block_length=35, block_grade=0, speed_limit=20, infrastructure="", elevation=0, cumulative_elevation=0, connections=[28]))
 
 
     return Greenline
