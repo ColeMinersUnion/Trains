@@ -1,8 +1,9 @@
 #from PyQt6.QtCore import QSize, Qt
-from PyQt6.QtWidgets import QMainWindow, QPushButton, QVBoxLayout, QWidget, QLineEdit, QLabel
+from PyQt6.QtWidgets import QMainWindow, QPushButton, QScrollArea, QVBoxLayout, QWidget, QLineEdit, QLabel
 from Components.SchedulePreviewer import SchedulePreviewer
 from datetime import datetime
 import time
+
 
 
 class CTCApplication(QMainWindow):
@@ -76,6 +77,14 @@ class CTCApplication(QMainWindow):
         self.layout.addWidget(self.submit)
         self.layout.addWidget(self.clear)
 
+        self.lbl10 = QLabel()
+        self.lbl10.setWordWrap(True)
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setWidget(self.lbl10)
+        self.lbl10.setText("Outputted String for Train")
+        
+
         lbl3 = QLabel()
         lbl3.setText("Automatic Mode")
         self.layout.addWidget(lbl3)
@@ -100,6 +109,8 @@ class CTCApplication(QMainWindow):
         self.layout.addWidget(self.speed)
         self.layout.addWidget(self.auth)
         self.layout.addWidget(self.switchState)
+        self.layout.addWidget(scroll_area)
+
 
         self.main.setLayout(self.layout)
 
@@ -108,23 +119,25 @@ class CTCApplication(QMainWindow):
     def onClick(self):
         id = self.Office.nextID - 1
         #print(id)
-        train = self.Office.Schedule.trains[id]
+        train = self.Office.Schedule["Green"].trains[id]
         if(train.move()):
             self.scheduleWidget.update(train.id, str(train.location), train.Next_Stop, datetime.now())
 
         self.speed.setText(f'Speed: {train.speedy()/1.609344} Mph')
         self.auth.setText(f'Authority {train.auth()/1609.344} Miles')
-        if train.Next_Stop == 'Station B':
-            self.switchState.setText("Up")
-        else:
-            self.switchState.setText("Down")
+
+        self.switchState.setText("To the Yard")
+
+
+            
 
         self.button_state = self.button.isChecked()
 
     def onSubmit(self):
         txt = self.addTrain.text()
-        if(txt == 'Station B' or txt == 'Station C'):
-            self.Office.addTrain([txt])
+        if(txt == 'Pioneer'):
+            self.lbl10.setText(f"String Auth: {self.Office.Schedule['Green'].trains[0].stringAuth()}")
+            self.lbl10.setWordWrap(True)
         else:
             self.addTrain.setText("That station Does not exist, try again.")
         self.submit_state = self.submit.isChecked()

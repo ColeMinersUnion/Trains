@@ -6,7 +6,6 @@ linenames=[]
 lines=[] 
 switchid=[] #track switch numbers for pinging
 crossingid=[] #track crossing numbers for pinging
-crossingid=[]
 failmode = 0
 failnames = ["None","Rail","Circuit","Power"]
 heaters = False
@@ -23,10 +22,8 @@ class Block:
         self.twoway = twoway
         self.elevation = elevation
         self.underground = underground
-        self.x1=x1
-        self.y1=y1
-        self.x2=x2
-        self.y2=y2
+        self.x=x1
+        self.y=y1
         self.occupied = False
         self.prev = None
         self.next = None #will change with crossing instantiation
@@ -120,7 +117,7 @@ class Crossing:
         self.on = False
         self.crossingid = crossingid[linenum]
         crossingid[linenum] = crossingid[linenum]+1
-        self.msg = "Crossing (" + linenames[linenum] + " Line, Block " + str(block) + ")\n Closed: "
+        self.msg = "Crossing (" + linenames[linenum] + " Line, Block " + str(block) + ")\nClosed: "
     def toString(self):
         return self.msg + str(self.on)
 
@@ -217,25 +214,25 @@ class Line:
         for x in self.switches:
             if x.hasBlock(block):
                 return x
-        return False
+        return None
             
     def getCrossing(self,block):
         for x in self.crossings:
             if (x.block==block):
                 return x
-        return False
+        return None
     
     def stationByBlock(self,block):
         for x in self.stations:
             if (x.block==block):
                 return x
-        return False
+        return None
     
     def stationByName(self,name):
         for x in self.stations:
             if (x.name==name):
-                return name
-        return False
+                return Station
+        return None
     
 def readX(string): #return cross marks
     return (string=="X")

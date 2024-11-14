@@ -1,0 +1,65 @@
+@startuml
+!define QT5_WIDGETS QWidget, QVBoxLayout, QPushButton, QLabel, QHBoxLayout, QApplication
+!define QT5_CORE QTimer, Qt
+
+class CommandCenter {
+    - backend : Backend
+    - testbench_ui : TestbenchUI
+    - engineer_view : EngineerView
+    - timer : QTimer
+    - authority_timer : QTimer
+    - brake_applied : bool
+    - speed_decrease_timer : QTimer
+    - speed_label : QLabel
+    - authority_label : QLabel
+    - brake_status_label : QLabel
+    - currentSpeedabel : QLabel
+    - power_output_label : QLabel
+    - door_status_label : QLabel
+    - lights_status_label : QLabel
+    - temperature_label : QLabel
+    - hl_status_label : QLabel
+    - speed_limit_label : QLabel
+    - Kp_Label : QLabel
+    - Ki_Label : QLabel
+
+    + __init__()
+    + initUI()
+    + open_testbench()
+    + open_engineer_view()
+    + update_authority()
+    + update_speed()
+    + update_values()
+}
+
+CommandCenter -- Backend
+CommandCenter -- TestbenchUI
+CommandCenter -- EngineerView
+
+class Backend {
+    + get_Kp_Ki()
+    + get_commanded_speed()
+    + get_authority()
+    + get_brake_status()
+    + get_currentSpeed()
+    + get_power_output()
+    + get_doors()
+    + get_lights()
+    + get_internal_temp()
+    + get_hl()
+    + get_speed_limit()
+    + safe_speed()
+    + set_safe_speed()
+}
+
+class TestbenchUI {
+    + show()
+    + inputs_updated
+}
+
+class EngineerView {
+    + show()
+    + Kp_Ki_updated
+}
+
+@enduml
