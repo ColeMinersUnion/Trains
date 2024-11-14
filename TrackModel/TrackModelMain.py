@@ -8,7 +8,7 @@ from math import atan2,pi,sqrt,pow,sin,cos
 #offsets are multiplied by scl
 XOFFSET = 0
 YOFFSET = 3
-SCL=30 #scale
+SCL=20 #scale
 
 linenames=[]
 lines=[] 
@@ -20,7 +20,7 @@ heaters = False
 speed = 1
 class Block:
     #instantiation
-    def __init__(self, linenum, section, number, length, grade, speed, twoway, elevation, underground,x1,y1,x2,y2):
+    def __init__(self, linenum, section, number, length, grade, speed, twoway, elevation, underground,x1,y1,x2,y2,adj1,adj2):
         self.linenum = linenum
         self.section = section
         self.number = number
@@ -33,10 +33,7 @@ class Block:
         self.x=x1
         self.y=y1
         self.occupied = False
-        self.adj = [None,None] #will change with crossing instantiation
-        if(number>0):
-            self.adj[0] = number-1 #will change with crossing instantiation
-            lines[linenum].blocks[number-1].adj[1] = number
+        self.adj = {adj1,adj2}
         self.center = [(x1+x2)/2,(y1+y2)/2] #center for front end
         self.mag = sqrt(((x2-x1)*(x2-x1))+((y2-y1)*(y2-y1))) #magnitude for front end
         self.angle = atan2((y2-y1),(x2-x1))*180/pi #angle for front end
@@ -74,9 +71,6 @@ class Switch:
         self.switchid = switchid[linenum]
         switchid[linenum] = switchid[linenum]+1
         self.leftside=True #the first block is the central
-
-        lines[self.linenum].blocks[self.blocks[1]-1].adj[1]=None #cut-off previous blocks
-        lines[self.linenum].blocks[self.blocks[2]-1].adj[1]=None
         self.updateEnds()
 
     def updateEnds(self):
@@ -84,15 +78,15 @@ class Switch:
         if(self.leftside): #connect 0 to 1
             if(self.blocks[2] in lines[self.linenum].blocks[self.blocks[0]].adj):
                 lines[self.linenum].blocks[self.blocks[0]].adj.remove(self.blocks[2]) #change vertex direction
-            lines[self.linenum].blocks[self.blocks[0]].adj.append(self.blocks[1])
-            lines[self.linenum].blocks[self.blocks[1]].adj.append(self.blocks[0])
+            lines[self.linenum].blocks[self.blocks[0]].adj.add(self.blocks[1])
+            lines[self.linenum].blocks[self.blocks[1]].adj.add(self.blocks[0])
             if(self.blocks[0] in lines[self.linenum].blocks[self.blocks[2]].adj):
                 lines[self.linenum].blocks[self.blocks[2]].adj.remove(self.blocks[0])
         else: #connect 0 to 2
-            if(self.blocks[2] in lines[self.linenum].blocks[self.blocks[0]].adj):
+            if(self.blocks[1] in lines[self.linenum].blocks[self.blocks[0]].adj):
                 lines[self.linenum].blocks[self.blocks[0]].adj.remove(self.blocks[1]) #change vertex direction
-            lines[self.linenum].blocks[self.blocks[0]].adj.append(self.blocks[2])
-            lines[self.linenum].blocks[self.blocks[2]].adj.append(self.blocks[0])
+            lines[self.linenum].blocks[self.blocks[0]].adj.add(self.blocks[2])
+            lines[self.linenum].blocks[self.blocks[2]].adj.add(self.blocks[0])
             if(self.blocks[0] in lines[self.linenum].blocks[self.blocks[1]].adj):
                 lines[self.linenum].blocks[self.blocks[1]].adj.remove(self.blocks[0])
 
@@ -163,6 +157,7 @@ class Station: #yard also
 
 class Train:
     def __init__(self,linenum,block1,length):
+        global lines
         self.linenum = linenum
         self.block1 = block1
         self.block2 = block1 #train can occupy multiple blocks
@@ -188,15 +183,18 @@ class Train:
         if self.pos>(lines[self.linenum].blocks[self.block1].length-self.length): 
             self.block2 = self.block1 #move train off old track if up far enough
         if self.pos>(lines[self.linenum].blocks[self.block1].length): #change track if past
-            self.prevblock = self.block1
             self.pos -= lines[self.linenum].blocks[self.block1].length
-            potential=self.lines[self.linenum].blocks[self.block1].adj #potential screw-up: switch train leaves changes before finishing block
-            potential.remove(self.prevblock) #remove previous block from options
-            self.block1=potential[0] #choose block that remains
+            potential=lines[self.linenum].blocks[self.block1].adj #potential screw-up: switch train leaves changes before finishing block
+            print(" ".join(map(str,potential)) + " " + str(self.prevblock) + "\n")
+            if(self.prevblock in potential):
+                potential.remove(self.prevblock) #remove previous block from options
+            self.prevblock = self.block1                                                                                                                                            
+            self.block1=list(potential)[0] #choose block that remains
             if self.block1==None:
                     lines[self.linenum].trains.remove(self)
                     del self
                     return
+            print("Train on block " + str(self.block1) + "\n")
         lines[self.linenum].blocks[self.block1].occupied = True
         lines[self.linenum].blocks[self.block2].occupied = True
         self.beacondata = "" #can't nest transponder function
@@ -281,7 +279,9 @@ def read(file):
                                                 XOFFSET+data.iat[i,15], #x1-coord
                                                 YOFFSET+data.iat[i,16], #y1-coord
                                                 XOFFSET+data.iat[i,17], #x2-coord
-                                                YOFFSET+data.iat[i,18]) #y2-coord
+                                                YOFFSET+data.iat[i,18], #y2-coord
+                                                data.iat[i,19], #adj1
+                                                data.iat[i,20]) #adj2
         if(not (pd.isnull(data.iat[i,9]) or pd.isnull(data.iat[i,10]))):
             tempswitch.append([linenum,data.iat[i,2],data.iat[i,9],data.iat[i,10]])
         if(not pd.isnull(data.iat[i,11])):
@@ -579,7 +579,7 @@ class StationIcon(QWidget):
     def __init__(self,obj,window):
         super().__init__()
         self.obj=obj
-        if(self.obj.name=="YARD"):
+        if(self.obj.name=="Yard"):
             pixmap = QPixmap('Icons/Yard.png')
         else:
             pixmap = QPixmap('Icons/Station.png')
@@ -595,7 +595,7 @@ class StationIcon(QWidget):
 class Map(QWidget):
     def __init__(self):
         super().__init__()
-        self.resize(1920,1080)
+        self.resize(1280,720)
         self.move(0,0)
         self.setWindowTitle("Track Model Map")
         self.setStyleSheet("background-color: lightyellow;")
@@ -678,20 +678,23 @@ class Testbench(QWidget):
     def switchOccupancy(self):
         line = int(self.input1.text())
         comp = int(self.input2.text())
-        lines[line].blocks[comp].switchOccupancy()
+        if(comp<len(lines[line].blocks)):
+            lines[line].blocks[comp].switchOccupancy()
     def flipSwitch(self):
         line = int(self.input1.text())
         comp = int(self.input2.text())
-        lines[line].switches[comp].switch()
+        if(comp<len(lines[line].switches)):
+            lines[line].switches[comp].switch()
     def flipCrossing(self):
         line = int(self.input1.text())
         comp = int(self.input2.text())
-        lines[line].crossings[comp].switch()
+        if(comp<len(lines[line].crossings)):
+            lines[line].crossings[comp].switch()
     def moveTrain(self):
         line = int(self.input1.text())
         comp = int(self.input2.text())
         if len(lines[line].trains)==0:
-            lines[line].trains.append(Train(line,0,comp))
+            lines[line].trains.append(Train(line,90,comp))
         else:
             lines[line].trains[0].addPos(comp)
 
