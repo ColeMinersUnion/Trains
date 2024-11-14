@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QPushButton, QCheckBox, QAppli
 from PyQt5.QtGui import QPixmap, QColor
 from PyQt5.QtCore import Qt, pyqtSignal
 #from Backend import Backend  
-from CombinedBackend import Train
+from .CombinedBackend import Train
 
 class LightsAndDoorsUI(QWidget):
     lds_updated = pyqtSignal()

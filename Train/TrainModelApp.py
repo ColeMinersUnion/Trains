@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QPushBut
 from PyQt5.QtCore import QTimer, Qt, QObject, pyqtSignal, pyqtSlot, QThread
 from PyQt5.QtGui import QFont
 #from TrainModelClass import trainModel
-from CombinedBackend import Train
+from .CombinedBackend import Train
 
 class Worker(QObject):
     finished = pyqtSignal()

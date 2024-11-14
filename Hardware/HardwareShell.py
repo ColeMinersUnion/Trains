@@ -15,7 +15,7 @@ class WaysideWindow(QMainWindow):
     
     def __init__(self):
         super().__init__()
-        uic.loadUi("Wayside_Controller/Hardware/app.ui", self)
+        uic.loadUi("Hardware/app.ui", self)
 
         self.occupancy = [False for i in range(151)]
         self.authority = [False for i in range(151)]

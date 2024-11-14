@@ -2,7 +2,7 @@ import PyQt5
 import sys
 from PyQt5.QtWidgets import QApplication, QCheckBox, QMainWindow, QLabel, QWidget, QVBoxLayout, QLineEdit, QPushButton, QTextEdit, QLayout
 from PyQt5.QtCore import pyqtSignal, QTimer
-from CombinedBackend import Train
+from .CombinedBackend import Train
 
 class TestbenchUI(QWidget):
     inputs_updated = pyqtSignal()

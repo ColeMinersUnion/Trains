@@ -4,8 +4,8 @@ import math
 from PyQt6.QtWidgets import QWidget, QLabel, QPushButton, QLineEdit, QSlider
 from PyQt6.QtGui import QTransform, QPixmap
 from PyQt6.QtCore import Qt,QTimer
-import TrackModelBackend
-from TrackModelBackend import lines,failmode,failnames,speed,heaters
+import TrackModel.TrackModelBackend as TrackModelBackend
+from .TrackModelBackend import lines,failmode,failnames,speed,heaters
 
 passive = [] #no update method, do not react to backend changes
 active = [] #update method, react to backend changes

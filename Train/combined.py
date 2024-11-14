@@ -3,11 +3,11 @@ import os
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QHBoxLayout, QLineEdit
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
-from CombinedBackend import Train
-from Testbench  import TestbenchUI
-from CommandCenter import CommandCenter
+from .CombinedBackend import Train
+from .Testbench  import TestbenchUI
+from .CommandCenter import CommandCenter
 #from TrainModelClass import trainModel
-from TrainModelApp import MetricsTab, MainWindow
+from .TrainModelApp import MetricsTab, MainWindow
 class combined:
     
     #currentSpeed_signal = pyqtSignal(float)

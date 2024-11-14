@@ -4,11 +4,11 @@ import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QHBoxLayout, QLineEdit
 from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QFont
-from Testbench import TestbenchUI
+from .Testbench import TestbenchUI
 #from Backend import Backend
-from CombinedBackend import Train
-from EngineerView import EngineerView
-from LightsAndDoorsUI  import LightsAndDoorsUI
+from .CombinedBackend import Train
+from .EngineerView import EngineerView
+from .LightsAndDoorsUI  import LightsAndDoorsUI
 
 
 class CommandCenter(QWidget):

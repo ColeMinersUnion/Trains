@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QApplication, QCheckBox, QMainWindow, QLabel, QWidge
 #from backend import Backend #importing backend logic
 from PyQt5.QtCore import pyqtSignal
 #from Backend import Backend
-from CombinedBackend import Train
+from .CombinedBackend import Train
 
 class EngineerView(QWidget):
     Kp_Ki_updated = pyqtSignal()
