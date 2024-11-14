@@ -1,9 +1,10 @@
 import sys
 from PyQt6.QtWidgets import QWidget, QLabel, QPushButton, QLineEdit, QSlider, QApplication
 from PyQt6.QtGui import QTransform, QPixmap
-from PyQt6.QtCore import Qt,QTimer
+from PyQt6.QtCore import Qt,QTimer,QObject
 import pandas as pd #reading the excel file
 from math import atan2,pi,sqrt,pow,sin,cos
+import Wayside_Controller
 
 #offsets are multiplied by scl
 XOFFSET = 0
@@ -294,6 +295,12 @@ def read(file):
     for s in tempswitch: #add switches now, blocks should update
         lines[s[0]].switches.append(Switch(s[0],[s[1],s[2],s[3]])) #add switch to appropriate line number
     return
+
+class SignalHandler(QObject):
+    def __init__():
+        super().__init__() 
+    
+    
 
 # FRONT END BRANCH
 
@@ -641,6 +648,9 @@ class Map(QWidget):
     def update(self): 
         for a in active:
             a.update() #update every active component
+        occupancies=[]
+        for b in lines[0].blocks:
+            occupancies.append(b.occupied)
 
 class Testbench(QWidget):
     def __init__(self):
