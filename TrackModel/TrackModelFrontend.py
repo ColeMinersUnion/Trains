@@ -1,7 +1,5 @@
-# method to automtically make shapes and add to array, for loop to make new blocks with arrays of requests
-
 import math
-from PyQt6.QtWidgets import QWidget, QLabel, QPushButton, QLineEdit, QSlider
+from PyQt6.QtWidgets import QWidget, QLabel, QPushButton, QLineEdit, QSlider, QGraphicsPixmapItem
 from PyQt6.QtGui import QTransform, QPixmap
 from PyQt6.QtCore import Qt,QTimer
 import TrackModelBackend
@@ -11,8 +9,7 @@ passive = [] #no update method, do not react to backend changes
 active = [] #update method, react to backend changes
 
 
-SCL=100 #scale
-YFF=360 #y-offset
+SCL=20 #scale
 #the below label styles are only used for widgets assigned transparent backgrounds in PyQT
 labelstyle = """QLabel {
                 background-color: transparent
@@ -22,6 +19,19 @@ tooltipstyle = """QToolTip {
                 color: white; 
                 border: white solid 1px
                 }"""
+
+def offset(angle):
+    if(angle < 0):
+        angle+=360
+    if(angle>180):
+        return 0
+    if(angle>135):
+        return 1 - ((angle-135)/45)
+    if(angle>90):
+        return 1
+    if(angle>45):
+        return 1 - ((45-angle)/2)
+    return 0
 
 clock=0
 class SpeedMeter(QWidget):
@@ -36,7 +46,6 @@ class SpeedMeter(QWidget):
         
         self.number = QLabel(window)
         self.number.move(930,0)
-        temp=0
         self.slider.setValue(0)
         self.number.setText(str(speed) + "x")
 
@@ -55,7 +64,7 @@ class HeaterSystem(QWidget):
         self.label = QLabel(window)
         self.label.move(405,0)
         self.label.setToolTip("Track heaters off")
-        pixmap = QPixmap('TrackModel/Icons/OffHeater.png')
+        pixmap = QPixmap('Icons/OffHeater.png')
         self.label.setPixmap(pixmap)
         
         self.slider = QSlider(Qt.Orientation.Horizontal, window)
@@ -79,13 +88,13 @@ class HeaterSystem(QWidget):
         if((not heaters) and self.temp<=32):
             self.label.setToolTip("Track heaters on")
             heaters=True
-            pixmap = QPixmap('TrackModel/Icons/OnHeater.png')
+            pixmap = QPixmap('Icons/OnHeater.png')
             self.label.setPixmap(pixmap)
 
         if(heaters and self.temp>32):
             self.label.setToolTip("Track heaters off")
             heaters=False
-            pixmap = QPixmap('TrackModel/Icons/OffHeater.png')
+            pixmap = QPixmap('Icons/OffHeater.png')
             self.label.setPixmap(pixmap)
 
 class TrainOccupy(QWidget):
@@ -96,7 +105,7 @@ class TrainOccupy(QWidget):
         self.blocknum = blocknum
         self.label = QLabel(window)
         self.center = lines[linenum].blocks[blocknum].center
-        pixmap = QPixmap('TrackModel/Icons/TrainOccupy.png')
+        pixmap = QPixmap('Icons/TrainOccupy.png')
         self.label.setPixmap(pixmap)
         self.label.move(-100,-100)
         self.label.setToolTip("Occupied at \n" + TrackModelBackend.linenames[linenum] + " Line, Block " + str(blocknum))
@@ -106,7 +115,7 @@ class TrainOccupy(QWidget):
 
     def update(self):
         if(lines[self.linenum].blocks[self.blocknum].occupied):
-            self.label.move((int((self.center[0]-0.125)*SCL)),int(YFF-(self.center[1]+0.175)*SCL))
+            self.label.move((int((self.center[0]-0.125)*SCL)),int((self.center[1]+0.175)*SCL))
         else:
             self.label.move(-100,-100)
         self.label.show()
@@ -120,7 +129,7 @@ class Failure(QWidget):
         self.blocknum = blocknum
         self.label = QLabel(window)
         self.center = lines[linenum].blocks[blocknum].center
-        pixmap = QPixmap('TrackModel/Icons/RailFailure.png')
+        pixmap = QPixmap('Icons/RailFailure.png')
         self.label.setPixmap(pixmap)
         self.label.move(-100,-100)
         self.label.setStyleSheet(labelstyle)
@@ -132,10 +141,10 @@ class Failure(QWidget):
         if(objfail==0):
             self.label.move(-100,-100)
         else:
-            pixmap = QPixmap('TrackModel/Icons/' + failnames[objfail] + 'Failure.png')
+            pixmap = QPixmap('Icons/' + failnames[objfail] + 'Failure.png')
             self.label.setPixmap(pixmap)
-            self.label.move((int((self.center[0]-0.35)*SCL)),int(YFF-(self.center[1]+0.225)*SCL))
-            self.label.setToolTip(failnames[objfail] + " Failure\n " + TrackModelBackend.linenames[self.linenum] + " Line, Block " + str(self.blocknum))
+            self.label.move((int((self.center[0]-0.35)*SCL)),int((self.center[1]+0.225)*SCL))
+            self.label.setToolTip(failnames[objfail] + " Failure\n" + TrackModelBackend.linenames[self.linenum] + " Line, Block " + str(self.blocknum))
         self.label.show()
 
         
@@ -144,7 +153,7 @@ class FailureSelect(QWidget):
     def __init__(self,window):
         super().__init__()
         self.label = QLabel(window)
-        self.label.setPixmap(QPixmap('TrackModel/Icons/FailureSelect.png'))
+        self.label.setPixmap(QPixmap('Icons/FailureSelect.png'))
         self.update()
     
     def update(self):
@@ -158,7 +167,7 @@ class FailureButton(QWidget):
     def __init__(self,failnum,window):
         super().__init__()
         self.failnum=failnum
-        self.pixmap = QPixmap('TrackModel/Icons/' + failnames[failnum] + 'Failure.png')
+        self.pixmap = QPixmap('Icons/' + failnames[failnum] + 'Failure.png')
         self.label = QLabel(window)
         self.label.setPixmap(self.pixmap)
         self.label.setToolTip(failnames[failnum] + " Failure")
@@ -180,14 +189,13 @@ class BlockIcon(QWidget):
         global active
         self.window=window
         self.obj=obj
-        self.pixmap = QPixmap('TrackModel/Icons/' + TrackModelBackend.linenames[obj.linenum] + 'Arrow.png')
+        pixmap = QPixmap('Icons/' + TrackModelBackend.linenames[obj.linenum] + 'Arrow' + ('Bi' if (obj.twoway) else '') + '.png')
         self.label=QLabel(window)
-        self.pixmap = self.pixmap.transformed(QTransform().scale(obj.mag*SCL/100,1))
-        self.pixmap = self.pixmap.transformed(QTransform().rotate(0-self.obj.angle))
-        self.label.setPixmap(self.pixmap)
+        pixmap = pixmap.transformed(QTransform().scale(obj.mag*0.8*SCL/100,3*SCL/100))
+        pixmap = pixmap.transformed(QTransform().rotate(self.obj.angle))
+        self.label.setPixmap(pixmap)
         self.label.setToolTip(obj.toString())
-        offset = 92 if self.obj.angle==45 else 0
-        self.label.move(self.obj.x1*SCL,YFF-self.obj.y1*SCL-13-offset)
+        self.label.move(int(self.obj.x*SCL),int(self.obj.y*SCL))
         self.label.setStyleSheet(labelstyle)
         self.setStyleSheet(tooltipstyle)
         self.label.mousePressEvent = self.setFailure
@@ -210,12 +218,12 @@ class SwitchIcon(QWidget):
         super().__init__()
         self.linenum=obj.linenum
         self.switchid=obj.switchid
-        pixmap = QPixmap('TrackModel/Icons/OpenSwitch.png')
+        pixmap = QPixmap('Icons/OpenSwitch.png')
         self.openlabel=QLabel(window)
         self.openlabel.setPixmap(pixmap)
         self.openlabel.setToolTip("Switched open")
         self.openlabel.setStyleSheet(labelstyle)
-        pixmap = QPixmap('TrackModel/Icons/ClosedSwitch.png')
+        pixmap = QPixmap('Icons/ClosedSwitch.png')
         self.closedlabel=QLabel(window)
         self.closedlabel.setPixmap(pixmap)
         self.closedlabel.setToolTip("Switched closed")
@@ -227,8 +235,8 @@ class SwitchIcon(QWidget):
         tempobj=lines[self.linenum].switches[self.switchid]
         opencenter=lines[tempobj.linenum].blocks[tempobj.getopen()].center
         closedcenter=lines[tempobj.linenum].blocks[tempobj.getclosed()].center
-        self.openlabel.move(int((opencenter[0]-0.125)*SCL),int(YFF-(opencenter[1]+0.225)*SCL))
-        self.closedlabel.move(int((closedcenter[0]-0.125)*SCL),int(YFF-(closedcenter[1]+0.225)*SCL))
+        self.openlabel.move(int((opencenter[0]-0.125)*SCL),int((opencenter[1]+0.225)*SCL))
+        self.closedlabel.move(int((closedcenter[0]-0.125)*SCL),int((closedcenter[1]+0.225)*SCL))
         self.openlabel.show()
         self.closedlabel.show()
     
@@ -239,7 +247,7 @@ class CrossingIcon(QWidget):
         self.crossingid=obj.crossingid
         self.label=QLabel(window)
         center = lines[obj.linenum].blocks[obj.block].center
-        self.label.move(int(center[0]*SCL-25),int(YFF-center[1]*SCL-22.5))
+        self.label.move(int(center[0]*SCL-25),int(center[1]*SCL-22.5))
         self.label.setStyleSheet(labelstyle)
         self.setStyleSheet(tooltipstyle)
         self.update()
@@ -247,9 +255,9 @@ class CrossingIcon(QWidget):
     def update(self):
         tempobj = lines[self.linenum].crossings[self.crossingid]
         if (tempobj.on==True):
-            self.pixmap = QPixmap('TrackModel/Icons/OnCrossing.png')
+            self.pixmap = QPixmap('Icons/OnCrossing.png')
         else:
-            self.pixmap = QPixmap('TrackModel/Icons/OffCrossing.png')
+            self.pixmap = QPixmap('Icons/OffCrossing.png')
         self.label.setPixmap(self.pixmap)
         self.label.setToolTip(tempobj.toString())
         self.label.show()
@@ -258,12 +266,12 @@ class TransponderIcon(QWidget):
     def __init__(self,obj,window):
         super().__init__()
         self.obj=obj
-        self.pixmap = QPixmap('TrackModel/Icons/Transponder.png')
+        pixmap = QPixmap('Icons/Transponder.png')
         self.label=QLabel(window)
-        self.label.setPixmap(self.pixmap)
+        self.label.setPixmap(pixmap)
         self.label.setToolTip(obj.msg) #no toString, transponder message is static
         center = lines[obj.linenum].blocks[obj.block].center
-        self.label.move(int(center[0]*SCL-5),int(YFF-center[1]*SCL-12.5))
+        self.label.move(int(center[0]*SCL-5),int(center[1]*SCL-12.5))
         self.label.setStyleSheet(labelstyle)
         self.setStyleSheet(tooltipstyle)
 
@@ -272,14 +280,14 @@ class StationIcon(QWidget):
         super().__init__()
         self.obj=obj
         if(self.obj.name=="YARD"):
-            pixmap = QPixmap('TrackModel/Icons/Yard.png')
+            pixmap = QPixmap('Icons/Yard.png')
         else:
-            pixmap = QPixmap('TrackModel/Icons/Station.png')
+            pixmap = QPixmap('Icons/Station.png')
         self.label=QLabel(window)
         self.label.setPixmap(pixmap)
         self.label.setToolTip(obj.msg) #no toString, station message is static
         center = lines[obj.linenum].blocks[obj.block].center
-        self.label.move(int(center[0]*SCL-5),int(YFF-center[1]*SCL-12.5))
+        self.label.move(int(center[0]*SCL-5),int(center[1]*SCL-12.5))
         self.label.setStyleSheet(labelstyle)
         self.setStyleSheet(tooltipstyle)
 
@@ -290,7 +298,7 @@ class Map(QWidget):
         self.move(0,0)
         self.setWindowTitle("Track Model Map")
         self.setStyleSheet("background-color: lightyellow;")
-        TrackModelBackend.read('TrackModel/Blue Line.xlsx')
+        TrackModelBackend.read('Green Line.xlsx')
         passive.append(HeaterSystem(self))
         for i in range(3):
             passive.append(FailureButton((i+1),self)) #add failure buttons
