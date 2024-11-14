@@ -9,6 +9,7 @@ from CommandCenter import CommandCenter
 #from TrainModelClass import trainModel
 from TrainModelApp import MetricsTab, MainWindow
 class combined:
+    
     #currentSpeed_signal = pyqtSignal(float)
     def  __init__(self):
         super().__init__()
