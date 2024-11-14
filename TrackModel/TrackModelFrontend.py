@@ -1,7 +1,5 @@
-# method to automtically make shapes and add to array, for loop to make new blocks with arrays of requests
-
 import math
-from PyQt6.QtWidgets import QWidget, QLabel, QPushButton, QLineEdit, QSlider
+from PyQt6.QtWidgets import QWidget, QLabel, QPushButton, QLineEdit, QSlider, QGraphicsPixmapItem
 from PyQt6.QtGui import QTransform, QPixmap
 from PyQt6.QtCore import Qt,QTimer
 import TrackModelBackend
@@ -21,6 +19,19 @@ tooltipstyle = """QToolTip {
                 color: white; 
                 border: white solid 1px
                 }"""
+
+def offset(angle):
+    if(angle < 0):
+        angle+=360
+    if(angle>180):
+        return 0
+    if(angle>135):
+        return 1 - ((angle-135)/45)
+    if(angle>90):
+        return 1
+    if(angle>45):
+        return 1 - ((45-angle)/2)
+    return 0
 
 clock=0
 class SpeedMeter(QWidget):
@@ -178,13 +189,11 @@ class BlockIcon(QWidget):
         global active
         self.window=window
         self.obj=obj
-        self.pixmap = QPixmap('Icons/' + TrackModelBackend.linenames[obj.linenum] + 'Arrow' + ('Bi' if (obj.twoway) else '') + '.png')
+        pixmap = QPixmap('Icons/' + TrackModelBackend.linenames[obj.linenum] + 'Arrow' + ('Bi' if (obj.twoway) else '') + '.png')
         self.label=QLabel(window)
-        self.pixmap = self.pixmap.transformed(QTransform().scale(0,0))
-        self.label.move(0,0)
-        self.pixmap = self.pixmap.transformed(QTransform().rotate(0-self.obj.angle))
-        self.pixmap = self.pixmap.transformed(QTransform().scale(obj.mag*SCL/100,SCL/100))
-        self.label.setPixmap(self.pixmap)
+        pixmap = pixmap.transformed(QTransform().scale(obj.mag*0.8*SCL/100,3*SCL/100))
+        pixmap = pixmap.transformed(QTransform().rotate(self.obj.angle))
+        self.label.setPixmap(pixmap)
         self.label.setToolTip(obj.toString())
         self.label.move(int(self.obj.x*SCL),int(self.obj.y*SCL))
         self.label.setStyleSheet(labelstyle)
