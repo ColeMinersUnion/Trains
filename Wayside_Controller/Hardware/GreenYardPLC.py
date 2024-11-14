@@ -136,13 +136,13 @@ class PLC:
         if not any(self.occupancy[41:77]):
             self.sw58 = not self.sw58
             self.update_authority(self.occupancy)
-            self.update_signals()
+
     
     def toggle_sw62(self):
         if not any(self.occupancy[41:77]):
             self.sw62 = not self.sw62
             self.update_authority(self.occupancy)
-            self.update_signals()
+        
 
     def toggle_sig58(self):
         if not any(self.occupancy[41:77]):
