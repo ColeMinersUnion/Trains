@@ -9,7 +9,7 @@ import sys
 class Track(QObject):
     tm_ws_occupancy = pyqtSignal(list)
     def __init__(self):
-        self.occupancy =[True for i in range(150)]
+        self.occupancy =[False for i in range(150)]
 
         self.send_occ()
 
