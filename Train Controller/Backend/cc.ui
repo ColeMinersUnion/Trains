@@ -1,7 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>CommandCenter</class>
  <widget class="QWidget" name="CommandCenter">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>908</width>
+    <height>778</height>
+   </rect>
+  </property>
   <property name="windowTitle">
    <string>Command Center</string>
   </property>
@@ -44,14 +52,14 @@
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="testbench_button">
+    <widget class="QPushButton" name="testbenchButton">
      <property name="text">
       <string>Open Testbench</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="engineer_button">
+    <widget class="QPushButton" name="engineerButton">
      <property name="text">
       <string>Open Engineer View</string>
      </property>
@@ -72,8 +80,9 @@
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="speed_label">
+    <widget class="QLabel" name="speedLabel">
      <property name="text">
+      <string>Speed: 0</string>
      </property>
     </widget>
    </item>

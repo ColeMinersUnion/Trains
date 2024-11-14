@@ -5,13 +5,31 @@
 # backend.py
 import time
 import os  
-class Backend:
+from PyQt5.QtCore import Qt, QTimer, pyqtSignal, QObject
+class Backend(QObject):
+    doors_changed = pyqtSignal()
     def __init__(self):
+        super().__init__()
+        #define output signals for:
+        #brake command
+        #power output
+        
+        #lights
+        #headlights
+
+        #input signals for 
+        #commanded speed
+        #beacon data
+        #status?doors/lights/hls
+
+        
         self.commanded_speed = 0
         self.cs_driver = 0
-        self.authority = 0
+        self.input_authority = "" #sent in from testbench, will be apended/also reps first one
+        self.full_authority = "" #takes input_auth and adds to the end
+        self.curr_authority = "" #shorter substring with past values deleted
         self.brake_status = False
-        self.current_speed = 0
+        self.currentSpeed = 0
         self.power_output = 0 #send to TM
         self.door_status = False #0 = closed,  1 = open
         self.lights_status = False  #0 = off,  1 = on
@@ -32,6 +50,7 @@ class Backend:
         self.prev_time = time.time()
         self.prev_pwr_out = 0
         self.block_switch = 0 #gets changed when we cross to a new block
+        self.beacon = ""
 
         #distance to underground
 
@@ -42,10 +61,41 @@ class Backend:
             #error message to driver ui
             self.commanded_speed = cs_sent
         else: self.commanded_speed = cs_driver
+    print("commended speed has been set")
 
-    def set_authority(self, authority):
+    def add_to_authority(self, input_authority, full_authority, curr_authority):
+        #if input isnt 0 and isnt current full, then add it
+        if (input_authority != "" and input_authority != full_authority):
+            self.full_authority = full_authority + input_authority
+            self.curr_authority = curr_authority + input_authority
+            print("added to authority")
+    
+    def next_authority(self, curr_authority, change_blocks, prev_block):
+        if (change_blocks != prev_block):
+            authority_list = curr_authority.split(';')
+            authority_list.pop(0)
+            self.curr_authority = ';'.join(authority_list)
+            print("next authority")
+            self.prev_block = change_blocks
+
+            a = int(self.curr_authority.split(';')[0])
+            print(f"int value for curr auth: {a}")
+
+            if (a  == 0):
+                self.at_station()
+            if (int(self.curr_authority.split(';')[0]) <= 50):
+                self.commanded_speed = 0
+                self.brake_status  = True
+        
+            #send only first val?
+
+    def set_original_authority(self, full_authority):
+        self.full_authority = full_authority
+        self.curr_authority = full_authority
+        
+
         #i have "offical" authority array, then current array that starts with current val 
-        #read in from preloaded string (csv, commas)
+        #read in from preloaded string (string, sep by semicolons ;)
         #if im at the last value then im done!
         #if i get sent a new one, add it to the end of mine 
         #delete first value from current authority string
@@ -57,7 +107,25 @@ class Backend:
         #if authority is 0 and theres not emergency thing then call a functuon that opens doors for 60 sec then closes
         #get authority length from subtracting
 
-        self.authority = authority
+    def at_station(self):
+        #make sure that power is 0 and brake is on
+        self.brake_status =  True
+        #open doors
+        self.set_door_status(True)
+        self.doors_changed.emit()
+        print ("at station! doors open")
+        time.sleep(3.5) 
+        print("pretend thats one minute")
+        self.set_door_status(False)
+        self.doors_changed.emit()
+        print ("close doors!")
+        if (self.change_blocks != self.prev_block):
+            authority_list = self.curr_authority.split(';')
+            authority_list.pop(0)
+            self.curr_authority = ';'.join(authority_list)
+            print("next authority")
+            self.prev_block = self.change_blocks
+        self.brake_status = False
     
     def set_brake_status(self, brake_driver, brake_status):
         if (brake_driver == 1):
@@ -65,10 +133,11 @@ class Backend:
         elif (brake_status == 1):
             self.brake_status = True
         else:  self.brake_status = False
+    
 
-    def set_current_speed(self, current_speed):
+    def set_currentSpeed(self, currentSpeed):
         #taken in from TM
-        self.current_speed = current_speed
+        self.currentSpeed = currentSpeed
     
     def set_lights(self, lights_status):
         #driver override avail
@@ -76,7 +145,8 @@ class Backend:
     
     def set_power_output(self):
         #make another function to send val to TM
-        self.power_output = self.power_function(self.commanded_speed, self.current_speed, self.Kp, self.Ki)
+        self.power_output = self.power_function(self.commanded_speed, self.currentSpeed, self.Kp, self.Ki)
+
 
     def set_door_status(self, status):
         self.door_status = status
@@ -85,8 +155,8 @@ class Backend:
         #set to 1 if underground = 1
         self.headlights_status = headlights_status
 
-    def set_ek(self, commanded_speed, current_speed):
-        self.ek = commanded_speed - current_speed
+    def set_ek(self, commanded_speed, currentSpeed):
+        self.ek = commanded_speed - currentSpeed
 
     def set_prev_ek(self, ek):
         self.prev_ek = ek
@@ -101,17 +171,23 @@ class Backend:
     def set_prev_pwr_out(self, pwr):
         self.prev_pwr_out = pwr
 
+    def set_beacon(self, beacon):
+        self.beacon  = beacon
+
+
     def get_commanded_speed(self):
         return self.commanded_speed
 
     def get_authority(self):
-        return self.authority
+        return self.curr_authority.split(';')[0]
     
     def get_brake(self):
+        #get brake value from stopping_distance?
         return self.brake_status
     
-    def get_current_speed(self):
-        return self.current_speed
+    def get_currentSpeed(self):
+        print(f"current speed in backend of TC: {self.currentSpeed}")
+        return self.currentSpeed
     
     def get_internal_temp(self):
         return self.internal_temperature
@@ -130,8 +206,7 @@ class Backend:
     
     def get_speed_limit(self):
         return self.speed_limit
-    def get_current_speed(self):
-        return self.current_speed
+
     def get_ek(self):
         return self.ek
     def get_uk(self):
@@ -142,39 +217,29 @@ class Backend:
         return self.prev_uk
     def get_prev_pwr_out(self):
         return self.prev_pwr_out 
+    def get_beacon(self):
+        return self.beacon
     
-    def set_testbench_inputs(self, commanded_speed, authority, brake_status, suggested_speed, current_speed, door_status, lights_status, internal_temperature, headlights_status, speed_limit):
 
-        """Set inputs for the testbench."""
+    def update_testbench_status(self, commanded_speed, full_authority, brake_status,  currentSpeed, door_status, lights_status, internal_temperature, headlights_status, speed_limit, beacon):
         self.commanded_speed = commanded_speed
-        self.authority = authority
-        self.brake_status = brake_status
-        self.suggested_speed = suggested_speed
-        self.current_speed = current_speed
-        self.door_status = door_status
-        self.lights_status = lights_status
-        self.internal_temperature = internal_temperature
-        self.headlights_status = headlights_status
-        self.speed_limit =  speed_limit
-        #distance to tunnel
-
-
-    def update_testbench_status(self, commanded_speed, authority, brake_status, suggested_speed,  current_speed, door_status, lights_status, internal_temperature, headlights_status, speed_limit):
-        self.commanded_speed = commanded_speed
-        self.authority = authority
+        self.full_authority = full_authority
+        #add to authority value
         self.brake_status = brake_status 
-        self.suggested_speed = suggested_speed
-        self.current_speed = current_speed
+        self.currentSpeed = currentSpeed
+        self.power_function(commanded_speed, currentSpeed, self.Kp, self.Ki)
         self.door_status = door_status
         self.lights_status = lights_status
         self.internal_temperature = internal_temperature
         self.headlights_status = headlights_status
         self.speed_limit = speed_limit
+        self.beacon = beacon
+        
         #beacon data
 
     def get_testbench_status(self):
         """Return the current status of the testbench inputs"""
-        return self.commanded_speed, self.authority, self.brake_status, self.suggested_speed, self.current_speed, self.door_status, self.lights_status, self.internal_temperature,  self.headlights_status, self.speed_limit
+        return self.commanded_speed, self.full_authority, self.brake_status, self.currentSpeed, self.door_status, self.lights_status, self.internal_temperature,  self.headlights_status, self.speed_limit, self.beacon
 
     
     def set_Kp_Ki(self , Kp, Ki):
@@ -184,27 +249,31 @@ class Backend:
     def get_Kp_Ki(self):
         return  self.Kp, self.Ki
     
-    def calculate_braking_dist(self):
-        #here is where the braking distance will be calculated,  for now it is just a placeholder
-        return 0.0
     
     def safe_speed(self):
         #function that makes sure the current speed is not greater then the speed limit. 
         if (self.commanded_speed >  self.speed_limit):
             self.commanded_speed = self.speed_limit
         return self.commanded_speed
-    def stopping_distance(self):
-        if (self.brake_status == False):
-            if (self.authority <= 10): #choose value that gives train enough time
-                #set brake status 
-                self.brake_status = True
-        return self.brake_status
-    def decode_beacons(self):
-        #function that decodes the beacons and returns:
-        #authority just to make sure it matches
-        #distance to underground 
-        return self.authority
     
+    
+    def decode_beacons(self, beacon):
+        #decode
+        #assuming the following format:
+        #first value is how many blocks until next stop 
+        #could do arrays of that size and load in, or just have as vectors>
+        #assume seperated by semicolons, with full things seperated by ??
+        #n = #first val, everything until first [
+        #underground = [n] #array with size n
+        #name = "" #station name
+        #speed_limits = [n] #array with size n
+        #authorities = [n]
+        #doors = [4]
+
+        #for now, assume just brought in as inputs 
+        return 0
+
+
     def underground_status(self):
         #if the distance to underground = 0
         #turn on headlights
@@ -224,28 +293,15 @@ class Backend:
         """Calculate the safe stopping distance based on speed and authority."""
         return (self.commanded_speed ** 2) / (2 * self.authority) if self.authority != 0 else float('inf')
 
-    def get_status(self):
-        """Returns a status report with calculated values."""
-        brake_force = self.calculate_brake_force()
-        stop_distance = self.calculate_safe_stop_distance()
-        return {
-            "Speed": self.commanded_speed,
-            "Authority": self.authority,
-            "Brake Status": self.brake_status,
-            "Brake Force": brake_force,
-            "Safe Stop Distance": stop_distance
 
-        }
-    
-    def power_function(self, commanded_speed, current_speed, Kp, Ki):
+    def power_function(self, commanded_speed, currentSpeed, Kp, Ki):
         self.max_pwr = 70000
-        print(f"max pwr:{self.max_pwr}")
         self.mass = 1000
         current_time = time.time()
         T = current_time - self.prev_time
         self.prev_time = current_time
         #call ek get 
-        self.set_ek(commanded_speed, current_speed)
+        self.set_ek(commanded_speed, currentSpeed)
         ek = self.get_ek()
         self.set_prev_ek(ek)
 
@@ -258,6 +314,9 @@ class Backend:
         #if prevpwr < pwrmax then send with all values to uk
         #if >= then send t as 0
         power_out = (Kp*ek) + (Ki*uk)
+        if (power_out < 0):
+            self.brake_status = True
+            power_out = 0
         print(f"pwr out: {power_out}")
         return power_out
 

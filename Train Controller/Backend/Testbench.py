@@ -2,14 +2,15 @@ import PyQt5
 import sys
 from PyQt5.QtWidgets import QApplication, QCheckBox, QMainWindow, QLabel, QWidget, QVBoxLayout, QLineEdit, QPushButton, QTextEdit, QLayout
 from PyQt5.QtCore import pyqtSignal, QTimer
-from Backend import Backend
+#from Backend import Backend
+from test import Train
 
 class TestbenchUI(QWidget):
     inputs_updated = pyqtSignal()
 
-    def __init__(self, backend):
+    def __init__(self, Train):
       super().__init__()
-      self.backend = backend
+      self.backend = Train
       self.initUI()
 
     def initUI(self):
@@ -30,22 +31,22 @@ class TestbenchUI(QWidget):
         layout.addWidget(QLabel("Authority:"))
         layout.addWidget(self.authority_input)
 
+        #change block status
+        self.toggle_change_blocks_button = QPushButton("Toggle Change Blocks", self)
+        self.toggle_change_blocks_button.clicked.connect(self.toggle_change_blocks)
+        layout.addWidget(self.toggle_change_blocks_button)
+
+
         # Checkbox for Brake Status
         self.brake_checkbox = QCheckBox("Brake Applied", self)
         layout.addWidget(QLabel("Brake Status:"))
         layout.addWidget(self.brake_checkbox)
 
-        #input field for suggested speed
-        self.suggested_speed_input = QLineEdit(self)
-        self.suggested_speed_input.setPlaceholderText("Enter Suggested Speed")
-        layout.addWidget(QLabel("Suggested Speed:"))
-        layout.addWidget(self.suggested_speed_input)
-
         #input fielf for current speed
-        self.current_speed_input = QLineEdit(self)
-        self.current_speed_input.setPlaceholderText("Enter Current Speed")
+        self.currentSpeed_input = QLineEdit(self)
+        self.currentSpeed_input.setPlaceholderText("Enter Current Speed")
         layout.addWidget(QLabel("Current Speed:"))
-        layout.addWidget(self.current_speed_input)
+        layout.addWidget(self.currentSpeed_input)
 
         #input field for door status
         self.door_checkbox = QCheckBox("Door Open", self)
@@ -74,6 +75,12 @@ class TestbenchUI(QWidget):
         layout.addWidget(QLabel("Speed Limit:"))
         layout.addWidget(self.speed_limit_input)
 
+        #Beacon Data Input spot
+        self.beacon_input = QLineEdit(self)
+        self.beacon_input.setPlaceholderText("Enter Beacon")
+        layout.addWidget(QLabel("Beacon:"))
+        layout.addWidget(self.beacon_input)
+
         # Button to submit command
         self.submit_button = QPushButton("Submit", self)
         self.submit_button.clicked.connect(self.submit_inputs)
@@ -91,24 +98,33 @@ class TestbenchUI(QWidget):
     def submit_inputs(self):
         # Get the input text
         commanded_speed = int(self.commanded_speed_input.text()) if self.commanded_speed_input.text() != "" else 0
-        authority = int(self.authority_input.text()) if self.authority_input.text() != "" else 0
-        brake_status = (self.backend.current_speed > self.backend.speed_limit) or (self.backend.authority < 10) or self.brake_checkbox.isChecked()
-        suggested_speed = self.backend.speed_limit or int(self.suggested_speed_input.text()) if  self.suggested_speed_input.text() != "" else 0
-        current_speed = int(self.current_speed_input.text()) if self.current_speed_input.text() != "" else 0
+        full_authority = self.authority_input.text()
+        self.backend.add_to_authority(full_authority, self.backend.full_authority, self.backend.curr_authority)
+        #if authority value is zero then dont send it?
+        #if full  auth already exists as a value (like isnt empty) then do append, otherwise set original or just have one function 
+        brake_status = (self.backend.currentSpeed > self.backend.speed_limit) or self.brake_checkbox.isChecked()
+        currentSpeed = int(self.currentSpeed_input.text()) if self.currentSpeed_input.text() != "" else 0
         door_status = self.door_checkbox.isChecked()
         lights_status = self.light_checkbox.isChecked()
         internal_temperature = int(self.internal_temp_input.text()) if self.internal_temp_input.text() != "" else 0
         headlights_status = self.hl_checkbox.isChecked()
         speed_limit = int(self.speed_limit_input.text()) if self.speed_limit_input.text() != "" else 0
+        beacon = self.beacon_input.text()
 
-        self.backend.update_testbench_status(commanded_speed, authority, brake_status, suggested_speed, current_speed, door_status, lights_status, internal_temperature, headlights_status, speed_limit)
-
+        self.backend.update_testbench_status(commanded_speed, full_authority, brake_status, currentSpeed, door_status, lights_status, internal_temperature, headlights_status, speed_limit, beacon)
         #self.status_label.setText(
         #f"Speed: {self.backend.commanded_speed}\n"
         #f"Authority: {self.backend.authority}\n"
         #f"Brake Status: {'Applied' if self.backend.brake_status else 'Released'}"
         #)
         self.inputs_updated.emit()
+
+    def toggle_change_blocks(self):
+        self.backend.change_blocks = not self.backend.change_blocks
+        print("block switch")
+        self.backend.next_authority(self.backend.curr_authority, self.backend.change_blocks, self.backend.prev_block)
+
+
 
 """""
 def main():

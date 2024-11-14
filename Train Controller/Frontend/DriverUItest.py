@@ -115,7 +115,7 @@ class DriverUI(QWidget):
         self.suggested_speed_label = QLabel(f"Suggested Speed: {self.backend.suggested_speed}")
         self.Kp_Label = QLabel(f"Kp: {self.backend.Kp}")
         self.Ki_Label = QLabel(f"Ki: {self.backend.Ki}")
-        self.current_speed_label = QLabel(f"Current Speed: {self.backend.safe_speed()}")
+        self.currentSpeed_label = QLabel(f"Current Speed: {self.backend.safe_speed()}")
         self.power_output_label = QLabel(f"Power Output: {self.backend.power_output}")
         self.door_status_label = QLabel(f"Door Status: {self.backend.door_status}")
         self.lights_status_label = QLabel(f"Lights Status: {self.backend.lights_status}")
@@ -183,10 +183,10 @@ class DriverUI(QWidget):
             self.timer.stop()  # stop the timer when speed is 0
     def update_speed(self):
         if self.brake_applied:
-            current_speed = self.backend.safe_speed()
+            currentSpeed = self.backend.safe_speed()
             self.update_values()
-            if current_speed > 0:
-                self.backend.set_safe_speed(current_speed - 1)  # decrease speed by 1 unit every second
+            if currentSpeed > 0:
+                self.backend.set_safe_speed(currentSpeed - 1)  # decrease speed by 1 unit every second
                 self.update_values()
             else:
                 self.backend.set_safe_speed(0)  # set speed to 0 when it reaches 0
@@ -194,7 +194,7 @@ class DriverUI(QWidget):
                 self.speed_decrease_timer.stop()
                 self.update_values()
     def update_values(self):
-        commanded_speed, authority, brake_status, suggested_speed, current_speed, power_output, door_status, lights_status, internal_temperature, headlights_status, speed_limit = self.backend.get_testbench_status()
+        commanded_speed, authority, brake_status, suggested_speed, currentSpeed, power_output, door_status, lights_status, internal_temperature, headlights_status, speed_limit = self.backend.get_testbench_status()
         Kp, Ki =  self.backend.get_Kp_Ki()
         #TODO figure out how to put LightsAndDoorsUI here
 
@@ -206,7 +206,7 @@ class DriverUI(QWidget):
         self.suggested_speed_label.setText(f"Suggested Speed: {suggested_speed}")
         self.Kp_Label.setText(f"Kp: {Kp}")
         self.Ki_Label.setText(f"Ki: {Ki}")
-        self.current_speed_label.setText(f"Current Speed: {current_speed}")
+        self.currentSpeed_label.setText(f"Current Speed: {currentSpeed}")
         self.power_output_label.setText(f"Power Output: {power_output}")
         self.door_status_label.setText(f"Door Status: {'Open'if door_status else 'Closed'}")
         self.lights_status_label.setText(f"Lights Status: {'ON' if lights_status else 'OFF'}")

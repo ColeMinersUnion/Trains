@@ -42,10 +42,10 @@ class TestbenchUI(QWidget):
         layout.addWidget(self.suggested_speed_input)
 
         #input fielf for current speed
-        self.current_speed_input = QLineEdit(self)
-        self.current_speed_input.setPlaceholderText("Enter Current Speed")
+        self.currentSpeed_input = QLineEdit(self)
+        self.currentSpeed_input.setPlaceholderText("Enter Current Speed")
         layout.addWidget(QLabel("Current Speed:"))
-        layout.addWidget(self.current_speed_input)
+        layout.addWidget(self.currentSpeed_input)
 
         #input field for current power output
         self.current_power_input = QLineEdit(self)
@@ -100,7 +100,7 @@ class TestbenchUI(QWidget):
         authority = int(self.authority_input.text()) if self.authority_input.text() != "" else 0
         brake_status = self.brake_checkbox.isChecked()
         suggested_speed = int(self.suggested_speed_input.text()) if  self.suggested_speed_input.text() != "" else 0
-        current_speed = int(self.current_speed_input.text()) if self.current_speed_input.text() != "" else 0
+        currentSpeed = int(self.currentSpeed_input.text()) if self.currentSpeed_input.text() != "" else 0
         power_output = int(self.current_power_input.text()) if  self.current_power_input.text() != "" else 0
         door_status = self.door_checkbox.isChecked()
         lights_status = self.light_checkbox.isChecked()
@@ -108,7 +108,7 @@ class TestbenchUI(QWidget):
         headlights_status = self.hl_checkbox.isChecked()
         speed_limit = int(self.speed_limit_input.text()) if self.speed_limit_input.text() != "" else 0
 
-        self.backend.update_testbench_status(commanded_speed, authority, brake_status, suggested_speed, current_speed, power_output, door_status, lights_status, internal_temperature, headlights_status, speed_limit)
+        self.backend.update_testbench_status(commanded_speed, authority, brake_status, suggested_speed, currentSpeed, power_output, door_status, lights_status, internal_temperature, headlights_status, speed_limit)
 
         #self.status_label.setText(
         #f"Speed: {self.backend.commanded_speed}\n"

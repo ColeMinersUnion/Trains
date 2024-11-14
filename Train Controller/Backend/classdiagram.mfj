@@ -114,7 +114,7 @@
                 },
                 {
                   "_type": "UMLOperation",
-                  "name": "get_current_speed",
+                  "name": "get_currentSpeed",
                   "visibility": "public"
                 },
                 {

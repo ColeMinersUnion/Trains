@@ -13,7 +13,7 @@ class CommandCenter {
     - speed_label : QLabel
     - authority_label : QLabel
     - brake_status_label : QLabel
-    - current_speed_label : QLabel
+    - currentSpeedabel : QLabel
     - power_output_label : QLabel
     - door_status_label : QLabel
     - lights_status_label : QLabel
@@ -41,7 +41,7 @@ class Backend {
     + get_commanded_speed()
     + get_authority()
     + get_brake_status()
-    + get_current_speed()
+    + get_currentSpeed()
     + get_power_output()
     + get_doors()
     + get_lights()
