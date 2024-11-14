@@ -21,20 +21,26 @@ class Train:
         #The notion is that I can do like a while(move())
         #Sort of thing and in the loop id:      time.sleep(block_length/speed)
         if(len(self.schedule.routes) == 0 ):
+            print("No Routes")
             return False
-        if(self.location == self.schedule.routes[self.curr_route].end):
-            if(self.curr_route + 1 < len(self.schedule.routes)):
-                self.curr_route += 1
-                self.Next_Stop = self.schedule.stations[self.curr_route + 1]
-            else:
-                return False #!Poof train should disappear
+        #if(self.location == self.schedule.routes[self.curr_route].end):
+        #    if(self.curr_route + 1 <= len(self.schedule.routes)):
+        #        self.curr_route += 1
+        #        self.Next_Stop = self.schedule.stations[self.curr_route + 1]
+        #    else:
+        #        print("Train has made it back to the station")
+        #        return False #!Poof train should disappear
         else:
             try:
-                self.location = self.line.graph[list(self.schedule.routes[self.curr_route].paths)[self.curr_route_index]]
+            
+                #print(self.schedule.routes[self.curr_route].paths[self.curr_route_index])
+            #print("H")
+                self.location = self.line.graph[self.schedule.routes[self.curr_route].paths[self.curr_route_index]]
 
                 if(self.curr_route_index + 1 <= len(self.schedule.routes[self.curr_route].paths)):
                     self.curr_route_index += 1
             except:
+            #    print("IDK")
                 return False
             #!I really hope that works, I did not think this through enough
         return True
@@ -55,7 +61,7 @@ class Train:
     def auth(self):
         try:
             self.authority = 0
-            for i in list(self.schedule.routes[self.curr_route].paths)[self.curr_route_index : ]:
+            for i in self.schedule.routes[self.curr_route].paths[self.curr_route_index : ]:
                 self.authority += self.line.graph[i].block_length
             return self.authority
         except:
@@ -63,14 +69,33 @@ class Train:
     
 if(__name__ == '__main__'):
     #Making the route
-    from GetBlue import Blue
-    blue = Blue(broken=False)
-    Thomas = TrainSchedule(blue)
-    Thomas.addStop("Station B")
-    Thomas.makeRoutes()
+    from GetGreen import Green
+    green = Green()
+    from Default import greenDefault
+    Thomas = TrainSchedule(green)
+    I, O = greenDefault()
+    from Route import Route
+    Incoming = Route(63, 2, green)
+    Incoming.paths = I
+    print(I)
+    print(Incoming.paths[0])
+    Outgoing = Route(1, 58, green)
+    Outgoing.paths = O
+    Thomas.routes = [Incoming, Outgoing]
 
-    James = Train(line=blue, schedule=Thomas, id=101)
+    James = Train(line=green, schedule=Thomas, id=101, location=green.graph[0])
+    print(James.schedule.routes[1].paths)
+    
     while(James.move()):
         print(str(James.location))
         time.sleep(James.waitTime(True))
-    print("Train has reached it's destination")
+    
+
+    print("Train has reached Pioneer Station")
+    time.sleep(1)
+    James.curr_route += 1
+    James.curr_route_index = 0
+    while(James.move()):
+        print(str(James.location))
+        time.sleep(James.waitTime(True))
+    print("Train has reached the yard")

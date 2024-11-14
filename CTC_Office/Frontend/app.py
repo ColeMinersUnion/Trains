@@ -5,6 +5,7 @@ from datetime import datetime
 import time
 
 
+
 class CTCApplication(QMainWindow):
     def __init__(self, Office = None):
         super().__init__()

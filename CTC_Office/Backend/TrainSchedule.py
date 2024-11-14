@@ -7,7 +7,7 @@ class TrainSchedule:
         self.routes = []
         self.line = line
         self.stops = [] #! List of indices for making routes
-        self.stations = ["Yard"] #! List of stops in string formats
+        self.stations = ["Yard", "Pioneer"] #! List of stops in string formats
         if(stations != []):
             self.stations.extend(stations)
             self.findStops()
@@ -62,10 +62,10 @@ class TrainSchedule:
         
 
 if(__name__ == '__main__'):
-    from GetBlue import Blue
-    blue = Blue(broken=False)
-    Thomas = TrainSchedule(blue)
-    Thomas.addStop("Station C")
+    from GetGreen import Green
+    green = Green()
+    Thomas = TrainSchedule(green)
+    Thomas.addStop("Station: Pioneer")
     Thomas.makeRoutes()
     for i, r in enumerate(Thomas.routes):
         print(f'Route {i}: {str(r)}')
