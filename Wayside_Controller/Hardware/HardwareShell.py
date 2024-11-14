@@ -15,6 +15,7 @@ class WaysideWindow(QMainWindow):
     ws_tm_maintenance = pyqtSignal(list)
     ws_ctc_occupancy = pyqtSignal(list)
     ws_ctc_maintenance = pyqtSignal(list)
+
     
     def __init__(self):
         super().__init__()
@@ -146,7 +147,7 @@ class WaysideWindow(QMainWindow):
         self.ws_ctc_switch_result.emit({"result": True, "switch_58": self.switch_58, "switch_62": self.switch_62, "signal_58": self.signal_58, "signal_62": self.signal_62})
         self.ws_tm_update_track.emit({"switch_58": self.switch_58, "switch_62": self.switch_62, "signal_58": self.signal_58, "signal_62": self.signal_62})
         self.ws_tm_authority.emit(self.authority)
-        
+
     @pyqtSlot(list)
     def update_occupancy(self, new_occ):
         # Slot to update the label text

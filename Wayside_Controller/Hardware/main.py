@@ -22,7 +22,7 @@ def main():
     ws_window.ws_tm_maintenance.connect(tm_window.update_maintenance)
     ws_window.ws_ctc_occupancy.connect(ctc_window.update_occupancy)
     ws_window.ws_ctc_maintenance.connect(ctc_window.update_maintenance)
-    ctc_window.ctc_ws_maintenance.connect(ws_window.update_maint_switch)
+    ctc_window.ctc_ws_maint_switch.connect(ws_window.update_maint_switch)
     # Show both windows
     ws_window.show()
     tm_window.show()
