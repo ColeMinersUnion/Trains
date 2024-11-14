@@ -21,20 +21,26 @@ class Train:
         #The notion is that I can do like a while(move())
         #Sort of thing and in the loop id:      time.sleep(block_length/speed)
         if(len(self.schedule.routes) == 0 ):
+            print("No Routes")
             return False
-        if(self.location == self.schedule.routes[self.curr_route].end):
-            if(self.curr_route + 1 < len(self.schedule.routes)):
-                self.curr_route += 1
-                self.Next_Stop = self.schedule.stations[self.curr_route + 1]
-            else:
-                return False #!Poof train should disappear
+        #if(self.location == self.schedule.routes[self.curr_route].end):
+        #    if(self.curr_route + 1 <= len(self.schedule.routes)):
+        #        self.curr_route += 1
+        #        self.Next_Stop = self.schedule.stations[self.curr_route + 1]
+        #    else:
+        #        print("Train has made it back to the station")
+        #        return False #!Poof train should disappear
         else:
             try:
-                self.location = self.line.graph[list(self.schedule.routes[self.curr_route].paths)[self.curr_route_index]]
+            
+                #print(self.schedule.routes[self.curr_route].paths[self.curr_route_index])
+            #print("H")
+                self.location = self.line.graph[self.schedule.routes[self.curr_route].paths[self.curr_route_index]]
 
                 if(self.curr_route_index + 1 <= len(self.schedule.routes[self.curr_route].paths)):
                     self.curr_route_index += 1
             except:
+            #    print("IDK")
                 return False
             #!I really hope that works, I did not think this through enough
         return True
@@ -52,25 +58,65 @@ class Train:
         except:
             return 0
     
-    def auth(self):
+    def auth(self, block = -1):
+        if block == -1:
+            block = self.curr_route_index
         try:
             self.authority = 0
-            for i in list(self.schedule.routes[self.curr_route].paths)[self.curr_route_index : ]:
+            for i in self.schedule.routes[self.curr_route].paths[block : ]:
                 self.authority += self.line.graph[i].block_length
             return self.authority
         except:
             return 0
     
+    def stringAuth(self):
+        strAuth = ""
+        temp = self.curr_route
+        for r in range(len(self.schedule.routes)):
+            self.curr_route = r
+            for i in range(len(self.schedule.routes[r].paths)+1):
+                strAuth += f'{self.auth(i)}; '
+        self.curr_route = temp
+        #print(strAuth)
+        return strAuth
+                
+    
+    
 if(__name__ == '__main__'):
     #Making the route
-    from GetBlue import Blue
-    blue = Blue(broken=False)
-    Thomas = TrainSchedule(blue)
-    Thomas.addStop("Station B")
-    Thomas.makeRoutes()
+    from GetGreen import Green
+    green = Green()
+    from Default import greenDefault
+    Thomas = TrainSchedule(green)
+    I, O = greenDefault()
+    from Route import Route
+    Incoming = Route(63, 2, green)
+    Incoming.paths = I
+    #print(I)
+    #print(Incoming.paths[0])
+    import numpy as np
+    Outgoing = Route(1, 58, green)
+    Outgoing.paths = O
+    Thomas.routes = [Incoming, Outgoing]
 
-    James = Train(line=blue, schedule=Thomas, id=101)
+    James = Train(line=green, schedule=Thomas, id=101, location=green.graph[0])
+    #print(James.schedule.routes[1].paths)
+    James.stringAuth()
+
+
+    #OutAuth = [James.auth(i) for i in O]
+    #print(np.array(OutAuth))
+
     while(James.move()):
-        print(str(James.location))
+        print(f'{str(James.location)}: {James.auth()}')
         time.sleep(James.waitTime(True))
-    print("Train has reached it's destination")
+    
+
+    print("Train has reached Pioneer Station")
+    time.sleep(1)
+    James.curr_route += 1
+    James.curr_route_index = 0
+    while(James.move()):
+        print(f'{str(James.location)}: {James.auth()}')
+        time.sleep(James.waitTime(True))
+    print("Train has reached the yard")
