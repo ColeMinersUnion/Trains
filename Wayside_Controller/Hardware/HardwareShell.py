@@ -34,6 +34,8 @@ class WaysideWindow(QMainWindow):
         self.server_ip = '192.168.137.222'
         self.server_port = 9000
 
+        self.user_inputs()
+        
         start = time()
         self.client_socket.connect((self.server_ip, self.server_port))
         end = time()    
@@ -146,6 +148,7 @@ class WaysideWindow(QMainWindow):
         self.ws_tm_authority.emit(self.authority)
 
     def toggle_sw58(self):
+        print("called toggle_sw58")
         data = {
             "input": "ws_sw58"
         }
