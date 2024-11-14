@@ -132,6 +132,26 @@ class PLC:
         self.update_signals()
         return self.authority
     
+    def toggle_sw58(self):
+        if not any(self.occupancy[41:77]):
+            self.sw58 = not self.sw58
+            self.update_authority(self.occupancy)
+            self.update_signals()
+    
+    def toggle_sw62(self):
+        if not any(self.occupancy[41:77]):
+            self.sw62 = not self.sw62
+            self.update_authority(self.occupancy)
+            self.update_signals()
+
+    def toggle_sig58(self):
+        if not any(self.occupancy[41:77]):
+            self.sig58 = not self.sig58
+
+    def toggle_sig62(self):
+        if not any(self.occupancy[41:77]):
+            self.sig62 = not self.sig62
+    
 if __name__ == "__main__":
     plc = PLC()
     test_maint = [False for i in range(151)]

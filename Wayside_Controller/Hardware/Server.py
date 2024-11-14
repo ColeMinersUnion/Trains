@@ -80,6 +80,36 @@ def main():
                             "maint": plc.maintenance,
                         }
 
+                    case "ws_sw58":
+                        plc.toggle_sw58()
+                        response = {
+                            "response": "ws_sw58",
+                            "sw58": plc.sw58,
+                            "auth" : plc.authority
+                        }
+                    
+                    case "ws_sw62":
+                        plc.toggle_sw62()
+                        response = {
+                            "response": "ws_sw62",
+                            "sw62": plc.sw62,
+                            "auth" : plc.authority
+                        }
+
+                    case "ws_sig58":
+                        plc.toggle_sig58()
+                        response = {
+                            "response": "ws_sig58",
+                            "sig58": plc.sig58
+                        }
+
+                    case "ws_sig62":
+                        plc.toggle_sig62()
+                        response = {
+                            "response": "ws_sig62",
+                            "sig62": plc.sig62
+                        }
+
                     case "say_hi":
                         response = {"response": "server connect"}
                         
