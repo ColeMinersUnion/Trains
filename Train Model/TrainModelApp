@@ -203,10 +203,15 @@ class MetricsTab(QWidget):
         self.weight_label.setFont(QFont('Arial', 14))
         col1_layout.addWidget(self.weight_label)
 
+        self.internal_light_status_label = QLabel()
+        self.internal_light_status_label.setAlignment(Qt.AlignCenter)
+        self.internal_light_status_label.setFont(QFont('Arial', 14))
+        col2_layout.addWidget(self.internal_light_status_label)
+
         self.temperature_label = QLabel()
         self.temperature_label.setAlignment(Qt.AlignCenter)
         self.temperature_label.setFont(QFont('Arial', 14))
-        col2_layout.addWidget(self.temperature_label)
+        col1_layout.addWidget(self.temperature_label)
 
         self.light_status_label = QLabel()
         self.light_status_label.setAlignment(Qt.AlignCenter)
@@ -246,6 +251,7 @@ class MetricsTab(QWidget):
         weight = self.train.getWeightImperial()
         temperature = self.train.getTemp()
         light_status = "On" if self.train.lightStatus else "Off"
+        internal_light_status = "On" if self.train.internalLightStatus else "Off"
         left_door_status = "Open" if self.train.leftDoorStatus else "Closed"
         right_door_status = "Open" if self.train.rightDoorStatus else "Closed"
         service_brake_status = "On" if self.train.serviceBrake else "Off"
@@ -256,6 +262,7 @@ class MetricsTab(QWidget):
         self.weight_label.setText(f"Weight: {weight:.2f} lbs")
         self.temperature_label.setText(f"Temperature: {temperature:.2f} °F")
         self.light_status_label.setText(f"Light Status: {light_status}")
+        self.internal_light_status_label.setText(f"Internal Light Status: {internal_light_status}")
         self.left_door_status_label.setText(f"Left Door Status: {left_door_status}")
         self.right_door_status_label.setText(f"Right Door Status: {right_door_status}")
         self.service_brake_status_label.setText(f"Service Brake: {service_brake_status}")
@@ -404,6 +411,10 @@ class TestBench(QWidget):
 
     def toggle_lights(self):
         self.train.lightToggle()
+        self.metrics_tab.update_labels()
+
+    def toggle_interior_lights(self):
+        self.train.internalLightToggle()
         self.metrics_tab.update_labels()
 
     def toggle_left_doors(self):

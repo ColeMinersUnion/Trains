@@ -204,3 +204,7 @@ class trainModel:
                 print(self.getAccelerationImperial())
                 self.powerCheck = False
                 time.sleep(self.period)
+
+    def avgDistance(self):
+        distance = self.period * self.currentSpeed
+        return distance
