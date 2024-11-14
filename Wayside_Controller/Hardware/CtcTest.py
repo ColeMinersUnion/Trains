@@ -8,6 +8,7 @@ import copy
 class CTCWindow(QMainWindow):
     ctc_ws_sugg_switch = pyqtSignal(int)
     ctc_ws_maintenance = pyqtSignal(list)
+    ctc_ws_maint_switch = pyqtSignal(int)
     def __init__(self):
         super().__init__()
         uic.loadUi("Wayside_Controller/Hardware/ctc_tb.ui", self)
@@ -30,6 +31,15 @@ class CTCWindow(QMainWindow):
 
         self.yard_button.clicked.connect(self.toggle_yard)
         self.blk76_button.clicked.connect(self.toggle_blk76)
+
+        self.maint_sw58.clicked.connect(self.maint_58)
+        self.maint_sw62.clicked.connect(self.maint_62)
+
+    def maint_58(self):
+        self.ctc_ws_maint_switch.emit(58)
+    
+    def maint_62(self):
+        self.ctc_ws_maint_switch.emit(62)
 
     def maintenance_change(self):
         maint_prop = [False for i in range(151)]

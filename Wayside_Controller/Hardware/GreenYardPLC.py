@@ -151,6 +151,14 @@ class PLC:
     def toggle_sig62(self):
         if not any(self.occupancy[41:77]):
             self.sig62 = not self.sig62
+
+    def maint_sw58(self):
+        if self.maintenance[57] and self.maintenance[58]:
+            self.sw58 = not self.sw58
+
+    def maint_sw62(self):      
+        if self.maintenance[62] and self.maintenance[63]:
+            self.sw62 = not self.sw62
     
 if __name__ == "__main__":
     plc = PLC()

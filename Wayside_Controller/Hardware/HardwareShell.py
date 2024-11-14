@@ -35,7 +35,7 @@ class WaysideWindow(QMainWindow):
         self.server_port = 9000
 
         self.user_inputs()
-        
+
         start = time()
         self.client_socket.connect((self.server_ip, self.server_port))
         end = time()    
@@ -127,6 +127,26 @@ class WaysideWindow(QMainWindow):
 
 
 
+    @pyqtSlot(int)
+    def update_maint_switch(self, switch):
+        if switch == 58:
+            input = "ctc_sw58"
+        elif switch == 62:
+            input = "ctc_sw62"
+        
+        data = {
+            "input" : input
+        }
+        self.send(data)
+        decoded_json = self.receive()
+        self.switch_58 = decoded_json["sw58"]
+        self.switch_62 = decoded_json["sw62"]
+        self.signal_58 = decoded_json["sig58"]
+        self.signal_62 = decoded_json["sig62"]
+        self.ws_ctc_switch_result.emit({"result": True, "switch_58": self.switch_58, "switch_62": self.switch_62, "signal_58": self.signal_58, "signal_62": self.signal_62})
+        self.ws_tm_update_track.emit({"switch_58": self.switch_58, "switch_62": self.switch_62, "signal_58": self.signal_58, "signal_62": self.signal_62})
+        self.ws_tm_authority.emit(self.authority)
+        
     @pyqtSlot(list)
     def update_occupancy(self, new_occ):
         # Slot to update the label text

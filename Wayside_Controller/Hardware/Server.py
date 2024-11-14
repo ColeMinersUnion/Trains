@@ -110,6 +110,29 @@ def main():
                             "sig62": plc.sig62
                         }
 
+                    case "ctc_sw58":
+                        plc.maint_sw58()
+                        response = {
+                            "response": "ctc_sw58",
+                            "sw58": plc.sw58,
+                            "sw62": plc.sw62,
+                            "sig58": plc.sig58,
+                            "sig62": plc.sig62,
+                            "auth": plc.authority
+
+                        }
+
+                    case "ctc_sw62":
+                        plc.maint_sw62()
+                        response = {
+                            "response": "ctc_sw62",
+                            "sw58": plc.sw58,
+                            "sw62": plc.sw62,
+                            "sig58": plc.sig58,
+                            "sig62": plc.sig62,
+                            "auth": plc.authority
+                        }
+
                     case "say_hi":
                         response = {"response": "server connect"}
                         
