@@ -40,10 +40,10 @@ class GreenPLC:
     def update_values(self, occupancy):
         #update switches then signals then crossings then authority
         switch77, switch85, switch28, switch13 = self.update_switch(occupancy)
-        #signal77, signal85, signal28, signal13 = self.update_signal(switch77, switch85, switch28, switch13)
-        #crossing19, crossing108 = self.update_crossing(occupancy)
+        signal77, signal85, signal28, signal13 = self.update_signal(switch77, switch85, switch28, switch13)
+        crossing19, crossing108 = self.update_crossing(occupancy)
         authority=self.update_authority(occupancy)
-        return authority, switch77, switch85, switch28, switch13 #, signal77, signal85, signal28, signal13, crossing19, crossing108
+        return authority, switch77, switch85, switch28, switch13, signal77, signal85, signal28, signal13, crossing19, crossing108
 
     def maintenance(self):
         #if theres an occupancy in the region, no maintenance or manual mode, it's disabled
@@ -100,22 +100,22 @@ class GreenPLC:
         self.switch_28=False
         self.switch_13=True
         #switch 77 (right then left, false then true)
-        if any(occupancy[78:100]==True) and self.switch_77==False:
+        if any(occupancy[78:100])==True and self.switch_77==False:
             self.switch_77=True
         else: 
             self.switch_77=False
         #switch 85 (left then right, true then false)
-        if any(occupancy[86:100]==True) and self.switch_85==True:
+        if any(occupancy[86:100])==True and self.switch_85==True:
             self.switch_85=False
         else: 
             self.switch_85=True
         #switch 28 (right then left, false then true)
-        if any(occupancy[1:27]==True) and self.switch_28==False:
+        if any(occupancy[1:27])==True and self.switch_28==False:
             self.switch_28=True
         else: 
             self.switch_28=False
         #switch 13 (left then right, true then false)
-        if any(occupancy[1:12]==True) and self.switch_13==True:
+        if any(occupancy[1:12])==True and self.switch_13==True:
             self.switch_13=False
         else: 
             self.switch_13=True
@@ -125,9 +125,9 @@ class GreenPLC:
     
     #coding the default path along the green line
     #determines if each occupied block has the authority to move to the next block, this is layout dependent so it is hardcoded
-    def update_authority(self, occupancy):
+    def update_authority(self, occupancy) -> list[bool]:
         #reset authority to true so train is moving unless told otherwise
-        authority=[True for i in range(1,150)]
+        authority=[True for i in range(151)]
         #go through a zone using hardcoded index (cannot modify index) to make sure there is no other train on track to move ahead
         #or set authority to true by default and always look ahead to next zone (hardcode) to make sure no train is in the next zone
         #ONLY ONE TRAIN IN A ZONE AT A TIME (simplifies things for us and is technically a 'safety feature')
