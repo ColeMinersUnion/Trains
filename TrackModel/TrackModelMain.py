@@ -4,7 +4,6 @@ from PyQt6.QtGui import QTransform, QPixmap
 from PyQt6.QtCore import Qt,QTimer,QObject
 import pandas as pd #reading the excel file
 from math import atan2,pi,sqrt,pow,sin,cos
-import Wayside_Controller
 
 #offsets are multiplied by scl
 XOFFSET = 0
@@ -108,6 +107,11 @@ class Switch:
         self.leftside = not self.leftside
         self.updateEnds()
 
+    #set switch to left
+    def setToLeft(self,bool):
+        self.leftside = True
+        self.updateEnds()
+    
     #get the open block
     def getopen(self):
         if(self.leftside):
@@ -298,7 +302,37 @@ def read(file):
 
 class SignalHandler(QObject):
     def __init__():
-        super().__init__() 
+        super().__init__()
+
+    
+
+    def getSwitch13(self,message):
+        lines[0].switches[0].setToLeft(message) 
+
+    def getSwitch28(self,message):
+        lines[0].switches[1].setToLeft(message) 
+
+    def getSwitch58(self,message):
+        lines[0].switches[2].setToLeft(message)
+
+    def getSwitch62(self,message):
+        lines[0].switches[3].setToLeft(message)
+
+    def getSwitch77(self,message):
+        lines[0].switches[4].setToLeft(message)
+
+    def getSwitch105(self,message):    
+        lines[0].switches[5].setToLeft(message)
+
+    def getCrossing19(self,message):
+        lines[0].crossings[0].on=message #switch 19
+
+    def getCrossing108(self,message):
+        lines[0].crossings[1].on=message #switch 108
+
+
+
+
     
     
 
@@ -704,7 +738,7 @@ class Testbench(QWidget):
         line = int(self.input1.text())
         comp = int(self.input2.text())
         if len(lines[line].trains)==0:
-            lines[line].trains.append(Train(line,90,comp))
+            lines[line].trains.append(Train(line,63,comp))
         else:
             lines[line].trains[0].addPos(comp)
 
