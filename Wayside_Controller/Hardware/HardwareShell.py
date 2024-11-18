@@ -16,7 +16,7 @@ class WaysideWindow(QMainWindow):
     ws_ctc_occupancy = pyqtSignal(list)
     ws_ctc_maintenance = pyqtSignal(list)
 
-    
+    #view
     def __init__(self):
         super().__init__()
         uic.loadUi("Wayside_Controller/Hardware/app.ui", self)
@@ -47,7 +47,7 @@ class WaysideWindow(QMainWindow):
         self.send(data)
         decoded_json = self.receive()
         #reads inputs from the user
-        #self.user_inputs()
+        #self.user_inputs()+
 
         
 
@@ -56,7 +56,8 @@ class WaysideWindow(QMainWindow):
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.update_ui)  # Function to update the UI
         self.timer.start(15)  # Updates every 1.5 seconds 
-
+    
+    #view
     def user_inputs(self):
         self.manual_sw58_button.clicked.connect(self.toggle_sw58)
         self.manual_sw62_button.clicked.connect(self.toggle_sw62)
@@ -86,7 +87,7 @@ class WaysideWindow(QMainWindow):
             print("failed to decode Json", message_data)
     
 
-
+    #view
     def update_ui(self):
         for i in range(41, 77):
             self.wayside_block_table.setItem(i-41, 0, QTableWidgetItem(str(self.occupancy[i])))   
