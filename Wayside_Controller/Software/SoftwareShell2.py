@@ -9,6 +9,7 @@ from GreenMainPLC import GreenPLC
 #from TM_test import Track
 
 class Wayside_Shell(QObject):
+
     wss_tm_authority = pyqtSignal(list)
     #ws_tm_dispatch = pyqtSignal(tuple)
 
@@ -79,6 +80,7 @@ class Wayside_Shell(QObject):
         #self.authority,self.switch_77,self.switch_85,self.switch_28,self.switch_13 = self.plc.update_values(new_occupancy) 
         self.authority,self.switch_77,self.switch_85,self.switch_28,self.switch_13,self.signal_77, self.signal_85, self.signal_28, self.signal_13, self.crossing_19, self.crossing_108 = self.plc.update_values(new_occupancy)
         #emitting updated authority and switch, signal, crossing states:
+
         self.wss_tm_authority.emit(self.authority)
 
         self.wss_tm_switch_77.emit(self.switch_77)
