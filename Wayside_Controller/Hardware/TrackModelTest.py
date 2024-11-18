@@ -12,6 +12,7 @@ class TrackModelWindow(QMainWindow):
         uic.loadUi("Wayside_Controller/Hardware/tm_tb.ui", self)
         self.occupancy = [False for i in range(151)]
         self.authority = [False for i in range(151)]
+        self.maintenance = [False for i in range(151)]
         self.switch_58 = False
         self.switch_62 = False
         self.signal_58 = False
@@ -77,7 +78,16 @@ class TrackModelWindow(QMainWindow):
         self.signal_58 = new_track["signal_58"]
         self.signal_62 = new_track["signal_62"]
 
+    @pyqtSlot(list)
+    def update_maintenance(self, new_maint):
+        for i in range(41,77):
+            if new_maint[i] == True and self.maintenance[i] == False:
+                self.maintenance[i] = True
+                self.occupancy[i] = True
 
-
+            elif new_maint[i] == False and self.maintenance[i] == True:
+                self.maintenance[i] = False
+                self.occupancy[i] = False
         
+        self.tm_ws_occupancy.emit(self.occupancy)
         
