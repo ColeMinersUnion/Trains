@@ -10,7 +10,7 @@ from GreenMainPLC import GreenPLC
 
 class WaysideShell(object):
     ws_tm_authority = pyqtSignal(list)
-    ws_tm_dispatch = pyqtSignal(tuple)
+    #ws_tm_dispatch = pyqtSignal(tuple)
 
     ws_tm_switch_13 = pyqtSignal(bool)
     ws_tm_switch_28 = pyqtSignal(bool)
@@ -64,16 +64,19 @@ class WaysideShell(object):
         #display UI
         self.ui.show()
         self.app.exec() 
+        #self.run()
 
+    ''' def run(self):
+        
+        self.app.exec()'''
+    
     #slot to update occupancy which then updates the plc authority
     #then send out updated authority, switches, signals, crossings 
     @pyqtSlot(list)
     def update_occupancy(self, new_occupancy):
         
-        self.authority,self.switch_77,self.switch_85,self.switch_28,self.switch_13 = self.plc.update_values(new_occupancy) 
-        #self.authority,self.switch_77,self.switch_85,self.switch_28,self.switch_13,
-        # self.signal_77, self.signal_85, self.signal_28, self.signal_13, 
-        #self.crossing_19, self.crossing_108 = self.plc.update_values(new_occupancy)
+        #self.authority,self.switch_77,self.switch_85,self.switch_28,self.switch_13 = self.plc.update_values(new_occupancy) 
+        self.authority,self.switch_77,self.switch_85,self.switch_28,self.switch_13,self.signal_77, self.signal_85, self.signal_28, self.signal_13, self.crossing_19, self.crossing_108 = self.plc.update_values(new_occupancy)
         #emitting updated authority and switch, signal, crossing states:
         self.ws_tm_authority.emit(self.authority)
 
@@ -82,13 +85,14 @@ class WaysideShell(object):
         self.ws_tm_switch_28.emit(self.switch_28)
         self.ws_tm_switch_13.emit(self.switch_13)
 
-        '''self.ws_tm_signal_77.emit(self.signal_77)
+        self.ws_tm_signal_77.emit(self.signal_77)
         self.ws_tm_signal_85.emit(self.signal_85)
         self.ws_tm_signal_28.emit(self.signal_28)
         self.ws_tm_signal_13.emit(self.signal_13)
 
         self.ws_tm_crossing_19.emit(self.crossing_19)
-        self.ws_tm_crossing_108.emit(self.crossing_108)'''
+        self.ws_tm_crossing_108.emit(self.crossing_108)
+        return self.authority,self.switch_77,self.switch_85,self.switch_28,self.switch_13,self.signal_77,self.signal_85,self.signal_28,self.signal_13,self.crossing_19,self.crossing_108
 
     #slot to receive dispatch info from ctc
     '''@pyqtSlot(tuple)
@@ -196,3 +200,4 @@ if __name__ == '__main__':
     import sys
     app = QtWidgets.QApplication(sys.argv)
     WaysideShell(app)
+    
