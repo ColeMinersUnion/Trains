@@ -35,6 +35,7 @@ class CTCApplication(QMainWindow):
         self.speed = QLabel()
         self.auth = QLabel()
 
+
         self.setWindowTitle("CTC Office")
         
         self.button.setCheckable(True)
@@ -103,6 +104,7 @@ class CTCApplication(QMainWindow):
         self.layout.addWidget(self.fixBlock)
         self.layout.addWidget(self.submitFix)
         
+        
 
 
         self.layout.addWidget(lbl)
@@ -149,6 +151,7 @@ class CTCApplication(QMainWindow):
         self.clear_state = self.clear.isChecked()
 
     def onBreak(self):
+        
         txt = self.breakBlok.text()
         if(self.Office.breakTrack(int(txt))):
             self.breakBlok.setText(f'Block {int(txt)} is now broken. ')
