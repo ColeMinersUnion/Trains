@@ -75,7 +75,7 @@ class Train:
         for r in range(len(self.schedule.routes)):
             self.curr_route = r
             for i in range(len(self.schedule.routes[r].paths)+1):
-                strAuth += f'{self.auth(i)}; '
+                strAuth += f'{self.auth(i)};'
         self.curr_route = temp
         #print(strAuth)
         return strAuth
