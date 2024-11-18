@@ -5,7 +5,7 @@ import socket
 import time
 import json
 
-    
+     
 
 
 class WaysideHardwareBackend:
@@ -65,7 +65,6 @@ class WaysideHardwareBackend:
 
     @pyqtSlot()
     def toggle_sw58(self):
-        print("called toggle_sw58")
         data = {
             "input": "ws_sw58"
         }
@@ -76,7 +75,6 @@ class WaysideHardwareBackend:
 
     @pyqtSlot()
     def toggle_sw62(self):
-        print("called toggle_sw62")
         data = {
             "input": "ws_sw62"
         }
@@ -87,7 +85,6 @@ class WaysideHardwareBackend:
 
     @pyqtSlot()
     def toggle_sig58(self):
-        print("called toggle_sig58")
         data = {
             "input": "ws_sig58"
         }
@@ -98,7 +95,6 @@ class WaysideHardwareBackend:
 
     @pyqtSlot()
     def toggle_sig62(self):
-        print("called toggle_sig62")
         data = {
             "input": "ws_sig62"
         }

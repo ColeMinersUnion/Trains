@@ -11,4 +11,3 @@ class WaysideHardwareController(QObject):
         self.view.ws_int_sig58.connect(self.model.toggle_sig58)
         self.view.ws_int_sig62.connect(self.model.toggle_sig62)
 
-        

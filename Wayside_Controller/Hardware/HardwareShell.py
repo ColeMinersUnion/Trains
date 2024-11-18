@@ -11,7 +11,10 @@ from time import time
 class WaysideWindow(QMainWindow):
     ws_tm_authority = pyqtSignal(list)
     ws_ctc_switch_result = pyqtSignal(dict)
-    ws_tm_update_track = pyqtSignal(dict)
+    wsh_tm_sw58 = pyqtSignal(bool)
+    wsh_tm_sw62 = pyqtSignal(bool)
+    wsh_tm_sig58 = pyqtSignal(bool)
+    wsh_tm_sig62 = pyqtSignal(bool)
     ws_tm_maintenance = pyqtSignal(list)
     ws_ctc_occupancy = pyqtSignal(list)
     ws_ctc_maintenance = pyqtSignal(list)
@@ -146,7 +149,7 @@ class WaysideWindow(QMainWindow):
         self.signal_58 = decoded_json["sig58"]
         self.signal_62 = decoded_json["sig62"]
         self.ws_ctc_switch_result.emit({"result": True, "switch_58": self.switch_58, "switch_62": self.switch_62, "signal_58": self.signal_58, "signal_62": self.signal_62})
-        self.ws_tm_update_track.emit({"switch_58": self.switch_58, "switch_62": self.switch_62, "signal_58": self.signal_58, "signal_62": self.signal_62})
+        self.wsh_tm_sw58.emit(self.switch_58)
         self.ws_tm_authority.emit(self.authority)
 
     @pyqtSlot(list)
@@ -178,7 +181,7 @@ class WaysideWindow(QMainWindow):
         decoded_json = self.receive()
         self.switch_58 = decoded_json["sw58"]
         self.ws_ctc_switch_result.emit({"result": True, "switch_58": self.switch_58, "switch_62": self.switch_62, "signal_58": self.signal_58, "signal_62": self.signal_62})
-        self.ws_tm_update_track.emit({"switch_58": self.switch_58, "switch_62": self.switch_62, "signal_58": self.signal_58, "signal_62": self.signal_62})
+        self.wsh_tm_sw58.emit(self.switch_58)
         self.ws_tm_authority.emit(self.authority)
 
     def toggle_sw62(self):
@@ -189,7 +192,7 @@ class WaysideWindow(QMainWindow):
         decoded_json = self.receive()
         self.switch_62 = decoded_json["sw62"]
         self.ws_ctc_switch_result.emit({"result": True, "switch_58": self.switch_58, "switch_62": self.switch_62, "signal_58": self.signal_58, "signal_62": self.signal_62})
-        self.ws_tm_update_track.emit({"switch_58": self.switch_58, "switch_62": self.switch_62, "signal_58": self.signal_58, "signal_62": self.signal_62})
+        self.wsh_tm_sw62.emit(self.switch_62)
         self.ws_tm_authority.emit(self.authority)
 
 
@@ -202,7 +205,7 @@ class WaysideWindow(QMainWindow):
         self.signal_58 = decoded_json["sig58"]
 
         self.ws_ctc_switch_result.emit({"result": True, "switch_58": self.switch_58, "switch_62": self.switch_62, "signal_58": self.signal_58, "signal_62": self.signal_62})
-        self.ws_tm_update_track.emit({"switch_58": self.switch_58, "switch_62": self.switch_62, "signal_58": self.signal_58, "signal_62": self.signal_62})
+        self.wsh_tm_sig58.emit(self.signal_58)
         self.ws_tm_authority.emit(self.authority)
 
 
@@ -215,7 +218,7 @@ class WaysideWindow(QMainWindow):
         self.signal_62 = decoded_json["sig62"]
 
         self.ws_ctc_switch_result.emit({"result": True, "switch_58": self.switch_58, "switch_62": self.switch_62, "signal_58": self.signal_58, "signal_62": self.signal_62})
-        self.ws_tm_update_track.emit({"switch_58": self.switch_58, "switch_62": self.switch_62, "signal_58": self.signal_58, "signal_62": self.signal_62})
+        self.wsh_tm_sig62.emit(self.signal_62)
         self.ws_tm_authority.emit(self.authority)
 
 
