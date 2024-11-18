@@ -1,12 +1,12 @@
 import sys
 from PyQt6.QtWidgets import QApplication
-from SoftwareShell2 import Wayside_Shell
+from SoftwareShell import WaysideShell
 from TM_test import Track
 
 def main():
     
     tm=Track()
-    wss=Wayside_Shell()
+    wss=WaysideShell()
 
     #connect track model input of updated occupancy to wayside shell's update_occupancy function
     tm.tm_wss_occupancy.connect(wss.update_occupancy)

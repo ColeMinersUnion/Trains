@@ -104,43 +104,43 @@ class WaysideShell(QMainWindow):
 
     def toggle_switch_13(self):
         self.switch_13 = not self.switch_13
-        self.ws_tm_switch_13.emit(self.switch_13)
+        self.wss_tm_switch_13.emit(self.switch_13)
     
     def toggle_switch_28(self):
         self.switch_28 = not self.switch_28
-        self.ws_tm_switch_28.emit(self.switch_28)
+        self.wss_tm_switch_28.emit(self.switch_28)
 
     def toggle_switch_77(self):
         self.switch_77 = not self.switch_77
-        self.ws_tm_switch_77.emit(self.switch_77)
+        self.wss_tm_switch_77.emit(self.switch_77)
     
     def toggle_switch_85(self):
         self.switch_85 = not self.switch_85
-        self.ws_tm_switch_85.emit(self.switch_85)
+        self.wss_tm_switch_85.emit(self.switch_85)
 
     def toggle_signal_13(self):
         self.signal_13 = not self.signal_13
-        self.ws_tm_signal_13.emit(self.signal_13)
+        self.wss_tm_signal_13.emit(self.signal_13)
     
     def toggle_signal_28(self):
         self.signal_28 = not self.signal_28
-        self.ws_tm_signal_28.emit(self.signal_28)
+        self.wss_tm_signal_28.emit(self.signal_28)
     
     def toggle_signal_77(self):
         self.signal_77 = not self.signal_77
-        self.ws_tm_signal_77.emit(self.signal_77)
+        self.wss_tm_signal_77.emit(self.signal_77)
 
     def toggle_signal_85(self):
         self.signal_85 = not self.signal_85
-        self.ws_tm_signal_85.emit(self.signal_85)
+        self.wss_tm_signal_85.emit(self.signal_85)
     
     def toggle_crossing_19(self):
         self.crossing_19 = not self.crossing_19
-        self.ws_tm_crossing_19.emit(self.crossing_19)
+        self.wss_tm_crossing_19.emit(self.crossing_19)
     
     def toggle_crossing_108(self):
         self.crossing_108 =  not self.crossing_108
-        self.ws_tm_crossing_108.emit(self.crossing_108)
+        self.wss_tm_crossing_108.emit(self.crossing_108)
 
     def manual_inputs(self):
         self.ui.manual_sw13_button.clicked.connect(self.toggle_switch_13)
