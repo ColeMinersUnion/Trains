@@ -9,14 +9,15 @@ from Train import Train
 from TrainSchedule import TrainSchedule
 from Route import Route
 
+skips = greenSkips()
+green = Green()
+
 def Central():
-    skips = greenSkips()
-    green = Green()
+    
     SL = Skiplist(green, skips)
     return SL.skipRoute(0, 10)
 
 def CentralAuth():
-    green = Green()
     Thomas = TrainSchedule(green)
     skips = greenSkips()
     SL = Skiplist(green, skips)

@@ -1,4 +1,5 @@
-from datetime import datetime
+#
+# from datetime import datetime
 from PyQt6.QtWidgets import QWidget, QPushButton
 
 #?List of track lines
@@ -18,7 +19,7 @@ Green = ['Pioneer', 'Edgebrook', 'Station D',
 
 class NewTrainWidget(QWidget):
     def __init__(self):
-        self.arrivalTime = datetime.now()
+        self.arrivalTime = ""
         self.stationsList = []
         self.line = []
         self.submit = QPushButton()
