@@ -1,15 +1,13 @@
-from PyQt6.QtCore import pyqtSignal, pyqtSlot, QObject
-from PyQt6 import QtCore, QtGui, QtWidgets, uic
-from PyQt6.QtWidgets import * 
-import importlib
-import copy
-import sys
-from time import time
 
 from SoftwareShell2 import Wayside_Shell
-from GreenMainPLC import GreenPLC
+#from GreenMainPLC import GreenPLC
 
 def main():
+    # unit test for wayside software module
+    # testing the intake of a list of block occupancies from the track model 
+    # and producing correct values for updated authority, switch states, signals, and crossings 
+    # for the green line
+
     occ=[False for i in range(151)]
 
     sh=Wayside_Shell()

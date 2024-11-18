@@ -55,7 +55,6 @@ class PLC:
         for i in range(47, 58):
             if maint_prop[i] == False and self.maintenance[i] == True:
                 self.maintenance[i] = False
-                self.occupancy[i] = False
             elif maint_prop[i] == True and self.maintenance[i] == False:
 
                 maint_safety = True
@@ -65,12 +64,10 @@ class PLC:
                         break
                 if maint_safety == True:
                     self.maintenance[i] = True
-                    self.occupancy[i] = True
         
         for i in range(58, 62):
             if maint_prop[i] == False and self.maintenance[i] == True:
                 self.maintenance[i] = False
-                self.occupancy[i] = False
             elif maint_prop[i] == True and self.maintenance[i] == False:
 
                 maint_safety = True
@@ -80,12 +77,10 @@ class PLC:
                         break
                 if maint_safety == True:
                     self.maintenance[i] = True
-                    self.occupancy[i] = True
 
         for i in range(63, 69):
             if maint_prop[i] == False and self.maintenance[i] == True:
                 self.maintenance[i] = False
-                self.occupancy[i] = False
             elif maint_prop[i] == True and self.maintenance[i] == False:
 
                 maint_safety = True
@@ -95,7 +90,6 @@ class PLC:
                         break
                 if maint_safety == True:
                     self.maintenance[i] = True
-                    self.occupancy[i] = True
 
         for i in range(69, 77):
             if maint_prop[i] == False and self.maintenance[i] == True:
@@ -110,10 +104,9 @@ class PLC:
                         break
                 if maint_safety == True:
                     self.maintenance[i] = True
-                    self.occupancy[i] = True
+
         
-        self.update_authority(self.occupancy)
-        return self.occupancy, self.authority, self.maintenance
+        
 
 
     def update_authority(self, occ):
@@ -138,3 +131,37 @@ class PLC:
         self.authority = auth
         self.update_signals()
         return self.authority
+    
+    def toggle_sw58(self):
+        if not any(self.occupancy[41:77]):
+            self.sw58 = not self.sw58
+            self.update_authority(self.occupancy)
+
+    
+    def toggle_sw62(self):
+        if not any(self.occupancy[41:77]):
+            self.sw62 = not self.sw62
+            self.update_authority(self.occupancy)
+        
+
+    def toggle_sig58(self):
+        if not any(self.occupancy[41:77]):
+            self.sig58 = not self.sig58
+
+    def toggle_sig62(self):
+        if not any(self.occupancy[41:77]):
+            self.sig62 = not self.sig62
+
+    def maint_sw58(self):
+        if self.maintenance[57] and self.maintenance[58]:
+            self.sw58 = not self.sw58
+
+    def maint_sw62(self):      
+        if self.maintenance[62] and self.maintenance[63]:
+            self.sw62 = not self.sw62
+    
+if __name__ == "__main__":
+    plc = PLC()
+    test_maint = [False for i in range(151)]
+    test_maint[47] = True
+    plc.ctc_update_maintenance(test_maint)
