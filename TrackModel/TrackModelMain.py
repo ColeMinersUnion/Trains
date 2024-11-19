@@ -1,7 +1,7 @@
 import sys
 from PyQt6.QtWidgets import QWidget, QLabel, QPushButton, QLineEdit, QSlider, QApplication
 from PyQt6.QtGui import QTransform, QPixmap
-from PyQt6.QtCore import Qt,QTimer,QObject
+from PyQt6.QtCore import Qt,QTimer,QObject, pyqtSignal, pyqtSlot
 import pandas as pd #reading the excel file
 from math import atan2,pi,sqrt,pow,sin,cos
 
@@ -301,13 +301,15 @@ def read(file):
     return
 
 class SignalHandler(QObject):
-    def __init__():
+    def __init__(self):
         super().__init__()
 
     
-
+    @pyqtSlot(bool)
     def getSwitch13(self,message):
         lines[0].switches[0].setToLeft(message) 
+        print("Switch 13: " + str(message))
+
 
     def getSwitch28(self,message):
         lines[0].switches[1].setToLeft(message) 
@@ -752,4 +754,6 @@ def main():
     testbench.show()
     sys.exit(app.exec())
 
-main()
+
+if __name__ == "__main__":
+    main()
