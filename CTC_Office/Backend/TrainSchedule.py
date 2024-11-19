@@ -1,6 +1,7 @@
 #from Node import Node
 from Graph import Graph
 from Route import Route
+from Skiplist import Skiplist
 
 class TrainSchedule:
     def __init__(self, line : Graph = None, stations : list = []) -> None:
@@ -61,6 +62,9 @@ class TrainSchedule:
                 oldStop = nextStop
             return
         
+    def makeSkips(self) -> None:
+        return #! This is a placeholder for now
+
 
 if(__name__ == '__main__'):
     from GetGreen import Green

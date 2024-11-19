@@ -213,7 +213,18 @@ def Green() -> Graph:
 
     return Greenline
 
-
+if __name__ == '__main__':
+    from Default import greenSkips
+    greenSkips = greenSkips()
+    from Skiplist import Skiplist
+    green = Green()
+    SL = Skiplist(green, greenSkips)
+    Rt = SL.skipRoute(0, 21)
+    #print(Rt)
+    speedLimits = []
+    for i in Rt:
+        speedLimits.append(green.graph[i].speed_limit)
+    print(speedLimits)
 
 
 

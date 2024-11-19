@@ -5,4 +5,4 @@ import math
 #returns a list of stations for each train. 
 #Dict [{Line: line, station: [stations]}]
 def readSchedule(fn: str = "") -> list:
-    
+    return []

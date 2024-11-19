@@ -1,8 +1,10 @@
 from datetime import datetime
-from PyQt6.QtWidgets import QListWidget
+from PyQt6.QtWidgets import QListWidget, QWidget
 
-class SchedulePreviewer:
+
+class SchedulePreviewer(QWidget):
     def __init__(self):
+        super().__init__()
         self.trains = {}
         self.display
         self.widget = QListWidget()
