@@ -223,8 +223,8 @@ if __name__ == '__main__':
     #print(Rt)
     speedLimits = []
     for i in Rt:
-        speedLimits.append(green.graph[i].speed_limit)
-    print(speedLimits)
+        speedLimits.append((green.graph[i].index, green.graph[i].block_length, green.graph[i].speed_limit))
+    print(f'{len(speedLimits)}: {speedLimits}')
 
 
 
