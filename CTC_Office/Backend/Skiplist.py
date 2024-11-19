@@ -1,5 +1,3 @@
-#Enforcing a default route. ALternative to route from 
-
 class Skiplist:
     def __init__(self, graph = None, skips: dict = None):
         self.graph = graph #This will be a graph, it's the list I'm skipping over. 
