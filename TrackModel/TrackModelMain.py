@@ -306,6 +306,10 @@ class SignalHandler(QObject):
     def __init__(self):
         super().__init__()
 
+    def callOccSend(self,occupancies):
+        self.sendOccupancies.emit(occupancies)
+        print(occupancies)
+
     @pyqtSlot(bool)
     def getSwitch13(self,message):
         lines[0].switches[0].setToLeft(message) 
@@ -334,7 +338,7 @@ class SignalHandler(QObject):
     def getCrossing19(self,message):
         lines[0].crossings[0].on=message #crossing 19
 
-    
+    @pyqtSlot(bool)
     def getCrossing108(self,message):
         lines[0].crossings[1].on=message #crossing 108
 
@@ -555,7 +559,7 @@ class BlockIcon(QWidget):
         objfail = lines[self.obj.linenum].blocks[self.obj.number].failure
         if(objfail == 0):
             lines[self.obj.linenum].blocks[self.obj.number].failure = failmode
-            if(objfail in [1,3]):
+            if(failmode in [1,3]):
                 lines[self.obj.linenum].blocks[self.obj.number].occupied = True      
 
 class SwitchIcon(QWidget):
@@ -696,7 +700,7 @@ class Map(QWidget):
         occupancies=[]
         for b in lines[0].blocks:
             occupancies.append(b.occupied)
-        self.signals.sendOccupancies.emit(occupancies)
+        self.signals.callOccSend(occupancies)
 
 class Testbench(QWidget):
     def __init__(self):
