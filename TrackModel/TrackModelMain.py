@@ -109,7 +109,7 @@ class Switch:
 
     #set switch to left
     def setToLeft(self,bool):
-        self.leftside = True
+        self.leftside = bool
         self.updateEnds()
     
     #get the open block
@@ -301,36 +301,42 @@ def read(file):
     return
 
 class SignalHandler(QObject):
+    sendOccupancies = pyqtSignal(list)
+
     def __init__(self):
         super().__init__()
 
-    
     @pyqtSlot(bool)
     def getSwitch13(self,message):
         lines[0].switches[0].setToLeft(message) 
-        print("Switch 13: " + str(message))
 
-
+    @pyqtSlot(bool)
     def getSwitch28(self,message):
-        lines[0].switches[1].setToLeft(message) 
+        lines[0].switches[1].setToLeft(not message) 
 
+    @pyqtSlot(bool)
     def getSwitch58(self,message):
         lines[0].switches[2].setToLeft(message)
 
+    @pyqtSlot(bool)
     def getSwitch62(self,message):
         lines[0].switches[3].setToLeft(message)
 
+    @pyqtSlot(bool)
     def getSwitch77(self,message):
-        lines[0].switches[4].setToLeft(message)
+        lines[0].switches[4].setToLeft(not message)
 
-    def getSwitch105(self,message):    
+    @pyqtSlot(bool)
+    def getSwitch85(self,message):    
         lines[0].switches[5].setToLeft(message)
 
+    @pyqtSlot(bool)
     def getCrossing19(self,message):
-        lines[0].crossings[0].on=message #switch 19
+        lines[0].crossings[0].on=message #crossing 19
 
+    
     def getCrossing108(self,message):
-        lines[0].crossings[1].on=message #switch 108
+        lines[0].crossings[1].on=message #crossing 108
 
 
 
@@ -549,7 +555,8 @@ class BlockIcon(QWidget):
         objfail = lines[self.obj.linenum].blocks[self.obj.number].failure
         if(objfail == 0):
             lines[self.obj.linenum].blocks[self.obj.number].failure = failmode
-        
+            if(objfail in [1,3]):
+                lines[self.obj.linenum].blocks[self.obj.number].occupied = True      
 
 class SwitchIcon(QWidget):
     def __init__(self,obj,window):
@@ -666,6 +673,8 @@ class Map(QWidget):
         self.tenBaud=QTimer() #timer for active components
         self.tenBaud.timeout.connect(self.tenBaudClock) #connect timer to update method
         self.tenBaud.start(1) #set clock speed of timer
+
+        self.signals=SignalHandler()
     
     def tenBaudClock(self):
         global lines
@@ -687,6 +696,7 @@ class Map(QWidget):
         occupancies=[]
         for b in lines[0].blocks:
             occupancies.append(b.occupied)
+        self.signals.sendOccupancies.emit(occupancies)
 
 class Testbench(QWidget):
     def __init__(self):
@@ -753,7 +763,6 @@ def main():
     trackmap.show()
     testbench.show()
     sys.exit(app.exec())
-
 
 if __name__ == "__main__":
     main()

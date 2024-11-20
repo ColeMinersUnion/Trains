@@ -76,7 +76,7 @@ class Wayside_Shell(QObject):
     #then send out updated authority, switches, signals, crossings 
     @pyqtSlot(list)
     def update_occupancy(self, new_occupancy):
-        
+        print("occupancy updated")
         #self.authority,self.switch_77,self.switch_85,self.switch_28,self.switch_13 = self.plc.update_values(new_occupancy) 
         self.authority,self.switch_77,self.switch_85,self.switch_28,self.switch_13,self.signal_77, self.signal_85, self.signal_28, self.signal_13, self.crossing_19, self.crossing_108 = self.plc.update_values(new_occupancy)
         #emitting updated authority and switch, signal, crossing states:
