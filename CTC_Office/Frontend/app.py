@@ -1,5 +1,6 @@
 #from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtWidgets import QMainWindow, QPushButton, QScrollArea, QVBoxLayout, QWidget, QLineEdit, QLabel
+from PyQt6.QtCore import pyqtSlot
 from Components.SchedulePreviewer import SchedulePreviewer
 from Components.NewTrainWidget import NewTrainWidget
 from datetime import datetime
@@ -17,6 +18,7 @@ class CTCApplication(QMainWindow):
     def __init__(self, Office = None):
         super().__init__()
         self.Office = Office
+        self.Office.addGreenLine()
         self.scheduleWidget = SchedulePreviewer()
         self.newTrainWidget = NewTrainWidget(Green)
         self.button = QPushButton("Move")
@@ -208,6 +210,17 @@ class CTCApplication(QMainWindow):
                 self.switchState.setText("Down")
 
             time.sleep(train.waitTime(speedUp=True))
+
+    @pyqtSlot(list)
+    def updateOccupancy(self, occupancies: list):
+        line = ""
+        if(len(occupancies) == 150):
+            line = "Green"
+        else:
+            line = "Red"
+        self.Office.updateTrack(line, occupancies)
+        return True
+        
 
 
 

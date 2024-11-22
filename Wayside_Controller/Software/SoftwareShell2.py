@@ -96,7 +96,7 @@ class Wayside_Shell(QObject):
         self.wss_tm_crossing_19.emit(self.crossing_19)
         self.wss_tm_crossing_108.emit(self.crossing_108)
 
-        return self.authority,self.switch_77,self.switch_85,self.switch_28,self.switch_13,self.signal_77,self.signal_85,self.signal_28,self.signal_13,self.crossing_19,self.crossing_108
+        #return self.authority,self.switch_77,self.switch_85,self.switch_28,self.switch_13,self.signal_77,self.signal_85,self.signal_28,self.signal_13,self.crossing_19,self.crossing_108
 
     #slot to receive dispatch info from ctc
     '''@pyqtSlot(tuple)
