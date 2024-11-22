@@ -9,7 +9,7 @@ from math import atan2,pi,sqrt,pow,sin,cos
 XOFFSET = 0
 YOFFSET = 3
 SCL=20 #scale
-
+occflag = True
 linenames=[]
 lines=[] 
 switchid=[] #track switch numbers for pinging
@@ -32,7 +32,7 @@ class Block:
         self.underground = underground
         self.x=x1
         self.y=y1
-        self.occupied = False
+        self._occupied = False
         self.adj = {adj1,adj2}
         self.center = [(x1+x2)/2,(y1+y2)/2] #center for front end
         self.mag = sqrt(((x2-x1)*(x2-x1))+((y2-y1)*(y2-y1))) #magnitude for front end
@@ -51,6 +51,19 @@ class Block:
         r = r + "\nUnderground: " + str(underground) 
         r = r + "\nOccupied: "
         self.msg = r    
+
+    @property
+    def occupied(self):
+        return self._occupied
+    
+    @occupied.setter
+    def occupied(self,newocc):
+        self._occupied = newocc
+        self.onOccChange()
+
+    def onOccChange(self):
+        global occflag
+        occflag = True    
 
     def toString(self):
         connections = ""
@@ -161,16 +174,11 @@ class Station: #yard also
             self.msg = "Station " + str(name) + "\nSide " + str(side) + "\n" + linenames[linenum] + " Line, Block " + str(block)
 
 class Train:
-    def __init__(self,linenum,block1,length):
+    def __init__(self,linenum,block1):
         global lines
         self.linenum = linenum
-        self.block1 = block1
-        self.block2 = block1 #train can occupy multiple blocks
-        self.prevblock = block1
-        self.length=length
-        self.velocity = 0
-        self.pos = 0
-        lines[self.linenum].blocks[self.block2].occupied = True
+        self.blocks = {block1}
+        lines[self.linenum].blocks[self.block1].occupied = True
         '''
         msgqueue = 10 Baud messages passed by wayside to train via track
         tenbaud = 10 bauds available after processing the bud limit
@@ -180,33 +188,14 @@ class Train:
         self.tenbaud = [False,False,False,False,False,False,False,False,False,False]
         self.beacondata = ""
 
-    def addPos(self,x):
-        global lines
-        self.pos = self.pos + x
-        lines[self.linenum].blocks[self.block1].occupied = False
-        lines[self.linenum].blocks[self.block2].occupied = False
-        if self.pos>(lines[self.linenum].blocks[self.block1].length-self.length): 
-            self.block2 = self.block1 #move train off old track if up far enough
-        if self.pos>(lines[self.linenum].blocks[self.block1].length): #change track if past
-            self.pos -= lines[self.linenum].blocks[self.block1].length
-            potential=lines[self.linenum].blocks[self.block1].adj #potential screw-up: switch train leaves changes before finishing block
-            print(" ".join(map(str,potential)) + " " + str(self.prevblock) + "\n")
-            if(self.prevblock in potential):
-                potential.remove(self.prevblock) #remove previous block from options
-            self.prevblock = self.block1                                                                                                                                            
-            self.block1=list(potential)[0] #choose block that remains
-            if self.block1==None:
-                    lines[self.linenum].trains.remove(self)
-                    del self
-                    return
-            print("Train on block " + str(self.block1) + "\n")
-        lines[self.linenum].blocks[self.block1].occupied = True
-        lines[self.linenum].blocks[self.block2].occupied = True
-        self.beacondata = "" #can't nest transponder function
-        for x in lines[self.linenum].transponders:
-            if (x.block==self.block1):
-                self.beacondata = x.data
-        
+    def addOcc(self,block):
+        self.blocks.add(block)
+        lines[self.linenum].blocks[block].occupied = True
+    
+    def removeOcc(self,block):
+        if(block in self.blocks):
+            self.blocks.remove(block)
+        lines[self.linenum].blocks[block].occupied = False
     
     def queueMessage(self,bool):
         self.msgqueue.append(bool)
@@ -452,6 +441,7 @@ class TrainOccupy(QWidget):
         self.blocknum = blocknum
         self.label = QLabel(window)
         self.center = lines[linenum].blocks[blocknum].center
+        self.check=False
         pixmap = QPixmap('TrackModel/Icons/TrainOccupy.png')
         pixmap = pixmap.transformed(QTransform().scale(SCL/100,SCL/100))
         self.label.setPixmap(pixmap)
@@ -462,11 +452,14 @@ class TrainOccupy(QWidget):
         self.update()
 
     def update(self):
-        if(lines[self.linenum].blocks[self.blocknum].occupied):
-            self.label.move((int((self.center[0]-0.125)*SCL)),int((self.center[1]+0.175)*SCL))
-        else:
-            self.label.move(-100,-100)
-        self.label.show()
+        occ = lines[self.linenum].blocks[self.blocknum].occupied
+        if(self.check!=occ):
+            if(occ):
+                self.label.move((int((self.center[0]-0.125)*SCL)),int((self.center[1]+0.175)*SCL))
+            else:
+                self.label.move(-100,-100)
+            self.label.show()
+            self.check=occ
 
 
 class Failure(QWidget):
@@ -477,6 +470,7 @@ class Failure(QWidget):
         self.blocknum = blocknum
         self.label = QLabel(window)
         self.center = lines[linenum].blocks[blocknum].center
+        self.check=0
         pixmap = QPixmap('TrackModel/Icons/RailFailure.png')
         self.label.setPixmap(pixmap)
         self.label.move(-100,-100)
@@ -486,15 +480,17 @@ class Failure(QWidget):
         
     def update(self):
         objfail = lines[self.linenum].blocks[self.blocknum].failure
-        if(objfail==0):
-            self.label.move(-100,-100)
-        else:
-            pixmap = QPixmap('TrackModel/Icons/' + failnames[objfail] + 'Failure.png')
-            pixmap = pixmap.transformed(QTransform().scale(SCL/100,SCL/100))
-            self.label.setPixmap(pixmap)
-            self.label.move((int((self.center[0]-0.35)*SCL)),int((self.center[1]+0.225)*SCL))
-            self.label.setToolTip(failnames[objfail] + " Failure\n" + linenames[self.linenum] + " Line, Block " + str(self.blocknum))
-        self.label.show()
+        if(self.check!=objfail):
+            if(objfail==0):
+                self.label.move(-100,-100)
+            else:
+                pixmap = QPixmap('TrackModel/Icons/' + failnames[objfail] + 'Failure.png')
+                pixmap = pixmap.transformed(QTransform().scale(SCL/100,SCL/100))
+                self.label.setPixmap(pixmap)
+                self.label.move((int((self.center[0]-0.125)*SCL)),int((self.center[1]-0.45)*SCL))
+                self.label.setToolTip(failnames[objfail] + " Failure\n" + linenames[self.linenum] + " Line, Block " + str(self.blocknum))
+            self.label.show()
+            self.check=objfail
 
         
 
@@ -503,14 +499,13 @@ class FailureSelect(QWidget):
         super().__init__()
         self.label = QLabel(window)
         self.label.setPixmap(QPixmap('TrackModel/Icons/FailureSelect.png'))
+        self.check=0
         self.update()
     
     def update(self):
-        if(failmode==0):
-            self.label.move(-100,-100)
-        else:
+        if(self.check!=failmode):
             self.label.move(180+failmode*45,50)
-        
+            self.check=failmode
 
 class FailureButton(QWidget):
     def __init__(self,failnum,window):
@@ -541,7 +536,7 @@ class BlockIcon(QWidget):
         self.obj=obj
         pixmap = QPixmap('TrackModel/Icons/' + linenames[obj.linenum] + 'Arrow' + ('Bi' if (obj.twoway) else '') + '.png')
         self.label=QLabel(window)
-        pixmap = pixmap.transformed(QTransform().scale(obj.mag*SCL/100,SCL/100))
+        pixmap = pixmap.transformed(QTransform().scale(obj.mag*SCL/100,SCL/50))
         pixmap = pixmap.transformed(QTransform().rotate(self.obj.angle))
         self.label.setPixmap(pixmap)
         self.label.setToolTip(obj.toString())
@@ -561,10 +556,8 @@ class BlockIcon(QWidget):
     def setFailure(self,event):
         global failmode
         objfail = lines[self.obj.linenum].blocks[self.obj.number].failure
-        if(objfail == 0):
-            lines[self.obj.linenum].blocks[self.obj.number].failure = failmode
-            if(failmode in [1,3]):
-                lines[self.obj.linenum].blocks[self.obj.number].occupied = True      
+        lines[self.obj.linenum].blocks[self.obj.number].failure = failmode
+        lines[self.obj.linenum].blocks[self.obj.number].occupied = (failmode in [1,3])      
 
 class SwitchIcon(QWidget):
     def __init__(self,obj,window):
@@ -584,16 +577,19 @@ class SwitchIcon(QWidget):
         self.closedlabel.setToolTip("Switched closed")
         self.closedlabel.setStyleSheet(labelstyle)
         self.setStyleSheet(tooltipstyle)
+        self.check=[0,0]
         
     def update(self):
         global lines
         tempobj=lines[self.linenum].switches[self.switchid]
         opencenter=lines[tempobj.linenum].blocks[tempobj.getopen()].center
-        closedcenter=lines[tempobj.linenum].blocks[tempobj.getclosed()].center
-        self.openlabel.move(int((opencenter[0]-0.125)*SCL),int((opencenter[1]+0.225)*SCL))
-        self.closedlabel.move(int((closedcenter[0]-0.125)*SCL),int((closedcenter[1]+0.225)*SCL))
-        self.openlabel.show()
-        self.closedlabel.show()
+        if(self.check!=opencenter):
+            closedcenter=lines[tempobj.linenum].blocks[tempobj.getclosed()].center
+            self.openlabel.move(int((opencenter[0]-0.125)*SCL),int((opencenter[1]+0.225)*SCL))
+            self.closedlabel.move(int((closedcenter[0]-0.125)*SCL),int((closedcenter[1]+0.225)*SCL))
+            self.openlabel.show()
+            self.closedlabel.show()
+            self.check=opencenter
     
 class CrossingIcon(QWidget):
     def __init__(self,obj,window):
@@ -601,6 +597,7 @@ class CrossingIcon(QWidget):
         self.linenum=obj.linenum
         self.crossingid=obj.crossingid
         self.label=QLabel(window)
+        self.check=True
         center = lines[obj.linenum].blocks[obj.block].center
         self.label.move(int((center[0]-0.25)*SCL),int((center[1]-0.225)*SCL))
         self.label.setStyleSheet(labelstyle)
@@ -608,16 +605,17 @@ class CrossingIcon(QWidget):
         self.update()
 
     def update(self):
-        tempobj = lines[self.linenum].crossings[self.crossingid]
-        if (tempobj.on==True):
-            self.pixmap = QPixmap('TrackModel/Icons/OnCrossing.png')
-
-        else:
-            self.pixmap = QPixmap('TrackModel/Icons/OffCrossing.png')
-        self.pixmap = self.pixmap.transformed(QTransform().scale(SCL/100,SCL/100))
-        self.label.setPixmap(self.pixmap)
-        self.label.setToolTip(tempobj.toString())
-        self.label.show()
+        obj = lines[self.linenum].crossings[self.crossingid]
+        if(self.check!=obj.on):
+            if (obj.on):
+                self.pixmap = QPixmap('TrackModel/Icons/OnCrossing.png')
+            else:
+                self.pixmap = QPixmap('TrackModel/Icons/OffCrossing.png')
+            self.check=obj.on
+            self.pixmap = self.pixmap.transformed(QTransform().scale(SCL/100,SCL/100))
+            self.label.setPixmap(self.pixmap)
+            self.label.setToolTip(obj.toString())
+            self.label.show()
 
 class TransponderIcon(QWidget):
     def __init__(self,obj,window):
@@ -695,16 +693,18 @@ class Map(QWidget):
             for l in lines:
                 for t in l.trains:
                     t.tenBaudMessage()
-
-        
     
     def update(self): 
+        global occflag
         for a in active:
             a.update() #update every active component
-        occupancies=[]
-        for b in lines[0].blocks:
-            occupancies.append(b.occupied)
-        self.signals.callOccSend(occupancies)
+        if(occflag):
+            print("occ update")
+            occupancies=[]
+            for b in lines[0].blocks:
+                occupancies.append(b.occupied)
+            self.signals.callOccSend(occupancies)
+            occflag = False
 
 class Testbench(QWidget):
     def __init__(self):
@@ -724,17 +724,13 @@ class Testbench(QWidget):
         crossingbutton = QPushButton("Change crossing", self)
         crossingbutton.move(100,100)
         crossingbutton.clicked.connect(self.flipCrossing)
-
-        trainbutton = QPushButton("Spawn/move train", self)
-        trainbutton.move(100,125)
-        trainbutton.clicked.connect(self.moveTrain)
         
         param1=QLabel("Line number",self)
         param1.move(100,175)
         self.input1 = QLineEdit(self)
         self.input1.move(100,200)
 
-        param2=QLabel("Component # / Length (m) / Displace (m)",self)
+        param2=QLabel("Component number",self)
         param2.move(100,250)
         self.input2 = QLineEdit(self)
         self.input2.move(100,275)
@@ -753,14 +749,7 @@ class Testbench(QWidget):
         line = int(self.input1.text())
         comp = int(self.input2.text())
         if(comp<len(lines[line].crossings)):
-            lines[line].crossings[comp].switch()
-    def moveTrain(self):
-        line = int(self.input1.text())
-        comp = int(self.input2.text())
-        if len(lines[line].trains)==0:
-            lines[line].trains.append(Train(line,63,comp))
-        else:
-            lines[line].trains[0].addPos(comp)
+            lines[line].crossings[comp].f()
 
 # MAIN BRANCH
 
