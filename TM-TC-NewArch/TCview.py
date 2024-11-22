@@ -1,6 +1,6 @@
   # train_controller/view.py
-from PyQt5.QtWidgets import QWidget, QSlider, QVBoxLayout, QLabel
-from PyQt5.QtCore import Qt, pyqtSignal as Signal, QTimer
+from PyQt6.QtWidgets import QWidget, QSlider, QVBoxLayout, QLabel
+from PyQt6.QtCore import Qt, pyqtSignal as Signal, QTimer
 
 class TCView(QWidget):
     setpoint_command_signal = Signal(float)

@@ -1,5 +1,5 @@
 # train_model/model.py
-from PyQt5.QtCore import QObject, pyqtSignal as Signal, pyqtSlot as Slot
+from PyQt6.QtCore import QObject, pyqtSignal as Signal, pyqtSlot as Slot
 import random, time
 T = 0.125  #Period of control loop in seconds
 class TrainModel(QObject):
@@ -32,6 +32,10 @@ class TrainModel(QObject):
         self.rightDoorStatus = False
         self.leftDoorStatus = False
         self.serviceBrakeStatus = False
+        #self.routeInfo = routeInfo
+        #self.blockID
+        #self.blockLength
+        #self.speedLimit
         self.calcTotalMass()
 
     """ velocity calculation """

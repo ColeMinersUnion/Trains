@@ -1,5 +1,5 @@
 # train_controller/model.py
-from PyQt5.QtCore import QObject, pyqtSignal as Signal, pyqtSlot as Slot
+from PyQt6.QtCore import QObject, pyqtSignal as Signal, pyqtSlot as Slot
 T = 0.125  #Period of control loop in seconds
 P_MAX = 120000  #Maximum power output
 class TCmodel(QObject):

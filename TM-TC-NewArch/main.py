@@ -1,5 +1,5 @@
 # main.py
-from PyQt5.QtWidgets import QApplication
+from PyQt6.QtWidgets import QApplication
 from TMmodel import TrainModel
 from TMview import TrainModelView
 from TMcontroller import TrainModelController
