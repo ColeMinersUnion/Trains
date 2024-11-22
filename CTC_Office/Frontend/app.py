@@ -18,6 +18,7 @@ class CTCApplication(QMainWindow):
     def __init__(self, Office = None):
         super().__init__()
         self.Office = Office
+        self.Office.addGreenLine()
         self.scheduleWidget = SchedulePreviewer()
         self.newTrainWidget = NewTrainWidget(Green)
         self.button = QPushButton("Move")
