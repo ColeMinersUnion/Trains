@@ -308,7 +308,7 @@ class SignalHandler(QObject):
 
     def callOccSend(self,occupancies):
         self.sendOccupancies.emit(occupancies)
-        print(occupancies)
+        print(occupancies[1])
 
     @pyqtSlot(bool)
     def getSwitch13(self,message):
