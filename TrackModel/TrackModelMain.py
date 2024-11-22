@@ -15,7 +15,7 @@ lines=[]
 switchid=[] #track switch numbers for pinging
 crossingid=[] #track crossing numbers for pinging
 failmode = 0
-failnames = ["None","Rail","Circuit","Power"]
+failnames = ["No","Rail","Circuit","Power"]
 heaters = False
 speed = 1
 class Block:
@@ -309,6 +309,10 @@ class SignalHandler(QObject):
     def callOccSend(self,occupancies):
         self.sendOccupancies.emit(occupancies)
         print(occupancies[1])
+
+    @pyqtSlot(int)
+    def toggleOccupancy(self,message):
+        lines[0].blocks[message].occupied = not lines[0].blocks[message].occupied
 
     @pyqtSlot(bool)
     def getSwitch13(self,message):
@@ -655,8 +659,8 @@ class Map(QWidget):
         self.setStyleSheet("background-color: lightyellow;")
         read('TrackModel/Green Line.xlsx')
         passive.append(HeaterSystem(self))
-        for i in range(3):
-            passive.append(FailureButton((i+1),self)) #add failure buttons
+        for i in range(4):
+            passive.append(FailureButton((i),self)) #add failure buttons
         for line in lines:
             for block in line.blocks:
                 active.append(BlockIcon(block,self)) #updates for view
