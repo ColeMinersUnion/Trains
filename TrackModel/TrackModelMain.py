@@ -60,6 +60,7 @@ class Block:
     
     def switchOccupancy(self):
         self.occupied = not self.occupied
+
 class Switch:
 #note, structuring switch depends on section, include that?)
     #instantiation
@@ -125,6 +126,7 @@ class Switch:
             return self.blocks[2]
         else:
             return self.blocks[1]
+
 class Crossing:
     #instantiation
     def __init__(self,linenum,block):
@@ -140,6 +142,7 @@ class Crossing:
     #change state of crossing
     def switch(self):
         self.on = not self.on
+
 class Transponder:
     #instantiation
     def __init__(self,linenum,block,data):
@@ -147,6 +150,7 @@ class Transponder:
         self.block = block 
         self.data = data
         self.msg = "Beacon (" + linenames[linenum] + " Line, Block " + str(block) + ")\n" + data
+
 class Station: #yard also
     #instantiation
     def __init__(self,linenum,block,name,side):
@@ -215,8 +219,7 @@ class Train:
             self.tenbaud.append(self.msgqueue[0])
             while(len(self.tenbaud>10)):
                 self.tenbaud.remove(0)
-
-        
+       
 
 class Line:
     def __init__(self,linenum):
@@ -331,13 +334,6 @@ class SignalHandler(QObject):
 
     def getCrossing108(self,message):
         lines[0].crossings[1].on=message #switch 108
-
-
-
-
-    
-    
-
 # FRONT END BRANCH
 
 passive = [] #no update method, do not react to backend changes
@@ -481,7 +477,6 @@ class Failure(QWidget):
             self.label.move((int((self.center[0]-0.35)*SCL)),int((self.center[1]+0.225)*SCL))
             self.label.setToolTip(failnames[objfail] + " Failure\n" + linenames[self.linenum] + " Line, Block " + str(self.blocknum))
         self.label.show()
-
         
 
 class FailureSelect(QWidget):

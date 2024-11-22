@@ -22,6 +22,7 @@ class CTC_Office:
         try:
             from GetBlue import Blue
             cls.line["Blue"] = Blue(broken=False)
+            cls.Schedule["Blue"] = Schedule("Blue")
             return True
         except:
             print("Blue Line Init Failed")
@@ -31,6 +32,7 @@ class CTC_Office:
         try:
             from GetGreen import Green
             cls.line["Green"] = Green()
+            cls.Schedule["Green"] = Schedule("Green")
             return True
         except:
             print("Green Line Init Failed")
