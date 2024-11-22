@@ -210,7 +210,6 @@ def Green() -> Graph:
     #?Section Z
     Greenline.graph.append(Node(index=150, line="Green", section="Z", block_length=35, block_grade=0, speed_limit=20, infrastructure="", elevation=0, cumulative_elevation=0, connections=[28]))
 
-
     return Greenline
 
 if __name__ == '__main__':

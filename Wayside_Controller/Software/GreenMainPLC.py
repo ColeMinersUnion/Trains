@@ -34,7 +34,7 @@ class GreenPLC:
                         self.occupancies[101:109], #RST
                         self.occupancies[110:121], #UV
                         self.occupancies[122:143], #W
-                        self.occupancies[144:150]] #XYZ '''
+                        self.occupancies[144:150]] #XYZ ''' 
     
     #intakes new occupancies from track model and switch defaults from the shell
     def update_values(self, occupancy):
