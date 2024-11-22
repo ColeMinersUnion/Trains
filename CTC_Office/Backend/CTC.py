@@ -135,7 +135,7 @@ class CTC_Office:
                     cls.line[line].closed = True
 
 
-                                
+                             
         
 
     
