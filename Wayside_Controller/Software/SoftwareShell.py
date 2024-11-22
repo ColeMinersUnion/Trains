@@ -10,10 +10,12 @@ import sys
 from time import time
 
 from Wayside_Controller.Software.GreenMainPLC import GreenPLC
-#from TM_test import Track
+#uncomment this to test/run wayside software UI by itself:
+#from GreenMainPLC import GreenPLC
 
 class WaysideShell(QMainWindow):
     wss_tm_authority = pyqtSignal(list)
+    wss_ctc_occupancy = pyqtSignal(list)
     #ws_tm_dispatch = pyqtSignal(tuple)
 
     wss_tm_switch_13 = pyqtSignal(bool)
@@ -34,42 +36,33 @@ class WaysideShell(QMainWindow):
        # self.app = app
         self.ui = uic.loadUi('Wayside_Controller/Software/app.ui')
 
-        #creating objects to connect signals to slots
         self.plc = GreenPLC()
-        #self.tm = Track()
-
+        
         self.occupancy = [False for i in range(1,151)]
         self.authority = [False for i in range(1,151)]
-
+        #switches
         self.switch_13 = True
         self.switch_28 = False
         self.switch_77 = False
         self.switch_85 = True
         #self.maintenance = [False for i in range(1,150)]   
-
+        #signals
         self.signal_13 = False
         self.signal_28 = False
         self.signal_77 = False
         self.signal_85 = False
-
+        #crossings
         self.crossing_19 = False
         self.crossing_108 = False
 
         #lets user toggle buttons manually
         self.manual_inputs()
 
-        #insert action to connect self.occupancy to incoming  occupancy signal from track model to update_occupancy func
-        #self.tm.tm_ws_occupancy.connect(self.update_occupancy)
 
-        self.timer = QtCore.QTimer()
+        '''self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.update_ui) 
-        self.timer.start(15) 
+        self.timer.start(15)''' 
 
-
-
-    ''' def run(self):
-        
-        self.app.exec()'''
     
     #slot to update occupancy which then updates the plc authority
     #then send out updated authority, switches, signals, crossings 
@@ -77,9 +70,10 @@ class WaysideShell(QMainWindow):
     def update_occupancy(self, new_occupancy):
         
         #self.authority,self.switch_77,self.switch_85,self.switch_28,self.switch_13 = self.plc.update_values(new_occupancy) 
-        self.authority,self.switch_77,self.switch_85,self.switch_28,self.switch_13,self.signal_77, self.signal_85, self.signal_28, self.signal_13, self.crossing_19, self.crossing_108 = self.plc.update_values(new_occupancy)
+        self.occupancy,self.authority,self.switch_77,self.switch_85,self.switch_28,self.switch_13,self.signal_77, self.signal_85, self.signal_28, self.signal_13, self.crossing_19, self.crossing_108 = self.plc.update_values(new_occupancy)
         #emitting updated authority and switch, signal, crossing states:
         self.wss_tm_authority.emit(self.authority)
+        self.wss_ctc_occupancy.emit(self.occupancy)
 
         self.wss_tm_switch_77.emit(self.switch_77)
         self.wss_tm_switch_85.emit(self.switch_85)
@@ -94,6 +88,7 @@ class WaysideShell(QMainWindow):
         self.wss_tm_crossing_19.emit(self.crossing_19)
         self.wss_tm_crossing_108.emit(self.crossing_108)
 
+        self.update_ui()
         #uncomment this when testing the shell:
         #return self.authority,self.switch_77,self.switch_85,self.switch_28,self.switch_13,self.signal_77,self.signal_85,self.signal_28,self.signal_13,self.crossing_19,self.crossing_108
 
@@ -201,13 +196,13 @@ class WaysideShell(QMainWindow):
             self.ui.wayside_elements_table.setItem(7,0, QTableWidgetItem("Red"))
         #update crossings
         if(self.crossing_19):
-            self.ui.wayside_elements_table.setItem(8,0, QTableWidgetItem("Green"))
+            self.ui.wayside_elements_table.setItem(8,0, QTableWidgetItem("Down"))
         else:
-            self.ui.wayside_elements_table.setItem(8,0, QTableWidgetItem("Red"))
+            self.ui.wayside_elements_table.setItem(8,0, QTableWidgetItem("Up"))
         if(self.crossing_108):
-            self.ui.wayside_elements_table.setItem(9,0, QTableWidgetItem("Green"))
+            self.ui.wayside_elements_table.setItem(9,0, QTableWidgetItem("Down"))
         else:
-            self.ui.wayside_elements_table.setItem(9,0, QTableWidgetItem("Red"))
+            self.ui.wayside_elements_table.setItem(9,0, QTableWidgetItem("Up"))
 
 if __name__ == '__main__':
     import sys
