@@ -34,7 +34,7 @@ class WaysideShell(QMainWindow):
     def __init__(self):
         super().__init__()
        # self.app = app
-        self.ui = uic.loadUi('Wayside_Controller/Software/app.ui')
+        uic.loadUi('Wayside_Controller/Software/app.ui')
 
         self.plc = GreenPLC()
         
@@ -139,70 +139,70 @@ class WaysideShell(QMainWindow):
         self.wss_tm_crossing_108.emit(self.crossing_108)
 
     def manual_inputs(self):
-        self.ui.manual_sw13_button.clicked.connect(self.toggle_switch_13)
-        self.ui.manual_sw28_button.clicked.connect(self.toggle_switch_28)
-        self.ui.manual_sw77_button.clicked.connect(self.toggle_switch_77)
-        self.ui.manual_sw85_button.clicked.connect(self.toggle_switch_85)
+        self.manual_sw13_button.clicked.connect(self.toggle_switch_13)
+        self.manual_sw28_button.clicked.connect(self.toggle_switch_28)
+        self.manual_sw77_button.clicked.connect(self.toggle_switch_77)
+        self.manual_sw85_button.clicked.connect(self.toggle_switch_85)
 
-        self.ui.manual_sig13_button.clicked.connect(self.toggle_signal_13)
-        self.ui.manual_sig28_button.clicked.connect(self.toggle_signal_28)
-        self.ui.manual_sig77_button.clicked.connect(self.toggle_signal_77)
-        self.ui.manual_sig85_button.clicked.connect(self.toggle_signal_85)
+        self.manual_sig13_button.clicked.connect(self.toggle_signal_13)
+        self.manual_sig28_button.clicked.connect(self.toggle_signal_28)
+        self.manual_sig77_button.clicked.connect(self.toggle_signal_77)
+        self.manual_sig85_button.clicked.connect(self.toggle_signal_85)
 
-        self.ui.manual_cr19_button.clicked.connect(self.toggle_crossing_19)
-        self.ui.manual_cr108_button.clicked.connect(self.toggle_crossing_108)
+        self.manual_cr19_button.clicked.connect(self.toggle_crossing_19)
+        self.manual_cr108_button.clicked.connect(self.toggle_crossing_108)
     
     def update_ui(self):
         #update block table state and authority from Track Model
         for i in range(len(self.occupancy)):
-            self.ui.wayside_block_table.setItem(i,0, QTableWidgetItem(str(self.occupancy[i])))
+            self.wayside_block_table.setItem(i,0, QTableWidgetItem(str(self.occupancy[i])))
 
         for i in range(len(self.authority)):
-            self.ui.wayside_block_table.setItem(i,1, QTableWidgetItem(str(self.authority[i])))
+            self.wayside_block_table.setItem(i,1, QTableWidgetItem(str(self.authority[i])))
         
         #update switches 
         if(self.switch_13):
-            self.ui.wayside_elements_table.setItem(0,0, QTableWidgetItem("True"))
+            self.wayside_elements_table.setItem(0,0, QTableWidgetItem("True"))
         else:
-            self.ui.wayside_elements_table.setItem(0,0, QTableWidgetItem("False"))
+            self.wayside_elements_table.setItem(0,0, QTableWidgetItem("False"))
         if(self.switch_28):
-            self.ui.wayside_elements_table.setItem(1,0, QTableWidgetItem("True"))
+            self.wayside_elements_table.setItem(1,0, QTableWidgetItem("True"))
         else:
-            self.ui.wayside_elements_table.setItem(1,0, QTableWidgetItem("False"))
+            self.wayside_elements_table.setItem(1,0, QTableWidgetItem("False"))
         if(self.switch_77):
-            self.ui.wayside_elements_table.setItem(2,0, QTableWidgetItem("True"))
+            self.wayside_elements_table.setItem(2,0, QTableWidgetItem("True"))
         else:
-            self.ui.wayside_elements_table.setItem(2,0, QTableWidgetItem("False"))
+            self.wayside_elements_table.setItem(2,0, QTableWidgetItem("False"))
         if(self.switch_85):
-            self.ui.wayside_elements_table.setItem(3,0, QTableWidgetItem("True"))
+            self.wayside_elements_table.setItem(3,0, QTableWidgetItem("True"))
         else:
-            self.ui.wayside_elements_table.setItem(3,0, QTableWidgetItem("False"))
+            self.wayside_elements_table.setItem(3,0, QTableWidgetItem("False"))
         #update signals
         if(self.signal_13):
-            self.ui.wayside_elements_table.setItem(4,0, QTableWidgetItem("Green"))
+            self.wayside_elements_table.setItem(4,0, QTableWidgetItem("Green"))
         else:
-            self.ui.wayside_elements_table.setItem(4,0, QTableWidgetItem("Red"))
+            self.wayside_elements_table.setItem(4,0, QTableWidgetItem("Red"))
         if(self.signal_28):
-            self.ui.wayside_elements_table.setItem(5,0, QTableWidgetItem("Green"))
+            self.wayside_elements_table.setItem(5,0, QTableWidgetItem("Green"))
         else:
-            self.ui.wayside_elements_table.setItem(5,0, QTableWidgetItem("Red"))
+            self.wayside_elements_table.setItem(5,0, QTableWidgetItem("Red"))
         if(self.signal_77):
-            self.ui.wayside_elements_table.setItem(6,0, QTableWidgetItem("Green"))
+            self.wayside_elements_table.setItem(6,0, QTableWidgetItem("Green"))
         else:
-            self.ui.wayside_elements_table.setItem(6,0, QTableWidgetItem("Red"))
+            self.wayside_elements_table.setItem(6,0, QTableWidgetItem("Red"))
         if(self.signal_85):
-            self.ui.wayside_elements_table.setItem(7,0, QTableWidgetItem("Green"))
+            self.wayside_elements_table.setItem(7,0, QTableWidgetItem("Green"))
         else:
-            self.ui.wayside_elements_table.setItem(7,0, QTableWidgetItem("Red"))
+            self.wayside_elements_table.setItem(7,0, QTableWidgetItem("Red"))
         #update crossings
         if(self.crossing_19):
-            self.ui.wayside_elements_table.setItem(8,0, QTableWidgetItem("Down"))
+            self.wayside_elements_table.setItem(8,0, QTableWidgetItem("Down"))
         else:
-            self.ui.wayside_elements_table.setItem(8,0, QTableWidgetItem("Up"))
+            self.wayside_elements_table.setItem(8,0, QTableWidgetItem("Up"))
         if(self.crossing_108):
-            self.ui.wayside_elements_table.setItem(9,0, QTableWidgetItem("Down"))
+            self.wayside_elements_table.setItem(9,0, QTableWidgetItem("Down"))
         else:
-            self.ui.wayside_elements_table.setItem(9,0, QTableWidgetItem("Up"))
+            self.wayside_elements_table.setItem(9,0, QTableWidgetItem("Up"))
 
 if __name__ == '__main__':
     import sys
