@@ -335,6 +335,14 @@ class SignalHandler(QObject):
     def getCrossing108(self,message):
         lines[0].crossings[1].on=message #crossing 108
 
+    @pyqtSlot(int)
+    def addOcc(self,message):
+        lines[0].blocks[message].occupied = True
+    
+    @pyqtSlot(int)
+    def removeOcc(self,message):
+        lines[0].blocks[message].occupied = False
+
 
 
 
@@ -740,11 +748,13 @@ class Testbench(QWidget):
         comp = int(self.input2.text())
         if(comp<len(lines[line].blocks)):
             lines[line].blocks[comp].switchOccupancy()
+
     def flipSwitch(self):
         line = int(self.input1.text())
         comp = int(self.input2.text())
         if(comp<len(lines[line].switches)):
             lines[line].switches[comp].switch()
+
     def flipCrossing(self):
         line = int(self.input1.text())
         comp = int(self.input2.text())

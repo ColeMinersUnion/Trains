@@ -21,6 +21,9 @@ def main():
     ws_window.wss_tm_crossing_19.connect(tm_signals.getCrossing19)
     ws_window.wss_tm_crossing_108.connect(tm_signals.getCrossing108)
     tm_signals.sendOccupancies.connect(ws_window.update_occupancy)
+
+    #.connect(tm_signals.addOcc)
+    #.connect(tm_signals.removeOcc)
     sys.exit(app.exec())
 
 if __name__ == "__main__":
