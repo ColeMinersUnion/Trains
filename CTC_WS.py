@@ -12,7 +12,7 @@ if __name__ == "__main__":
     ex2.wss_ctc_occupancy.connect(ex.updateOccupancy)
 
     ex.show()
-    ex2.show()
+    ex2.ui.show()
 
 
     sys.exit(app.exec())
