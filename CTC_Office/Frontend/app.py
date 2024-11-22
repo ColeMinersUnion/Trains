@@ -1,9 +1,16 @@
 #from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtWidgets import QMainWindow, QPushButton, QScrollArea, QVBoxLayout, QWidget, QLineEdit, QLabel
 from Components.SchedulePreviewer import SchedulePreviewer
+from Components.NewTrainWidget import NewTrainWidget
 from datetime import datetime
 import time
 
+Green = ['Pioneer', 'Edgebrook', 'Station D', 
+         'Whited', 'South Bank', 'Central',
+         'Inglewood', 'Overbrook', 'Glenbury',
+         'Dormont', 'MT Lebanon', 'Poplar',
+         'Castle Shannon', 'Dormont', 'Glenbury',
+         'Overbrook', 'Inglewood', 'Central']
 
 
 class CTCApplication(QMainWindow):
@@ -11,6 +18,7 @@ class CTCApplication(QMainWindow):
         super().__init__()
         self.Office = Office
         self.scheduleWidget = SchedulePreviewer()
+        self.newTrainWidget = NewTrainWidget(Green)
         self.button = QPushButton("Move")
         self.layout = QVBoxLayout()
         self.main = QWidget()
@@ -30,10 +38,13 @@ class CTCApplication(QMainWindow):
         self.Auto = QPushButton("Schedule File")
         self.auto_state = True
 
+        self.layout.addWidget(self.newTrainWidget)
+
         #!TestBench Stuff
         self.switchState = QLabel()
         self.speed = QLabel()
         self.auth = QLabel()
+
 
         self.setWindowTitle("CTC Office")
         
@@ -103,6 +114,7 @@ class CTCApplication(QMainWindow):
         self.layout.addWidget(self.fixBlock)
         self.layout.addWidget(self.submitFix)
         
+        
 
 
         self.layout.addWidget(lbl)
@@ -149,6 +161,7 @@ class CTCApplication(QMainWindow):
         self.clear_state = self.clear.isChecked()
 
     def onBreak(self):
+        
         txt = self.breakBlok.text()
         if(self.Office.breakTrack(int(txt))):
             self.breakBlok.setText(f'Block {int(txt)} is now broken. ')

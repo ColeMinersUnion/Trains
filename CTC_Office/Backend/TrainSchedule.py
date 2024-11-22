@@ -1,6 +1,7 @@
 #from Node import Node
 from Graph import Graph
 from Route import Route
+from Skiplist import Skiplist
 
 class TrainSchedule:
     def __init__(self, line : Graph = None, stations : list = []) -> None:
@@ -22,7 +23,8 @@ class TrainSchedule:
     #INDIVIDUAL STOP
     def findStop(self, stop: str) -> bool:
         for block in self.line.graph:
-            if block.infrastructure == stop:
+            if stop in block.infrastrucutre:
+                
                 self.stops.append(block.index)
                 return True #* Stop was found
         return False #! stop was not found on the line
@@ -60,6 +62,9 @@ class TrainSchedule:
                 oldStop = nextStop
             return
         
+    def makeSkips(self) -> None:
+        return #! This is a placeholder for now
+
 
 if(__name__ == '__main__'):
     from GetGreen import Green

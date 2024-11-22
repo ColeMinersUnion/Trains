@@ -6,8 +6,8 @@ __pycache__/
 *deprecated/
 # C extensions
 *.so
-
 # Distribution / packaging
+.idea/
 .Python
 build/
 develop-eggs/

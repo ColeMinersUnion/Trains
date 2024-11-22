@@ -1,7 +1,7 @@
 import sys
 from PyQt6.QtWidgets import QWidget, QLabel, QPushButton, QLineEdit, QSlider, QApplication
 from PyQt6.QtGui import QTransform, QPixmap
-from PyQt6.QtCore import Qt,QTimer
+from PyQt6.QtCore import Qt,QTimer,QObject, pyqtSignal, pyqtSlot
 import pandas as pd #reading the excel file
 from math import atan2,pi,sqrt,pow,sin,cos
 
@@ -107,6 +107,11 @@ class Switch:
         self.leftside = not self.leftside
         self.updateEnds()
 
+    #set switch to left
+    def setToLeft(self,bool):
+        self.leftside = True
+        self.updateEnds()
+    
     #get the open block
     def getopen(self):
         if(self.leftside):
@@ -295,6 +300,44 @@ def read(file):
         lines[s[0]].switches.append(Switch(s[0],[s[1],s[2],s[3]])) #add switch to appropriate line number
     return
 
+class SignalHandler(QObject):
+    def __init__(self):
+        super().__init__()
+
+    
+    @pyqtSlot(bool)
+    def getSwitch13(self,message):
+        lines[0].switches[0].setToLeft(message) 
+        print("Switch 13: " + str(message))
+
+
+    def getSwitch28(self,message):
+        lines[0].switches[1].setToLeft(message) 
+
+    def getSwitch58(self,message):
+        lines[0].switches[2].setToLeft(message)
+
+    def getSwitch62(self,message):
+        lines[0].switches[3].setToLeft(message)
+
+    def getSwitch77(self,message):
+        lines[0].switches[4].setToLeft(message)
+
+    def getSwitch105(self,message):    
+        lines[0].switches[5].setToLeft(message)
+
+    def getCrossing19(self,message):
+        lines[0].crossings[0].on=message #switch 19
+
+    def getCrossing108(self,message):
+        lines[0].crossings[1].on=message #switch 108
+
+
+
+
+    
+    
+
 # FRONT END BRANCH
 
 passive = [] #no update method, do not react to backend changes
@@ -354,7 +397,7 @@ class HeaterSystem(QWidget):
         self.label = QLabel(window)
         self.label.move(405,0)
         self.label.setToolTip("Track heaters off")
-        pixmap = QPixmap('Icons/OffHeater.png')
+        pixmap = QPixmap('TrackModel/Icons/OffHeater.png')
         self.label.setPixmap(pixmap)
         
         self.slider = QSlider(Qt.Orientation.Horizontal, window)
@@ -378,13 +421,13 @@ class HeaterSystem(QWidget):
         if((not heaters) and self.temp<=32):
             self.label.setToolTip("Track heaters on")
             heaters=True
-            pixmap = QPixmap('Icons/OnHeater.png')
+            pixmap = QPixmap('TrackModel/Icons/OnHeater.png')
             self.label.setPixmap(pixmap)
 
         if(heaters and self.temp>32):
             self.label.setToolTip("Track heaters off")
             heaters=False
-            pixmap = QPixmap('Icons/OffHeater.png')
+            pixmap = QPixmap('TrackModel/Icons/OffHeater.png')
             self.label.setPixmap(pixmap)
 
 class TrainOccupy(QWidget):
@@ -395,7 +438,7 @@ class TrainOccupy(QWidget):
         self.blocknum = blocknum
         self.label = QLabel(window)
         self.center = lines[linenum].blocks[blocknum].center
-        pixmap = QPixmap('Icons/TrainOccupy.png')
+        pixmap = QPixmap('TrackModel/Icons/TrainOccupy.png')
         pixmap = pixmap.transformed(QTransform().scale(SCL/100,SCL/100))
         self.label.setPixmap(pixmap)
         self.label.move(-100,-100)
@@ -420,7 +463,7 @@ class Failure(QWidget):
         self.blocknum = blocknum
         self.label = QLabel(window)
         self.center = lines[linenum].blocks[blocknum].center
-        pixmap = QPixmap('Icons/RailFailure.png')
+        pixmap = QPixmap('TrackModel/Icons/RailFailure.png')
         self.label.setPixmap(pixmap)
         self.label.move(-100,-100)
         self.label.setStyleSheet(labelstyle)
@@ -432,7 +475,7 @@ class Failure(QWidget):
         if(objfail==0):
             self.label.move(-100,-100)
         else:
-            pixmap = QPixmap('Icons/' + failnames[objfail] + 'Failure.png')
+            pixmap = QPixmap('TrackModel/Icons/' + failnames[objfail] + 'Failure.png')
             pixmap = pixmap.transformed(QTransform().scale(SCL/100,SCL/100))
             self.label.setPixmap(pixmap)
             self.label.move((int((self.center[0]-0.35)*SCL)),int((self.center[1]+0.225)*SCL))
@@ -445,7 +488,7 @@ class FailureSelect(QWidget):
     def __init__(self,window):
         super().__init__()
         self.label = QLabel(window)
-        self.label.setPixmap(QPixmap('Icons/FailureSelect.png'))
+        self.label.setPixmap(QPixmap('TrackModel/Icons/FailureSelect.png'))
         self.update()
     
     def update(self):
@@ -459,7 +502,7 @@ class FailureButton(QWidget):
     def __init__(self,failnum,window):
         super().__init__()
         self.failnum=failnum
-        self.pixmap = QPixmap('Icons/' + failnames[failnum] + 'Failure.png')
+        self.pixmap = QPixmap('TrackModel/Icons/' + failnames[failnum] + 'Failure.png')
         self.label = QLabel(window)
         self.label.setPixmap(self.pixmap)
         self.label.setToolTip(failnames[failnum] + " Failure")
@@ -482,7 +525,7 @@ class BlockIcon(QWidget):
         global active
         self.window=window
         self.obj=obj
-        pixmap = QPixmap('Icons/' + linenames[obj.linenum] + 'Arrow' + ('Bi' if (obj.twoway) else '') + '.png')
+        pixmap = QPixmap('TrackModel/Icons/' + linenames[obj.linenum] + 'Arrow' + ('Bi' if (obj.twoway) else '') + '.png')
         self.label=QLabel(window)
         pixmap = pixmap.transformed(QTransform().scale(obj.mag*SCL/100,SCL/100))
         pixmap = pixmap.transformed(QTransform().rotate(self.obj.angle))
@@ -513,13 +556,13 @@ class SwitchIcon(QWidget):
         super().__init__()
         self.linenum=obj.linenum
         self.switchid=obj.switchid
-        pixmap = QPixmap('Icons/OpenSwitch.png')
+        pixmap = QPixmap('TrackModel/Icons/OpenSwitch.png')
         pixmap = pixmap.transformed(QTransform().scale(SCL/100,SCL/100))
         self.openlabel=QLabel(window)
         self.openlabel.setPixmap(pixmap)
         self.openlabel.setToolTip("Switched open")
         self.openlabel.setStyleSheet(labelstyle)
-        pixmap = QPixmap('Icons/ClosedSwitch.png')
+        pixmap = QPixmap('TrackModel/Icons/ClosedSwitch.png')
         pixmap = pixmap.transformed(QTransform().scale(SCL/100,SCL/100))
         self.closedlabel=QLabel(window)
         self.closedlabel.setPixmap(pixmap)
@@ -552,10 +595,10 @@ class CrossingIcon(QWidget):
     def update(self):
         tempobj = lines[self.linenum].crossings[self.crossingid]
         if (tempobj.on==True):
-            self.pixmap = QPixmap('Icons/OnCrossing.png')
+            self.pixmap = QPixmap('TrackModel/Icons/OnCrossing.png')
 
         else:
-            self.pixmap = QPixmap('Icons/OffCrossing.png')
+            self.pixmap = QPixmap('TrackModel/Icons/OffCrossing.png')
         self.pixmap = self.pixmap.transformed(QTransform().scale(SCL/100,SCL/100))
         self.label.setPixmap(self.pixmap)
         self.label.setToolTip(tempobj.toString())
@@ -565,7 +608,7 @@ class TransponderIcon(QWidget):
     def __init__(self,obj,window):
         super().__init__()
         self.obj=obj
-        pixmap = QPixmap('Icons/Transponder.png')
+        pixmap = QPixmap('TrackModel/Icons/Transponder.png')
         pixmap = pixmap.transformed(QTransform().scale(SCL/100,SCL/100))
         self.label=QLabel(window)
         self.label.setPixmap(pixmap)
@@ -580,9 +623,9 @@ class StationIcon(QWidget):
         super().__init__()
         self.obj=obj
         if(self.obj.name=="Yard"):
-            pixmap = QPixmap('Icons/Yard.png')
+            pixmap = QPixmap('TrackModel/Icons/Yard.png')
         else:
-            pixmap = QPixmap('Icons/Station.png')
+            pixmap = QPixmap('TrackModel/Icons/Station.png')
         self.label=QLabel(window)
         pixmap = pixmap.transformed(QTransform().scale(SCL/100,SCL/100))
         self.label.setPixmap(pixmap)
@@ -599,7 +642,7 @@ class Map(QWidget):
         self.move(0,0)
         self.setWindowTitle("Track Model Map")
         self.setStyleSheet("background-color: lightyellow;")
-        read('Green Line.xlsx')
+        read('TrackModel/Green Line.xlsx')
         passive.append(HeaterSystem(self))
         for i in range(3):
             passive.append(FailureButton((i+1),self)) #add failure buttons
@@ -641,6 +684,9 @@ class Map(QWidget):
     def update(self): 
         for a in active:
             a.update() #update every active component
+        occupancies=[]
+        for b in lines[0].blocks:
+            occupancies.append(b.occupied)
 
 class Testbench(QWidget):
     def __init__(self):
@@ -694,7 +740,7 @@ class Testbench(QWidget):
         line = int(self.input1.text())
         comp = int(self.input2.text())
         if len(lines[line].trains)==0:
-            lines[line].trains.append(Train(line,90,comp))
+            lines[line].trains.append(Train(line,63,comp))
         else:
             lines[line].trains[0].addPos(comp)
 
@@ -708,4 +754,6 @@ def main():
     testbench.show()
     sys.exit(app.exec())
 
-main()
+
+if __name__ == "__main__":
+    main()

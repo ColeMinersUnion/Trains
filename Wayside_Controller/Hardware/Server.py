@@ -72,6 +72,67 @@ def main():
                             "auth": plc.authority
 
                         }
+                    
+                    case "ctc_maintenance":
+                        result = plc.ctc_update_maintenance(decoded_json["maint"])
+                        response = {
+                            "response": "ctc_maintenance",
+                            "maint": plc.maintenance,
+                        }
+
+                    case "ws_sw58":
+                        plc.toggle_sw58()
+                        response = {
+                            "response": "ws_sw58",
+                            "sw58": plc.sw58,
+                            "auth" : plc.authority
+                        }
+                    
+                    case "ws_sw62":
+                        plc.toggle_sw62()
+                        response = {
+                            "response": "ws_sw62",
+                            "sw62": plc.sw62,
+                            "auth" : plc.authority
+                        }
+
+                    case "ws_sig58":
+                        plc.toggle_sig58()
+                        response = {
+                            "response": "ws_sig58",
+                            "sig58": plc.sig58
+                        }
+
+                    case "ws_sig62":
+                        plc.toggle_sig62()
+                        response = {
+                            "response": "ws_sig62",
+                            "sig62": plc.sig62
+                        }
+
+                    case "ctc_sw58":
+                        plc.maint_sw58()
+                        response = {
+                            "response": "ctc_sw58",
+                            "sw58": plc.sw58,
+                            "sw62": plc.sw62,
+                            "sig58": plc.sig58,
+                            "sig62": plc.sig62,
+                            "auth": plc.authority
+
+                        }
+
+                    case "ctc_sw62":
+                        plc.maint_sw62()
+                        response = {
+                            "response": "ctc_sw62",
+                            "sw58": plc.sw58,
+                            "sw62": plc.sw62,
+                            "sig58": plc.sig58,
+                            "sig62": plc.sig62,
+                            "auth": plc.authority
+                        }
+
                     case "say_hi":
                         response = {"response": "server connect"}
                         
