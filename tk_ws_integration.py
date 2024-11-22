@@ -11,7 +11,7 @@ def main():
     tm_signals = SignalHandler()
 
     # Show both windows
-    ws_window.ui.show()
+    ws_window.show()
     tm_window.show()
 
     ws_window.wss_tm_switch_13.connect(tm_signals.getSwitch13)
