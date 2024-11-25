@@ -1,8 +1,8 @@
 # train_controller/model.py
-from PyQt5.QtCore import QObject, pyqtSignal as Signal, pyqtSlot as Slot
+from PyQt6.QtCore import QObject, pyqtSignal as Signal, pyqtSlot as Slot
 import os
 import sys
-from PyQt5.QtWidgets import QApplication
+from PyQt6.QtWidgets import QApplication
 
 T = 0.125  #Period of control loop in seconds
 P_MAX = 120000  #Maximum power output
