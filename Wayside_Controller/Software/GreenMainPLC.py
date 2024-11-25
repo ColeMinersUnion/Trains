@@ -43,7 +43,7 @@ class GreenPLC:
         signal77, signal85, signal28, signal13 = self.update_signal(switch77, switch85, switch28, switch13)
         crossing19, crossing108 = self.update_crossing(occupancy)
         authority=self.update_authority(occupancy)
-        return occupancy, authority, switch77, switch85, switch28, switch13, signal77, signal85, signal28, signal13, crossing19, crossing108
+        return authority, switch77, switch85, switch28, switch13, signal77, signal85, signal28, signal13, crossing19, crossing108
 
     def maintenance(self):
         #if theres an occupancy in the region, no maintenance or manual mode, it's disabled
