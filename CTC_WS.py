@@ -9,6 +9,7 @@ if __name__ == "__main__":
     ex = CTCApplication()
     ex2 = WaysideShell()
     
+    #Emit Connect Slot
     ex2.wss_ctc_occupancy.connect(ex.updateOccupancy)
 
     ex.show()

@@ -30,6 +30,7 @@ class CTCApplication(QMainWindow):
         super().__init__()
         self.Office = Office
         self.Office.addGreenLine()
+
         self.scheduleWidget = SchedulePreviewer()
         self.newTrainWidget = NewTrainWidget(Green)
         self.button = QPushButton("Move")
@@ -232,7 +233,13 @@ class CTCApplication(QMainWindow):
         self.Office.updateTrack(line, occupancies)
         return True
         
+    #handles the emitted signals from the NewTrainWidget
+    @pyqtSlot(dict)
+    def handleNewTrain(self, train: dict):
+        
 
+
+        return True
 
 
 
