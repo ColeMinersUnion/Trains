@@ -34,12 +34,12 @@ class WaysideShell(QMainWindow):
     def __init__(self):
         super().__init__()
        # self.app = app
-        uic.loadUi('Wayside_Controller/Software/app.ui', self)
+        uic.loadUi('Wayside_Controller/Software/app.ui')
 
         self.plc = GreenPLC()
         
-        self.occupancy = [False for i in range(151)]
-        self.authority = [False for i in range(151)]
+        self.occupancy = [False for i in range(1,151)]
+        self.authority = [False for i in range(1,151)]
         #switches
         self.switch_13 = True
         self.switch_28 = False
@@ -57,24 +57,23 @@ class WaysideShell(QMainWindow):
 
         #lets user toggle buttons manually
         self.manual_inputs()
-        
+
 
         '''self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.update_ui) 
-        self.timer.start(15)'''
+        self.timer.start(15)''' 
 
     
     #slot to update occupancy which then updates the plc authority
     #then send out updated authority, switches, signals, crossings 
     @pyqtSlot(list)
     def update_occupancy(self, new_occupancy):
-        print("called")
-        self.occupancy = new_occupancy
+        self.occupancy=new_occupancy
         #self.authority,self.switch_77,self.switch_85,self.switch_28,self.switch_13 = self.plc.update_values(new_occupancy) 
-        self.occupancy,self.authority,self.switch_77,self.switch_85,self.switch_28,self.switch_13,self.signal_77, self.signal_85, self.signal_28, self.signal_13, self.crossing_19, self.crossing_108 = self.plc.update_values(new_occupancy)
+        self.authority,self.switch_77,self.switch_85,self.switch_28,self.switch_13,self.signal_77, self.signal_85, self.signal_28, self.signal_13, self.crossing_19, self.crossing_108 = self.plc.update_values(new_occupancy)
         #emitting updated authority and switch, signal, crossing states:
         self.wss_tm_authority.emit(self.authority)
-        self.wss_ctc_occupancy.emit(self.occupancy) 
+        self.wss_ctc_occupancy.emit(self.occupancy)
 
         self.wss_tm_switch_77.emit(self.switch_77)
         self.wss_tm_switch_85.emit(self.switch_85)
@@ -102,52 +101,42 @@ class WaysideShell(QMainWindow):
     def toggle_switch_13(self):
         self.switch_13 = not self.switch_13
         self.wss_tm_switch_13.emit(self.switch_13)
-        self.update_ui()
     
     def toggle_switch_28(self):
         self.switch_28 = not self.switch_28
         self.wss_tm_switch_28.emit(self.switch_28)
-        self.update_ui()
 
     def toggle_switch_77(self):
         self.switch_77 = not self.switch_77
         self.wss_tm_switch_77.emit(self.switch_77)
-        self.update_ui()
     
     def toggle_switch_85(self):
         self.switch_85 = not self.switch_85
         self.wss_tm_switch_85.emit(self.switch_85)
-        self.update_ui()
 
     def toggle_signal_13(self):
         self.signal_13 = not self.signal_13
         self.wss_tm_signal_13.emit(self.signal_13)
-        self.update_ui()
     
     def toggle_signal_28(self):
         self.signal_28 = not self.signal_28
         self.wss_tm_signal_28.emit(self.signal_28)
-        self.update_ui()
     
     def toggle_signal_77(self):
         self.signal_77 = not self.signal_77
         self.wss_tm_signal_77.emit(self.signal_77)
-        self.update_ui()
 
     def toggle_signal_85(self):
         self.signal_85 = not self.signal_85
         self.wss_tm_signal_85.emit(self.signal_85)
-        self.update_ui()
     
     def toggle_crossing_19(self):
         self.crossing_19 = not self.crossing_19
         self.wss_tm_crossing_19.emit(self.crossing_19)
-        self.update_ui()
     
     def toggle_crossing_108(self):
         self.crossing_108 =  not self.crossing_108
         self.wss_tm_crossing_108.emit(self.crossing_108)
-        self.update_ui()
 
     def manual_inputs(self):
         self.manual_sw13_button.clicked.connect(self.toggle_switch_13)
@@ -165,10 +154,10 @@ class WaysideShell(QMainWindow):
     
     def update_ui(self):
         #update block table state and authority from Track Model
-        for i in range(0,150):
+        for i in range(len(self.occupancy)):
             self.wayside_block_table.setItem(i,0, QTableWidgetItem(str(self.occupancy[i])))
 
-        for i in range(0,150):
+        for i in range(len(self.authority)):
             self.wayside_block_table.setItem(i,1, QTableWidgetItem(str(self.authority[i])))
         
         #update switches 

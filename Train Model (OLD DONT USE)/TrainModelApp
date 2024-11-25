@@ -452,11 +452,7 @@ class MainWindow(QTabWidget):
         self.addTab(self.metrics_tab, "Metrics")
         self.addTab(self.test_bench, "Test Bench")
 
-        self.calculation_timer = QTimer(self)
-<<<<<<< Updated upstream
-=======
-        #self.calculation_timer.timeout.connect(self.update_labels)
->>>>>>> Stashed changes
+        #self.calculation_timer = QTimer(self)
         self.calculation_timer.timeout.connect(self.start_speed_calculation)
         self.calculation_timer.start(500)  # Every 500ms
 
