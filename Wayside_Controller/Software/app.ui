@@ -32,7 +32,7 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout">
         <item row="0" column="0" rowspan="2">
-         <layout class="QGridLayout" name="block_occ">
+         <layout class="QVBoxLayout" name="block_occ">
           <item>
            <widget class="QLabel" name="label_20">
             <property name="font">

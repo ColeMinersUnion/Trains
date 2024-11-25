@@ -1,5 +1,5 @@
 # train_model/view.py
-from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout
+from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout
 
 class TrainModelView(QWidget):
     def __init__(self):
