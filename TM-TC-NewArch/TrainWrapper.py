@@ -7,11 +7,11 @@ from TCview import TCView
 from TCcontroller    import TCcontroller
 
 class Train(QWidget):
-    def __init__(self):
+    def __init__(self, routeInfo):
         super().__init__()
 
         # Create the train model and view
-        self.train_model = TrainModel()
+        self.train_model = TrainModel(routeInfo)
         self.train_model_view = TrainModelView()
         self.train_model_controller = TrainModelController(self.train_model, self.train_model_view)
 
@@ -22,4 +22,4 @@ class Train(QWidget):
 
         # Connect the train controller to the train model
         self.train_controller_model.power_command.connect(self.train_model.set_power)
-        self.train_model.velocity_updated.connect(self.train_controller_model.set_velocity)
+        self.train_model.velocity_updated.connect(self.train_controller_model.set_current_speed)

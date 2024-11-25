@@ -14,7 +14,7 @@ class TrainModel(QObject):
     right_door_updated = Signal(bool) #Signal to toggle right doors
     service_brake_updated = Signal(bool) #Signal to toggle service brake
     
-    def __init__(self):
+    def __init__(self, routeInfo):
         super().__init__()
         self.vn = 0.0
         self.vn_1 = 0.0
@@ -32,7 +32,7 @@ class TrainModel(QObject):
         self.rightDoorStatus = False
         self.leftDoorStatus = False
         self.serviceBrakeStatus = False
-        #self.routeInfo = routeInfo
+        self.routeInfo = routeInfo
         #self.blockID
         #self.blockLength
         #self.speedLimit
