@@ -1,5 +1,5 @@
 # train_controller/controller.py
-from PyQt5.QtCore import QObject
+from PyQt6.QtCore import QObject
 
 class TCcontroller (QObject):
     def __init__(self, model, view):
