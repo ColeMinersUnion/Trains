@@ -8,10 +8,12 @@ trains = []
 
 @pyqtSlot(list)
 def trainFactory(routeInfo: list):
-    trains.append(Train(routeInfo))
-    trains[-1].train_model_view.show()
-    trains[-1].train_controller_view.show()
-    
+    try:
+        trains.append(Train(routeInfo))
+        trains[-1].train_model_view.show()
+        trains[-1].train_controller_view.show()
+    except TypeError:
+        print('Oops')
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
@@ -20,7 +22,7 @@ if __name__ == "__main__":
     
     
     #Emit Connect Slot
-    ex.handleNewGreenTrain.connect(trainFactory)
+    ex.emitTrackInfo.connect(trainFactory)
 
     ex.show()
 
