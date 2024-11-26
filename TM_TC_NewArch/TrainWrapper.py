@@ -8,7 +8,7 @@ try:
     from TCcontroller    import TCcontroller
 except:
     import os, sys
-    sys.path.insert(1, os.getcwd() + '/TM_TC_NewArch/Backend')
+    sys.path.insert(1, os.getcwd() + '/TM_TC_NewArch')
     from TMmodel import TrainModel
     from TMview import TrainModelView
     from TMcontroller import TrainModelController
