@@ -17,7 +17,7 @@ def main():
     ws_window.ws_tm_authority.connect(tm_window.update_authority)
     ctc_window.ctc_ws_sugg_switch.connect(ws_window.update_switch)
     ws_window.ws_ctc_switch_result.connect(ctc_window.update_track)
-    ws_window.ws_tm_update_track.connect(tm_window.update_track)
+    #ws_window.ws_tm_update_track.connect(tm_window.update_track)
     ctc_window.ctc_ws_maintenance.connect(ws_window.update_maintenance)
     ws_window.ws_tm_maintenance.connect(tm_window.update_maintenance)
     ws_window.ws_ctc_occupancy.connect(ctc_window.update_occupancy)
