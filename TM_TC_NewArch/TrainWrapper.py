@@ -1,10 +1,21 @@
 from PyQt6.QtWidgets import QWidget
-from TMmodel import TrainModel
-from TMview import TrainModelView
-from TMcontroller import TrainModelController
-from TCmodel import TCmodel
-from TCview import TCView
-from TCcontroller    import TCcontroller
+try:
+    from TMmodel import TrainModel
+    from TMview import TrainModelView
+    from TMcontroller import TrainModelController
+    from TCmodel import TCmodel
+    from TCview import TCView
+    from TCcontroller    import TCcontroller
+except:
+    import os, sys
+    sys.path.insert(1, os.getcwd() + '/TM_TC_NewArch/Backend')
+    from TMmodel import TrainModel
+    from TMview import TrainModelView
+    from TMcontroller import TrainModelController
+    from TCmodel import TCmodel
+    from TCview import TCView
+    from TCcontroller    import TCcontroller
+
 
 class Train(QWidget):
     def __init__(self, routeInfo):
