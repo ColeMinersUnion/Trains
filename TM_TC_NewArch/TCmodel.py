@@ -8,6 +8,7 @@ T = 0.125  #Period of control loop in seconds
 P_MAX = 120000  #Maximum power output
 class TCmodel(QObject):
     power_command = Signal(float)  # Signal to send power command
+    update_auth = Signal(str)  # Signal to update authentication status
 
     def __init__(self):
         super().__init__()
@@ -29,7 +30,12 @@ class TCmodel(QObject):
         self.curr_authority = 0
         self.maxSpeed = (70000 / 3600) #in m/s
         self.maxPower = int(os.getenv("MAX_POWER", 120000)) # in watts
-    
+
+    def set_full_authority(self, auth):
+        self.full_authority = auth
+        #emit signal to update ui
+        self.update_auth.emit(auth)
+
     @Slot(float)
     def set_commanded_speed(self, commandedSpeed):
         """ Set the setpoint speed. """
