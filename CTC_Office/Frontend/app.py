@@ -1,8 +1,19 @@
 #from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtWidgets import QMainWindow, QPushButton, QScrollArea, QVBoxLayout, QWidget, QLineEdit, QLabel
 from PyQt6.QtCore import pyqtSlot
-from Components.SchedulePreviewer import SchedulePreviewer
-from Components.NewTrainWidget import NewTrainWidget
+import sys, os
+try:
+    from Components.SchedulePreviewer import SchedulePreviewer
+    from Components.NewTrainWidget import NewTrainWidget
+except:
+    from CTC_Office.Frontend.Components.SchedulePreviewer import SchedulePreviewer
+    from CTC_Office.Frontend.Components.NewTrainWidget import NewTrainWidget
+    sys.path.insert(1, os.getcwd() + '/CTC_Office/Backend')
+    print(os.getcwd())
+    from CTC import CTC_Office    
+    #print(os.getcwd())
+    
+
 from datetime import datetime
 import time
 
@@ -15,10 +26,11 @@ Green = ['Pioneer', 'Edgebrook', 'Station D',
 
 
 class CTCApplication(QMainWindow):
-    def __init__(self, Office = None):
+    def __init__(self, Office = CTC_Office()):
         super().__init__()
         self.Office = Office
         self.Office.addGreenLine()
+
         self.scheduleWidget = SchedulePreviewer()
         self.newTrainWidget = NewTrainWidget(Green)
         self.button = QPushButton("Move")
@@ -221,7 +233,13 @@ class CTCApplication(QMainWindow):
         self.Office.updateTrack(line, occupancies)
         return True
         
+    #handles the emitted signals from the NewTrainWidget
+    @pyqtSlot(dict)
+    def handleNewTrain(self, train: dict):
+        
 
+
+        return True
 
 
 

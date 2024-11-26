@@ -16,8 +16,8 @@ def greenDefault()->list:
 def greenSkips()->dict:
     YardtoGlenbury = [i for i in range(63, 66)]
     GlenburytoDormont = [i for i in range(66, 74)]
-    DormonttoMTLebanon = [i for i in range(74, 76)]
-    MTLebanonToPoplar = [i for i in range(76, 89)]
+    DormonttoMTLebanon = [i for i in range(74, 78)]
+    MTLebanonToPoplar = [i for i in range(78, 89)]
     PoplarToCastle = [i for i in range(89, 97)]
     #This was really cool, I was able to use the unpacking operator to make the list in one line
     CastleToPoplar = [97, 98, 99, 100, *(i for i in range(85, 76, -1))]

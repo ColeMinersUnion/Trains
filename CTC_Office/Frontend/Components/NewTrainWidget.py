@@ -92,11 +92,11 @@ class NewTrainWidget(QWidget):
     def onSubmit(self):
         #! emit proper data to the main file which interracts with the schedule
 
+
         self.submit_state = False
-        self.emitStation.emit(self.station.currentText())
-        self.emitHour.emit(int(self.hour.currentText()))
-        self.emitMinute.emit(int(self.minute.currentText()))
-        self.emitSecond.emit(int(self.second.currentText()))
+
+        output = {self.station.currentIndex(): [int(self.hour.currentText()), int(self.minute.currentText()), int(self.second.currentText())]}
+        self.emitStuff.emit(output)
         self.emitYardSwitch.emit(0) #! When a train is scheduled to only go to one station
                                     #! It will be sent to the yard after it reaches the station
         self.submit_state = True
