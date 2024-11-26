@@ -11,3 +11,6 @@ class TCcontroller (QObject):
         self.view.setpoint_command_signal.connect(self.model.set_commanded_speed)  
         self.view.pid_tick_signal.connect(self.model.pid_tick)
         self.view.ebrake_signal.connect(self.model.set_ebrake)
+
+        self.view.kp_signal.connect(self.model.set_Kp)
+        self.view.ki_signal.connect(self.model.set_Ki)

@@ -45,6 +45,15 @@ class TCmodel(QObject):
         print (f"ebrake has been set to:{ebrake}")
         #add signal here later
     
+    @Slot(float)
+    def set_Kp(self, kp):
+        self.Kp = kp
+        print(f"kp: {self.Kp}")
+    
+    @Slot(float)
+    def set_Ki(self, ki):
+        self.Ki = ki
+        print(f"ki: {self.Ki}")
 
     def set_ek(self, commandedSpeed, currentSpeed):
         self.ek = commandedSpeed - currentSpeed
