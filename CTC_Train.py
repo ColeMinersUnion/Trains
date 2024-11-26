@@ -6,10 +6,10 @@ from TM_TC_NewArch.TrainWrapper import Train
 
 trains = []
 
-@pyqtSlot(list)
-def trainFactory(routeInfo: list):
+@pyqtSlot(list, str)
+def trainFactory(routeInfo: list, authority: str):
     try:
-        trains.append(Train(routeInfo))
+        trains.append(Train(routeInfo, authority))
         trains[-1].train_model_view.show()
         trains[-1].train_controller_view.show()
     except TypeError:
