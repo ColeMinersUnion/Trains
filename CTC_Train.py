@@ -22,7 +22,7 @@ if __name__ == "__main__":
     
     
     #Emit Connect Slot
-    ex.emitTrackInfo.connect(trainFactory)
+    ex.emitTrain.connect(trainFactory)
 
     ex.show()
 

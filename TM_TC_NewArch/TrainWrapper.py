@@ -18,7 +18,7 @@ except:
 
 
 class Train(QWidget):
-    def __init__(self, routeInfo):
+    def __init__(self, routeInfo:list, authority:str):
         super().__init__()
 
         # Create the train model and view
@@ -29,7 +29,7 @@ class Train(QWidget):
         # Create the train controller model and view
         self.train_controller_model = TCmodel()
         self.train_controller_view = TCView()
-        self.train_controller_controller = TCcontroller  (self.train_controller_model, self.train_controller_view)
+        self.train_controller_controller = TCcontroller  (self.train_controller_model, self.train_controller_view, authority)
 
         # Connect the train controller to the train model
         self.train_controller_model.power_command.connect(self.train_model.set_power)
