@@ -71,10 +71,13 @@ class TCView(QWidget):
         self.ebrake_button = QPushButton("Emergency Brake: OFF")
         self.ebrake_button.clicked.connect(self.ebrake_toggle)
 
+        self.auth_label = QLabel("Authority: ")
+
         top_layout = QVBoxLayout()
         top_layout.addWidget(self.label)
         top_layout.addWidget(self.setpoint_slider)
         top_layout.addWidget(self.ebrake_button)
+        top_layout.addWidget(self.auth_label)
 
         self.kp_input = QLineEdit()
         self.kp_input.setPlaceholderText("Enter Kp value")
@@ -139,6 +142,10 @@ class TCView(QWidget):
         self.ebrake_signal.emit(self.ebrake)
         #update ui
         self.ebrake_button.setText("Emergency Brake: ON" if self.ebrake else "Emergency Brake: OFF")
+
+    @Slot (str)
+    def full_auth(self, auth):
+        self.auth_label = QLabel(f"Authority String: {auth}")
     @Slot(bool)
     def ebrake_changed(self, e):
         self.ebrake = e
