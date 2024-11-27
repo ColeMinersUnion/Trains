@@ -72,9 +72,9 @@ class WaysideShell(QMainWindow):
         #self.authority,self.switch_77,self.switch_85,self.switch_28,self.switch_13 = self.plc.update_values(new_occupancy) 
         self.authority,self.switch_77,self.switch_85,self.switch_28,self.switch_13,self.signal_77, self.signal_85, self.signal_28, self.signal_13, self.crossing_19, self.crossing_108 = self.plc.update_values(new_occupancy)
         #emitting updated authority and switch, signal, crossing states:
-        self.wss_tm_authority.emit(self.authority)
-        self.wss_ctc_occupancy.emit(self.occupancy)
-
+        self.wss_tm_authority.emit(self.authority) #sending updated authority to track model
+        self.wss_ctc_occupancy.emit(self.occupancy) #sending occupancy to ctc
+        
         self.wss_tm_switch_77.emit(self.switch_77)
         self.wss_tm_switch_85.emit(self.switch_85)
         self.wss_tm_switch_28.emit(self.switch_28)
@@ -91,7 +91,13 @@ class WaysideShell(QMainWindow):
         self.update_ui()
         #uncomment this when testing the shell:
         #return self.authority,self.switch_77,self.switch_85,self.switch_28,self.switch_13,self.signal_77,self.signal_85,self.signal_28,self.signal_13,self.crossing_19,self.crossing_108
-
+    
+    #slot to receive maintenance occupancies from ctc
+    @pyqtSlot(list)
+    def receive_maintenance(self, suggested_maintenance):
+        #maintenance_mode function will determine if it is safe to put a zone into maint mode
+        #if so, it will implement maint mode
+        self.plc.maintenance_mode(suggested_maintenance, self.occupancy)
     #slot to receive dispatch info from ctc
     '''@pyqtSlot(tuple)
     def send_dispatch(self, dispatch):
@@ -101,42 +107,52 @@ class WaysideShell(QMainWindow):
     def toggle_switch_13(self):
         self.switch_13 = not self.switch_13
         self.wss_tm_switch_13.emit(self.switch_13)
+        self.update_ui()
     
     def toggle_switch_28(self):
         self.switch_28 = not self.switch_28
         self.wss_tm_switch_28.emit(self.switch_28)
+        self.update_ui()
 
     def toggle_switch_77(self):
         self.switch_77 = not self.switch_77
         self.wss_tm_switch_77.emit(self.switch_77)
+        self.update_ui()
     
     def toggle_switch_85(self):
         self.switch_85 = not self.switch_85
         self.wss_tm_switch_85.emit(self.switch_85)
+        self.update_ui()
 
     def toggle_signal_13(self):
         self.signal_13 = not self.signal_13
         self.wss_tm_signal_13.emit(self.signal_13)
+        self.update_ui()
     
     def toggle_signal_28(self):
         self.signal_28 = not self.signal_28
         self.wss_tm_signal_28.emit(self.signal_28)
+        self.update_ui()
     
     def toggle_signal_77(self):
         self.signal_77 = not self.signal_77
         self.wss_tm_signal_77.emit(self.signal_77)
+        self.update_ui()
 
     def toggle_signal_85(self):
         self.signal_85 = not self.signal_85
         self.wss_tm_signal_85.emit(self.signal_85)
+        self.update_ui()
     
     def toggle_crossing_19(self):
         self.crossing_19 = not self.crossing_19
         self.wss_tm_crossing_19.emit(self.crossing_19)
+        self.update_ui()
     
     def toggle_crossing_108(self):
         self.crossing_108 =  not self.crossing_108
         self.wss_tm_crossing_108.emit(self.crossing_108)
+        self.update_ui()
 
     def manual_inputs(self):
         self.manual_sw13_button.clicked.connect(self.toggle_switch_13)
