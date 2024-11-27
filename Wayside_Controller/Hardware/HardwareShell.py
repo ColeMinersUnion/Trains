@@ -35,7 +35,7 @@ class WaysideWindow(QMainWindow):
 
 
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server_ip = '192.168.137.222'
+        self.server_ip = '192.168.2.2'
         self.server_port = 9000
 
         self.user_inputs()
@@ -50,7 +50,7 @@ class WaysideWindow(QMainWindow):
         self.send(data)
         decoded_json = self.receive()
         #reads inputs from the user
-        #self.user_inputs()+
+        self.user_inputs()
 
         
 
