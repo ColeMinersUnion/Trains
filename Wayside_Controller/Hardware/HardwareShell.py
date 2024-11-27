@@ -50,7 +50,7 @@ class WaysideWindow(QMainWindow):
         self.send(data)
         decoded_json = self.receive()
         #reads inputs from the user
-        #self.user_inputs()+
+        self.user_inputs()
 
         
 
