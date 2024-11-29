@@ -15,7 +15,7 @@ from Wayside_Controller.Software.GreenMainPLC import GreenPLC
 
 class WaysideShell(QMainWindow):
     wss_tm_authority = pyqtSignal(list)
-    wss_ctc_occupancy = pyqtSignal(list)
+    wss_ctc_occupancy = pyqtSignal(list) 
     #ws_tm_dispatch = pyqtSignal(tuple)
 
     wss_tm_switch_13 = pyqtSignal(bool)
