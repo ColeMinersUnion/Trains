@@ -6,7 +6,7 @@ from PyQt6.QtWidgets import QApplication
 
 
 
-class WaysideView(QWidget):
+class WaysideHardwareView(QMainWindow):
 # Signal to send data to Handler
     wsh_int_sw58 = pyqtSignal()
     wsh_int_sw62 = pyqtSignal()
@@ -15,7 +15,7 @@ class WaysideView(QWidget):
     wsh_int_connect = pyqtSignal()
     def __init__(self):
         super().__init__()
-        uic.load_ui("Wayside_Controller/Hardware/app.ui", self) # Load the UI file
+        uic.loadUi("Wayside_Controller/Hardware/app.ui", self) # Load the UI file
     
 
     def user_inputs(self):
@@ -23,6 +23,7 @@ class WaysideView(QWidget):
         self.manual_sw62_button.clicked.connect(self.toggle_sw62)
         self.manual_sig58_button.clicked.connect(self.toggle_sig58)
         self.manual_sig62_button.clicked.connect(self.toggle_sig62)
+        self.connect_green.clicked.connect(self.connect)
 
     def toggle_sw58(self):
         self.wsh_int_sw58.emit()
@@ -36,7 +37,8 @@ class WaysideView(QWidget):
     def toggle_sig62(self):
         self.wsh_int_sig62.emit()
 
-
+    def connect(self):
+        self.wsh_int_connect.emit()
     
     @pyqtSlot(list)
     def update_occupancy_table(self, occupancy):

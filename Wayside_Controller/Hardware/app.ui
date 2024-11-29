@@ -31,7 +31,71 @@
         <string>Green Line</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="0" column="0" rowspan="2">
+        <item row="0" column="2" rowspan="3">
+         <layout class="QVBoxLayout" name="wayside_log_2">
+          <item>
+           <widget class="QLabel" name="label_13">
+            <property name="font">
+             <font>
+              <pointsize>11</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>Wayside Log</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTextBrowser" name="wayside_log"/>
+          </item>
+         </layout>
+        </item>
+        <item row="2" column="1">
+         <layout class="QVBoxLayout" name="track_state_3">
+          <item>
+           <widget class="QLabel" name="label_21">
+            <property name="font">
+             <font>
+              <pointsize>11</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>Track Element States</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTableWidget" name="wayside_elements_table">
+            <row>
+             <property name="text">
+              <string>Switch 58</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Switch 62</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Signal 58</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Signal 62</string>
+             </property>
+            </row>
+            <column>
+             <property name="text">
+              <string>State</string>
+             </property>
+            </column>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="0" column="0" rowspan="3">
          <layout class="QVBoxLayout" name="block_occ">
           <item>
            <widget class="QLabel" name="label_20">
@@ -284,51 +348,6 @@
           </item>
          </layout>
         </item>
-        <item row="1" column="1">
-         <layout class="QVBoxLayout" name="track_state_3">
-          <item>
-           <widget class="QLabel" name="label_21">
-            <property name="font">
-             <font>
-              <pointsize>11</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>Track Element States</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QTableWidget" name="wayside_elements_table">
-            <row>
-             <property name="text">
-              <string>Switch 58</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Switch 62</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Signal 58</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Signal 62</string>
-             </property>
-            </row>
-            <column>
-             <property name="text">
-              <string>State</string>
-             </property>
-            </column>
-           </widget>
-          </item>
-         </layout>
-        </item>
         <item row="0" column="1">
          <layout class="QVBoxLayout" name="verticalLayout">
           <item>
@@ -425,22 +444,21 @@
           </item>
          </layout>
         </item>
-        <item row="0" column="2" rowspan="2">
-         <layout class="QVBoxLayout" name="wayside_log_2">
+        <item row="1" column="1">
+         <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
-           <widget class="QLabel" name="label_13">
-            <property name="font">
-             <font>
-              <pointsize>11</pointsize>
-             </font>
-            </property>
+           <widget class="QLabel" name="label">
             <property name="text">
-             <string>Wayside Log</string>
+             <string>Connect to PLC</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QTextBrowser" name="wayside_log"/>
+           <widget class="QPushButton" name="connect_green">
+            <property name="text">
+             <string>Green</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
