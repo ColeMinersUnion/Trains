@@ -15,7 +15,7 @@ from Wayside_Controller.Software.GreenMainPLC import GreenPLC
 
 class WaysideShell(QMainWindow):
     wss_tm_authority = pyqtSignal(list)
-    wss_ctc_occupancy = pyqtSignal(list)
+    wss_ctc_occupancy = pyqtSignal(list) 
     #ws_tm_dispatch = pyqtSignal(tuple)
 
     wss_tm_switch_13 = pyqtSignal(bool)
@@ -38,8 +38,8 @@ class WaysideShell(QMainWindow):
 
         self.plc = GreenPLC()
         
-        self.occupancy = [False for i in range(151)]
-        self.authority = [False for i in range(151)]
+        self.occupancy = [False for i in range(1,151)]
+        self.authority = [False for i in range(1,151)]
         #switches
         self.switch_13 = True
         self.switch_28 = False
@@ -57,25 +57,24 @@ class WaysideShell(QMainWindow):
 
         #lets user toggle buttons manually
         self.manual_inputs()
-        
+
 
         '''self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.update_ui) 
-        self.timer.start(15)'''
+        self.timer.start(15)''' 
 
     
     #slot to update occupancy which then updates the plc authority
     #then send out updated authority, switches, signals, crossings 
     @pyqtSlot(list)
     def update_occupancy(self, new_occupancy):
-        print("called")
-        self.occupancy = new_occupancy
+        self.occupancy=new_occupancy
         #self.authority,self.switch_77,self.switch_85,self.switch_28,self.switch_13 = self.plc.update_values(new_occupancy) 
-        self.occupancy,self.authority,self.switch_77,self.switch_85,self.switch_28,self.switch_13,self.signal_77, self.signal_85, self.signal_28, self.signal_13, self.crossing_19, self.crossing_108 = self.plc.update_values(new_occupancy)
+        self.authority,self.switch_77,self.switch_85,self.switch_28,self.switch_13,self.signal_77, self.signal_85, self.signal_28, self.signal_13, self.crossing_19, self.crossing_108 = self.plc.update_values(new_occupancy)
         #emitting updated authority and switch, signal, crossing states:
-        self.wss_tm_authority.emit(self.authority)
-        self.wss_ctc_occupancy.emit(self.occupancy) 
-
+        self.wss_tm_authority.emit(self.authority) #sending updated authority to track model
+        self.wss_ctc_occupancy.emit(self.occupancy) #sending occupancy to ctc
+        
         self.wss_tm_switch_77.emit(self.switch_77)
         self.wss_tm_switch_85.emit(self.switch_85)
         self.wss_tm_switch_28.emit(self.switch_28)
@@ -92,7 +91,13 @@ class WaysideShell(QMainWindow):
         self.update_ui()
         #uncomment this when testing the shell:
         #return self.authority,self.switch_77,self.switch_85,self.switch_28,self.switch_13,self.signal_77,self.signal_85,self.signal_28,self.signal_13,self.crossing_19,self.crossing_108
-
+    
+    #slot to receive maintenance occupancies from ctc
+    @pyqtSlot(list)
+    def receive_maintenance(self, suggested_maintenance):
+        #maintenance_mode function will determine if it is safe to put a zone into maint mode
+        #if so, it will implement maint mode
+        self.plc.maintenance_mode(suggested_maintenance, self.occupancy)
     #slot to receive dispatch info from ctc
     '''@pyqtSlot(tuple)
     def send_dispatch(self, dispatch):
@@ -165,10 +170,10 @@ class WaysideShell(QMainWindow):
     
     def update_ui(self):
         #update block table state and authority from Track Model
-        for i in range(0,150):
+        for i in range(len(self.occupancy)):
             self.wayside_block_table.setItem(i,0, QTableWidgetItem(str(self.occupancy[i])))
 
-        for i in range(0,150):
+        for i in range(len(self.authority)):
             self.wayside_block_table.setItem(i,1, QTableWidgetItem(str(self.authority[i])))
         
         #update switches 

@@ -5,9 +5,6 @@ class Skiplist:
 
     def skipRoute(self, start: int, end: int) -> list:
         #* Things that shouldn't happen
-        if(start == end):
-            print("Start and end are the same")
-            return []
         if end >= len(self.skips):
             print("End is out of range")
             return []
@@ -22,9 +19,14 @@ class Skiplist:
             return []
         #* Things that should happen
         rt = []
-        for i in range(start, end):
+        for i in range(start, end+1):
             if i in self.skips:
                 rt.extend(self.skips[i])
         return rt
-    
+
+if __name__ == '__main__':
+    from Default import greenSkips
+    from GetGreen import Green
+    skips = Skiplist(Green(), greenSkips())
+    print(skips.skipRoute(0, 0))   
 

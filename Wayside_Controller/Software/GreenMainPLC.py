@@ -4,7 +4,8 @@
 #class to hardcode green line        
 class GreenPLC:
     def __init__(self):
-       
+        #to hold maintenance occupancies
+        self.maintenance_occ=[False for i in range(151)]
         #track switches
         self.switch_13 = True
         self.switch_28 = False
@@ -43,11 +44,33 @@ class GreenPLC:
         signal77, signal85, signal28, signal13 = self.update_signal(switch77, switch85, switch28, switch13)
         crossing19, crossing108 = self.update_crossing(occupancy)
         authority=self.update_authority(occupancy)
-        return occupancy, authority, switch77, switch85, switch28, switch13, signal77, signal85, signal28, signal13, crossing19, crossing108
+        return authority, switch77, switch85, switch28, switch13, signal77, signal85, signal28, signal13, crossing19, crossing108
 
-    def maintenance(self):
+    #takes in list of occupancies from ctc, updates with current occupancy list from the shell
+    def maintenance_mode(self, suggested_maintenance, occupancy):
         #if theres an occupancy in the region, no maintenance or manual mode, it's disabled
-        pass
+        for i in range(77, 100):
+            if suggested_maintenance[i] == False and self.maintenance_occ[i] == True:
+                self.maintenance_occ[i] = False
+            elif suggested_maintenance[i] == True and self.maintenance_occ[i] == False:
+                maint_safety = True
+                for j in range(69, 100):
+                    if occupancy[j] == True and self.maintenance_occ[j] == False:
+                        maint_safety = False
+                        break
+                if maint_safety == True:
+                    self.maintenance_occ[i] = True
+        for i in range(1, 29):
+            if suggested_maintenance[i] == False and self.maintenance_occ[i] == True:
+                self.maintenance_occ[i] = False
+            elif suggested_maintenance[i] == True and self.maintenance_occ[i] == False:
+                maint_safety = True
+                for j in range(1, 13):
+                    if occupancy[j] == True and self.maintenance_occ[j] == False:
+                        maint_safety = False
+                        break
+                if maint_safety == True:
+                    self.maintenance_occ[i] = True
     
     #confirm PLC is uploaded
     def say_hi(self):
@@ -81,11 +104,11 @@ class GreenPLC:
     def update_crossing(self, occupancy):
         #checks if the train is within 3 blocks of the crossings, if so sets crossings to true
         #crossings on greenline: 19 and 108 
-        if occupancy[17] == True or occupancy[18] == True or occupancy[19] == True or occupancy[20] == True or occupancy[21] == True:
+        if any(occupancy[17:21])==True:
             self.crossing_19 = True
         else:
             self.crossing_19 = False
-        if occupancy[106]==True or occupancy[107]==True or occupancy[108]==True or occupancy[109]==True or occupancy[110]==True:
+        if any(occupancy[106:110])==True:
             self.crossing_108=True
         else:
             self.crossing_108=False
@@ -132,6 +155,10 @@ class GreenPLC:
         #or set authority to true by default and always look ahead to next zone (hardcode) to make sure no train is in the next zone
         #ONLY ONE TRAIN IN A ZONE AT A TIME (simplifies things for us and is technically a 'safety feature')
         #start at section overlap with waysideHW (block 69-76) (aka sections L and M):
+        if occupancy[68]==True and (any(occupancy[69:76])==True):
+            authority[69]=False
+        else:
+            authority[69]=True
         if occupancy[69]==True and (any(occupancy[70:76])==True):
             authority[70]==False
         else:

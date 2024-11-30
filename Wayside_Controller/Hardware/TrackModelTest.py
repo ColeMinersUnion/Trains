@@ -9,7 +9,7 @@ class TrackModelWindow(QMainWindow):
     tm_ws_occupancy = pyqtSignal(list)
     def __init__(self):
         super().__init__()
-        uic.loadUi("Wayside_Controller/Hardware/tm_tb.ui", self)
+        uic.loadUi("tm_tb.ui", self)
         self.occupancy = [False for i in range(151)]
         self.authority = [False for i in range(151)]
         self.maintenance = [False for i in range(151)]

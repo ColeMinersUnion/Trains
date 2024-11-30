@@ -65,8 +65,13 @@ class Train:
             self.authority = 0
             for i in self.schedule.routes[self.curr_route].paths[block : ]:
                 self.authority += self.line.graph[i].block_length
-            return self.authority
+            if(self.schedule.routes[self.curr_route].paths[-1] != 0):
+                temp = (self.line.graph[self.schedule.routes[self.curr_route].paths[-1]].block_length/2)
+            else:
+                temp = (self.line.graph[self.schedule.routes[self.curr_route].paths[-1]].block_length)
+            return self.authority + temp
         except:
+            print("oops")
             return 0
     
     def stringAuth(self):
@@ -87,36 +92,9 @@ if(__name__ == '__main__'):
     from GetGreen import Green
     green = Green()
     from Default import greenDefault
-    Thomas = TrainSchedule(green)
-    I, O = greenDefault()
+    Thomas = TrainSchedule(green, [])
     from Route import Route
-    Incoming = Route(63, 2, green)
-    Incoming.paths = I
-    #print(I)
-    #print(Incoming.paths[0])
-    import numpy as np
-    Outgoing = Route(1, 58, green)
-    Outgoing.paths = O
-    Thomas.routes = [Incoming, Outgoing]
-
-    James = Train(line=green, schedule=Thomas, id=101, location=green.graph[0])
-    #print(James.schedule.routes[1].paths)
-    James.stringAuth()
-
-
-    #OutAuth = [James.auth(i) for i in O]
-    #print(np.array(OutAuth))
-
-    while(James.move()):
-        print(f'{str(James.location)}: {James.auth()}')
-        time.sleep(James.waitTime(True))
+    from Skiplist import Skiplist
+    from Default import greenSkips
+    skips = Skiplist(green, greenSkips())
     
-
-    print("Train has reached Pioneer Station")
-    time.sleep(1)
-    James.curr_route += 1
-    James.curr_route_index = 0
-    while(James.move()):
-        print(f'{str(James.location)}: {James.auth()}')
-        time.sleep(James.waitTime(True))
-    print("Train has reached the yard")

@@ -23,7 +23,7 @@ class TrainSchedule:
     #INDIVIDUAL STOP
     def findStop(self, stop: str) -> bool:
         for block in self.line.graph:
-            if stop in block.infrastrucutre:
+            if stop in block.infrastructre:
                 
                 self.stops.append(block.index)
                 return True #* Stop was found

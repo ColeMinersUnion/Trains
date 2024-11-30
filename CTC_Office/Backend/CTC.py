@@ -2,6 +2,9 @@ from Train import Train
 from TrainSchedule import TrainSchedule
 from Schedule import Schedule
 from ScheduleParser import readSchedule
+from Route import Route
+from Skiplist import Skiplist
+from Default import greenSkips
 
 #! Top level Backend object to be instantiated in the application. 
 #? ALso should become a singleton when I learn how those work
@@ -22,6 +25,7 @@ class CTC_Office:
         try:
             from GetBlue import Blue
             cls.line["Blue"] = Blue(broken=False)
+            cls.Schedule["Blue"] = Schedule("Blue")
             return True
         except:
             print("Blue Line Init Failed")
@@ -31,6 +35,7 @@ class CTC_Office:
         try:
             from GetGreen import Green
             cls.line["Green"] = Green()
+            cls.Schedule["Green"] = Schedule("Green")
             return True
         except:
             print("Green Line Init Failed")
@@ -90,7 +95,7 @@ class CTC_Office:
         else:
             return False
         
-    def addTrain(cls, line: str, stations: list = []) -> bool:
+    def deprecatedAddTrain(cls, line: str, stations: list = []) -> bool:
         if(stations == []):
             return False #Train isn't going anywhere
         #Add a schedule
@@ -103,6 +108,37 @@ class CTC_Office:
         #add the train to the total schedule
         cls.Schedule[line].addTrain(newTrain)
         return True
+
+    def addTrain(cls, line: str, stations: list = []) -> str:
+        #list of indices
+        
+        if(stations == []):
+            return False
+        if(line == "Green"):
+            cls.skips = Skiplist(cls.line["Green"], greenSkips())
+        else:
+            return False
+        #Add a schedule
+        temp = 0
+        rtList = []
+        for i, x in enumerate(stations):
+            rt = cls.skips.skipRoute(temp, x)
+            temp = x + 1
+            rtList.append(Route(rt[0], rt[len(rt)-1], cls.line["Green"]))
+            rtList[i].paths = rt
+        returnRt = [*(cls.skips.skipRoute(temp, 20)), 0]
+        print(returnRt)
+        backHome = Route(returnRt[0], returnRt[len(returnRt)-1], cls.line["Green"])
+        backHome.paths = returnRt
+        rtList.append(backHome)
+
+        Thomas = TrainSchedule(cls.line["Green"])
+        Thomas.routes = rtList
+        James = Train(line=cls.line["Green"], schedule=Thomas, id=cls.nextID, location=cls.line["Green"].graph[0])
+        cls.num_trains += 1
+        cls.nextID += 1
+        cls.Schedule["Green"].addTrain(James)
+        return James.stringAuth()
 
     def addStop(cls, trainID: int, stations: list = [])->bool:
         if stations == []:

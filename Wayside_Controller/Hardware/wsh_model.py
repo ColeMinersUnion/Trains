@@ -8,12 +8,14 @@ import json
      
 
 
-class WaysideHardwareBackend:
+class WaysideHardwareModel(QObject):
 
     wsh_tm_sw58 = pyqtSignal(bool)
     wsh_tm_sw62 = pyqtSignal(bool)
     wsh_tm_sig58 = pyqtSignal(bool)
     wsh_tm_sig62 = pyqtSignal(bool)
+    wsh_tm_authority = pyqtSignal(list)
+    
 
     def __init__(self):
         self.occupancy = [False for i in range(151)]
@@ -27,21 +29,25 @@ class WaysideHardwareBackend:
 
 
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server_ip = '192.168.137.222'
+        self.server_ip = '127.0.0.1'
         self.server_port = 9000
 
-
+    @pyqtSlot()
     def connect(self):
-        start = time()
-        self.client_socket.connect((self.server_ip, self.server_port))
-        end = time()    
-        print(f"Connected to server {end - start} seconds") 
-        data = {
-            "input" : "say_hi"
-        }
+        try:
+            start = time()
+            self.client_socket.connect((self.server_ip, self.server_port))
+            end = time()    
+            print(f"Connected to server {end - start} seconds") 
+            data = {
+                "input" : "say_hi"
+            }
 
-        self.send(data)
-        decoded_json = self.receive()
+            self.send(data)
+            decoded_json = self.receive()
+        except:
+            print("Failed to connect to server")
+
 
     def send(self, data):
         json_data = json.dumps(data)
@@ -102,3 +108,21 @@ class WaysideHardwareBackend:
         decoded_json = self.receive()
         self.signal_62 = decoded_json["sig62"]
         self.wsh_tm_sig62.emit(self.signal_62)
+
+
+
+    @pyqtSlot(list)
+    def update_occupancy(self, occupancy):
+        # Slot to update the label text
+        self.occupancy = occupancy
+        data = {
+            "input" : "tm_occupancy",
+            "occupancy": occupancy
+        }
+        self.send(data)
+        decoded_json = self.receive()
+        self.authority = decoded_json["auth"]
+        self.signal_58 = decoded_json["sig58"]
+        self.signal_62 = decoded_json["sig62"]
+        self.wsh_tm_authority.emit(self.authority)
+

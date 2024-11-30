@@ -2,37 +2,37 @@ import socket
 import json
 
 from GreenYardPLC import PLC
-import RPi.GPIO as GPIO
+#import RPi.GPIO as GPIO
 
 def main():
     plc = PLC()
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind(('0.0.0.0', 9000))
+    server_socket.bind(('127.0.0.1', 9000))
     server_socket.listen(5)
     print("Server is listening")
 
-    GPIO.setwarnings(False)
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(23, GPIO.OUT) # Switch58 true
-    GPIO.setup(24, GPIO.OUT) # Switch58 false
-    GPIO.setup(22, GPIO.OUT) # Switch62 true
-    GPIO.setup(27, GPIO.OUT) # Switch62 false
-    GPIO.setup(5, GPIO.OUT) #Sig58False
-    GPIO.setup(12, GPIO.OUT) #Sig58True
-    GPIO.setup(6, GPIO.OUT) #Sig62False
-    GPIO.setup(13, GPIO.OUT) #Sig62True
+    # GPIO.setwarnings(False)
+    # GPIO.setmode(GPIO.BCM)
+    # GPIO.setup(23, GPIO.OUT) # Switch58 true
+    # GPIO.setup(24, GPIO.OUT) # Switch58 false
+    # GPIO.setup(22, GPIO.OUT) # Switch62 true
+    # GPIO.setup(27, GPIO.OUT) # Switch62 false
+    # GPIO.setup(5, GPIO.OUT) #Sig58False
+    # GPIO.setup(12, GPIO.OUT) #Sig58True
+    # GPIO.setup(6, GPIO.OUT) #Sig62False
+    # GPIO.setup(13, GPIO.OUT) #Sig62True
     try:
         client_socket, addr = server_socket.accept()
         print(f"connection from {addr} has been established")
         while True:
-            GPIO.output(23, plc.sw58)
-            GPIO.output(24, not plc.sw58)
-            GPIO.output(22, plc.sw62)
-            GPIO.output(27, not plc.sw62)
-            GPIO.output(5, not plc.sig58)
-            GPIO.output(12, plc.sig58)
-            GPIO.output(6, not plc.sig62)
-            GPIO.output(13, plc.sig62)
+            # GPIO.output(23, plc.sw58)
+            # GPIO.output(24, not plc.sw58)
+            # GPIO.output(22, plc.sw62)
+            # GPIO.output(27, not plc.sw62)
+            # GPIO.output(5, not plc.sig58)
+            # GPIO.output(12, plc.sig58)
+            # GPIO.output(6, not plc.sig62)
+            # GPIO.output(13, plc.sig62)
             
             length_prefix = client_socket.recv(10).decode('utf-8').strip()
             print(length_prefix)
@@ -147,14 +147,14 @@ def main():
             
 
     finally:
-        GPIO.output(23, False)
-        GPIO.output(24, False)
-        GPIO.output(22, False)
-        GPIO.output(27, False)
-        GPIO.output(5, False)
-        GPIO.output(12, False)
-        GPIO.output(6, False)
-        GPIO.output(13, False)
+        # GPIO.output(23, False)
+        # GPIO.output(24, False)
+        # GPIO.output(22, False)
+        # GPIO.output(27, False)
+        # GPIO.output(5, False)
+        # GPIO.output(12, False)
+        # GPIO.output(6, False)
+        # GPIO.output(13, False)
 
         client_socket.close()
         server_socket.close()
