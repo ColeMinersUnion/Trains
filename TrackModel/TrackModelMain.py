@@ -110,7 +110,7 @@ class Switch:
 
     #set switch to left
     def setToLeft(self,bool):
-        self.leftside = True
+        self.leftside = bool
         self.updateEnds()
     
     #get the open block
@@ -325,6 +325,9 @@ class SignalHandler(QObject):
 
     def getSwitch77(self,message):
         lines[0].switches[4].setToLeft(message)
+
+    def getSwitch85(self,message):
+        lines[0].switches[5].setToLeft(message)
 
     def getSwitch105(self,message):    
         lines[0].switches[5].setToLeft(message)

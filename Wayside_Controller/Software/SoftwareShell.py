@@ -34,7 +34,7 @@ class WaysideShell(QMainWindow):
     def __init__(self):
         super().__init__()
        # self.app = app
-        uic.loadUi('Wayside_Controller/Software/app.ui')
+        uic.loadUi('Wayside_Controller/Software/app.ui', self)
 
         self.plc = GreenPLC()
         
