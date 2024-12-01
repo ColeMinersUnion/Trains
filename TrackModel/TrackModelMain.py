@@ -37,7 +37,8 @@ class Block:
         self.center = [(x1+x2)/2,(y1+y2)/2] #center for front end
         self.mag = sqrt(((x2-x1)*(x2-x1))+((y2-y1)*(y2-y1))) #magnitude for front end
         self.angle = atan2((y2-y1),(x2-x1))*180/pi #angle for front end
-        self.failure=0 
+        self.failure=0
+        self.authority = True 
         if(self.angle<0):
             self.angle = self.angle+360
         r = linenames[linenum] + " Line"
@@ -69,7 +70,7 @@ class Block:
         connections = ""
         for a in self.adj:
             connections = connections + " " + str(a)
-        return self.msg + str(self.occupied) + "\nFailure: " + failnames[self.failure] + "\nConnections:" + connections
+        return self.msg + str(self.occupied) + "\nAuthority: " + str(self.authority) + "\nFailure: " + failnames[self.failure] + "\nConnections:" + connections 
     
     def switchOccupancy(self):
         self.occupied = not self.occupied
@@ -297,14 +298,20 @@ class SignalHandler(QObject):
         super().__init__()
         self.oldblock = 0
 
+    def callOccSend(self,occupancies):
+        self.sendOccupancies.emit(occupancies)
+        print(occupancies[1])
+
+    @pyqtSlot(int)
     def addOcc(self,message):
         lines[0].blocks[self.oldblock].occupied = False
         lines[0].blocks[message].occupied = True
         self.oldblock = message
 
-    def callOccSend(self,occupancies):
-        self.sendOccupancies.emit(occupancies)
-        print(occupancies[1])
+    @pyqtSlot(list)
+    def getAuthority(self,message):
+        for i in range(len(lines[0].blocks)):
+            lines[0].blocks[i].authority = message[i]
 
     @pyqtSlot(bool)
     def getSwitch13(self,message):
