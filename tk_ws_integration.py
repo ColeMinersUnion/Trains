@@ -17,6 +17,10 @@ def main():
     tm_window.show()
     wsh_window.show()
 
+    #tk sending occupancies to wss
+    tm_signals.sendOccupancies.connect(wss_window.update_occupancy)
+    #wss sending updated authority to tk:
+    wss_window.wss_tm_authority.connect(tm_signals.getAuthority)
     wss_window.wss_tm_switch_13.connect(tm_signals.getSwitch13)
     wss_window.wss_tm_switch_28.connect(tm_signals.getSwitch28)
     wss_window.wss_tm_switch_77.connect(tm_signals.getSwitch77)
