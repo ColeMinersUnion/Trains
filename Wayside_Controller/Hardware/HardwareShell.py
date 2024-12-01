@@ -9,15 +9,15 @@ from time import time
 
 
 class WaysideWindow(QMainWindow):
-    ws_tm_authority = pyqtSignal(list)
+    wsh_tm_authority = pyqtSignal(list)
     ws_ctc_switch_result = pyqtSignal(dict)
-    wsh_tm_sw58 = pyqtSignal(bool)
-    wsh_tm_sw62 = pyqtSignal(bool)
+    wsh_tm_switch_58 = pyqtSignal(bool)
+    wsh_tm_switch_62 = pyqtSignal(bool)
     wsh_tm_sig58 = pyqtSignal(bool)
     wsh_tm_sig62 = pyqtSignal(bool)
     ws_tm_maintenance = pyqtSignal(list)
-    ws_ctc_occupancy = pyqtSignal(list)
-    ws_ctc_maintenance = pyqtSignal(list)
+    wsh_ctc_occupancy = pyqtSignal(list)
+    wsh_ctc_maintenance = pyqtSignal(list)
 
     #view
     def __init__(self):
@@ -35,10 +35,10 @@ class WaysideWindow(QMainWindow):
 
 
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server_ip = '192.168.137.222'
+        self.server_ip = '127.0.0.1'
         self.server_port = 9000
 
-        self.user_inputs()
+
 
         start = time()
         self.client_socket.connect((self.server_ip, self.server_port))
@@ -50,15 +50,9 @@ class WaysideWindow(QMainWindow):
         self.send(data)
         decoded_json = self.receive()
         #reads inputs from the user
-        #self.user_inputs()+
+        self.user_inputs()
 
         
-
-
-        # Setup the periodic update
-        self.timer = QtCore.QTimer()
-        self.timer.timeout.connect(self.update_ui)  # Function to update the UI
-        self.timer.start(15)  # Updates every 1.5 seconds 
     
     #view
     def user_inputs(self):
@@ -149,14 +143,16 @@ class WaysideWindow(QMainWindow):
         self.signal_58 = decoded_json["sig58"]
         self.signal_62 = decoded_json["sig62"]
         self.ws_ctc_switch_result.emit({"result": True, "switch_58": self.switch_58, "switch_62": self.switch_62, "signal_58": self.signal_58, "signal_62": self.signal_62})
-        self.wsh_tm_sw58.emit(self.switch_58)
-        self.ws_tm_authority.emit(self.authority)
+        self.wsh_tm_switch_58.emit(self.switch_58)
+        self.wsh_tm_authority.emit(self.authority)
+        self.update_ui()
 
     @pyqtSlot(list)
     def update_occupancy(self, new_occ):
         # Slot to update the label text
         self.send_occupancy(new_occ)
-        self.ws_tm_authority.emit(self.authority)
+        self.wsh_tm_authority.emit(self.authority)
+        self.update_ui()
 
 
     def send_occupancy(self, occupancy):
@@ -170,10 +166,10 @@ class WaysideWindow(QMainWindow):
         self.authority = decoded_json["auth"]
         self.signal_58 = decoded_json["sig58"]
         self.signal_62 = decoded_json["sig62"]
-        self.ws_tm_authority.emit(self.authority)
+        self.wsh_tm_authority.emit(self.authority)
+        self.update_ui()
 
     def toggle_sw58(self):
-        print("called toggle_sw58")
         data = {
             "input": "ws_sw58"
         }
@@ -181,8 +177,10 @@ class WaysideWindow(QMainWindow):
         decoded_json = self.receive()
         self.switch_58 = decoded_json["sw58"]
         self.ws_ctc_switch_result.emit({"result": True, "switch_58": self.switch_58, "switch_62": self.switch_62, "signal_58": self.signal_58, "signal_62": self.signal_62})
-        self.wsh_tm_sw58.emit(self.switch_58)
-        self.ws_tm_authority.emit(self.authority)
+        self.wsh_tm_switch_58.emit(not self.switch_58)
+        self.wsh_tm_authority.emit(self.authority)
+        print("Switch 58: ", self.switch_58)
+        self.update_ui()
 
     def toggle_sw62(self):
         data = {
@@ -192,8 +190,9 @@ class WaysideWindow(QMainWindow):
         decoded_json = self.receive()
         self.switch_62 = decoded_json["sw62"]
         self.ws_ctc_switch_result.emit({"result": True, "switch_58": self.switch_58, "switch_62": self.switch_62, "signal_58": self.signal_58, "signal_62": self.signal_62})
-        self.wsh_tm_sw62.emit(self.switch_62)
-        self.ws_tm_authority.emit(self.authority)
+        self.wsh_tm_switch_62.emit(not self.switch_62)
+        self.wsh_tm_authority.emit(self.authority)
+        self.update_ui()
 
 
     def toggle_sig58(self):
@@ -206,7 +205,8 @@ class WaysideWindow(QMainWindow):
 
         self.ws_ctc_switch_result.emit({"result": True, "switch_58": self.switch_58, "switch_62": self.switch_62, "signal_58": self.signal_58, "signal_62": self.signal_62})
         self.wsh_tm_sig58.emit(self.signal_58)
-        self.ws_tm_authority.emit(self.authority)
+        self.wsh_tm_authority.emit(self.authority)
+        self.update_ui()
 
 
     def toggle_sig62(self):
@@ -219,7 +219,8 @@ class WaysideWindow(QMainWindow):
 
         self.ws_ctc_switch_result.emit({"result": True, "switch_58": self.switch_58, "switch_62": self.switch_62, "signal_58": self.signal_58, "signal_62": self.signal_62})
         self.wsh_tm_sig62.emit(self.signal_62)
-        self.ws_tm_authority.emit(self.authority)
+        self.wsh_tm_authority.emit(self.authority)
+        self.update_ui()
 
 
 
@@ -235,6 +236,7 @@ class WaysideWindow(QMainWindow):
         self.ws_tm_maintenance.emit(self.maintenance)
         self.ws_ctc_maintenance.emit(self.maintenance)
         self.ws_ctc_occupancy.emit(self.occupancy)
+        self.update_ui()
 
     @pyqtSlot(int)
     def update_switch(self, exit_block):
@@ -256,9 +258,12 @@ class WaysideWindow(QMainWindow):
         self.signal_58 = decoded_json["sig58"]
         self.signal_62 = decoded_json["sig62"]
         self.ws_ctc_switch_result.emit({"result": result, "switch_58": self.switch_58, "switch_62": self.switch_62, "signal_58": self.signal_58, "signal_62": self.signal_62})
-        self.ws_tm_update_track.emit({"switch_58": self.switch_58, "switch_62": self.switch_62, "signal_58": self.signal_58, "signal_62": self.signal_62})
-        self.ws_tm_authority.emit(self.authority)
-
+        self.wsh_tm_switch_58.emit(self.switch_58)
+        self.wsh_tm_sig58.emit(self.signal_58)
+        self.wsh_tm_switch_62.emit(self.switch_62)
+        self.wsh_tm_sig62.emit(self.signal_62)
+        self.wsh_tm_authority.emit(self.authority)
+        self.update_ui()
 
 
 if __name__ == "__main__":

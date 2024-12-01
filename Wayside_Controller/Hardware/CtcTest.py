@@ -11,7 +11,7 @@ class CTCWindow(QMainWindow):
     ctc_ws_maint_switch = pyqtSignal(int)
     def __init__(self):
         super().__init__()
-        uic.loadUi("Wayside_Controller/Hardware/ctc_tb.ui", self)
+        uic.loadUi("ctc_tb.ui", self)
         self.occupancy = [False for i in range(151)]
         self.maintenance = [False for i in range(151)]
         self.switch_58 = False

@@ -1,3 +1,5 @@
+#this file is to be used exclusively for testing shell communications with plc and UI features
+#This will ensure that the main shell code in Soft
 import sys
 import os
 
@@ -58,25 +60,26 @@ class WaysideShell(QMainWindow):
         #lets user toggle buttons manually
         self.manual_inputs()
 
-
-        self.timer = QtCore.QTimer()
+        self.update_ui()
+        '''self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.update_ui) 
-        self.timer.start(15)
+        self.timer.start(15)'''
 
         self.show()
         self.app.exec()
 
     
-    #slot to update occupancy which then updates the plc authority
-    #then send out updated authority, switches, signals, crossings 
+    #slot to receive updated occupancy from track model
+    #which then updates the plc
+    #then sends out updated authority, switches, signals, crossings 
     @pyqtSlot(list)
     def update_occupancy(self, new_occupancy):
         self.occupancy=new_occupancy
         #self.authority,self.switch_77,self.switch_85,self.switch_28,self.switch_13 = self.plc.update_values(new_occupancy) 
         self.authority,self.switch_77,self.switch_85,self.switch_28,self.switch_13,self.signal_77, self.signal_85, self.signal_28, self.signal_13, self.crossing_19, self.crossing_108 = self.plc.update_values(new_occupancy)
         #emitting updated authority and switch, signal, crossing states:
-        self.wss_tm_authority.emit(self.authority)
-        self.wss_ctc_occupancy.emit(self.occupancy)
+        self.wss_tm_authority.emit(self.authority) #sends updated authority to track model
+        self.wss_ctc_occupancy.emit(self.occupancy) #sends track occ to ctc
 
         self.wss_tm_switch_77.emit(self.switch_77)
         self.wss_tm_switch_85.emit(self.switch_85)
@@ -104,42 +107,52 @@ class WaysideShell(QMainWindow):
     def toggle_switch_13(self):
         self.switch_13 = not self.switch_13
         self.wss_tm_switch_13.emit(self.switch_13)
+        self.update_ui()
     
     def toggle_switch_28(self):
         self.switch_28 = not self.switch_28
         self.wss_tm_switch_28.emit(self.switch_28)
+        self.update_ui()
 
     def toggle_switch_77(self):
         self.switch_77 = not self.switch_77
         self.wss_tm_switch_77.emit(self.switch_77)
+        self.update_ui()
     
     def toggle_switch_85(self):
         self.switch_85 = not self.switch_85
         self.wss_tm_switch_85.emit(self.switch_85)
+        self.update_ui()
 
     def toggle_signal_13(self):
         self.signal_13 = not self.signal_13
         self.wss_tm_signal_13.emit(self.signal_13)
+        self.update_ui()
     
     def toggle_signal_28(self):
         self.signal_28 = not self.signal_28
         self.wss_tm_signal_28.emit(self.signal_28)
+        self.update_ui()
     
     def toggle_signal_77(self):
         self.signal_77 = not self.signal_77
         self.wss_tm_signal_77.emit(self.signal_77)
+        self.update_ui()
 
     def toggle_signal_85(self):
         self.signal_85 = not self.signal_85
         self.wss_tm_signal_85.emit(self.signal_85)
+        self.update_ui()
     
     def toggle_crossing_19(self):
         self.crossing_19 = not self.crossing_19
         self.wss_tm_crossing_19.emit(self.crossing_19)
+        self.update_ui()
     
     def toggle_crossing_108(self):
         self.crossing_108 =  not self.crossing_108
         self.wss_tm_crossing_108.emit(self.crossing_108)
+        self.update_ui()
 
     def manual_inputs(self):
         self.manual_sw13_button.clicked.connect(self.toggle_switch_13)
@@ -154,6 +167,13 @@ class WaysideShell(QMainWindow):
 
         self.manual_cr19_button.clicked.connect(self.toggle_crossing_19)
         self.manual_cr108_button.clicked.connect(self.toggle_crossing_108)
+
+    #confirm PLC is uploaded
+    def say_hi(self):
+        print("PLC Uploaded Successfully")
+
+    def upload_plc(self):
+        self.manual_plc_button.clicked.connect(self.say_hi)
     
     def update_ui(self):
         #update block table state and authority from Track Model
@@ -212,6 +232,37 @@ class WaysideShell(QMainWindow):
             self.wayside_elements_table.setItem(9,0, QTableWidgetItem("Down"))
         else:
             self.wayside_elements_table.setItem(9,0, QTableWidgetItem("Up"))
+
+        #Manual mode not permitted unless track is unoccuppied
+        if(any(self.occupancy[1:41]) or any(self.occupancy[69:151])):
+            #disable switches, signals and crossings if track is occuppied
+            self.manual_sw13_button.setEnabled(False)
+            self.manual_sw28_button.setEnabled(False)
+            self.manual_sw77_button.setEnabled(False)
+            self.manual_sw85_button.setEnabled(False)
+
+            self.manual_sig13_button.setEnabled(False)
+            self.manual_sig28_button.setEnabled(False)
+            self.manual_sig77_button.setEnabled(False)
+            self.manual_sig85_button.setEnabled(False)
+
+            self.manual_cr19_button.setEnabled(False)
+            self.manual_cr108_button.setEnabled(False)
+
+        else:
+            self.manual_sw13_button.setEnabled(True)
+            self.manual_sw28_button.setEnabled(True)
+            self.manual_sw77_button.setEnabled(True)
+            self.manual_sw85_button.setEnabled(True)
+
+            self.manual_sig13_button.setEnabled(True)
+            self.manual_sig28_button.setEnabled(True)
+            self.manual_sig77_button.setEnabled(True)
+            self.manual_sig85_button.setEnabled(True)
+
+            self.manual_cr19_button.setEnabled(True)
+            self.manual_cr108_button.setEnabled(True)
+            
 
 if __name__ == '__main__':
     import sys

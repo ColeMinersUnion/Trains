@@ -35,6 +35,9 @@ class Station:
         self.stationsLeft.extend(self.allStations)        
 
 class NewTrainWidget(QWidget):
+
+    emitTrain = pyqtSignal(dict)
+    emitYardSwitch = pyqtSignal(int)
     def __init__(self, stations: list = []):
         super().__init__()
         self.layout = QVBoxLayout()
@@ -77,11 +80,7 @@ class NewTrainWidget(QWidget):
         self.layout.addWidget(self.submit)
 
         #This is for the string that goes to the train on creation. 
-        self.emitStation = pyqtSignal(str)
-        self.emitHour = pyqtSignal(int)
-        self.emitMinute = pyqtSignal(int)
-        self.emitSecond = pyqtSignal(int)
-        self.emitYardSwitch = pyqtSignal(int)
+        
         self.setLayout(self.layout)
 
 
@@ -96,7 +95,7 @@ class NewTrainWidget(QWidget):
         self.submit_state = False
 
         output = {self.station.currentIndex(): [int(self.hour.currentText()), int(self.minute.currentText()), int(self.second.currentText())]}
-        self.emitStuff.emit(output)
+        self.emitTrain.emit(output)
         self.emitYardSwitch.emit(0) #! When a train is scheduled to only go to one station
                                     #! It will be sent to the yard after it reaches the station
         self.submit_state = True

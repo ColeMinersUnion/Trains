@@ -109,7 +109,7 @@ class CTC_Office:
         cls.Schedule[line].addTrain(newTrain)
         return True
 
-    def addTrain(cls, line: str, stations: list = []) -> bool:
+    def addTrain(cls, line: str, stations: list = []) -> str:
         #list of indices
         
         if(stations == []):
@@ -138,6 +138,7 @@ class CTC_Office:
         cls.num_trains += 1
         cls.nextID += 1
         cls.Schedule["Green"].addTrain(James)
+        return James.stringAuth()
 
     def addStop(cls, trainID: int, stations: list = [])->bool:
         if stations == []:
