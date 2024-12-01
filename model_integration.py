@@ -22,6 +22,7 @@ def main():
     train.train_model_view.show()
     train.train_controller_view.show()
 
+    #connect signals
     model.block_change.connect(tm_signals.addOcc)
 
     sys.exit(app.exec())
