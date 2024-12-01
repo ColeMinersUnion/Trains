@@ -304,15 +304,19 @@ def read(file):
     return
 
 class SignalHandler(QObject):
+
     def __init__(self):
         super().__init__()
+        self.oldblock = 0
 
-    
-    @pyqtSlot(bool)
+    def addOcc(self,message):
+        lines[0].blocks[self.oldblock].occupied = False
+        lines[0].blocks[message].occupied = True
+        self.oldblock = message
+
     def getSwitch13(self,message):
         lines[0].switches[0].setToLeft(message) 
         print("Switch 13: " + str(message))
-
 
     def getSwitch28(self,message):
         lines[0].switches[1].setToLeft(message) 

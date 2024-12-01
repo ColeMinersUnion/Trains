@@ -10,7 +10,7 @@ def main():
     wss_window = WaysideShell()
     wsh_window = WaysideWindow()
     tm_window = Map()   
-    tm_signals = SignalHandler()
+    tm_signals = tm_window.signals
 
     # Show both windows
     wss_window.show()
