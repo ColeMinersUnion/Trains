@@ -3,7 +3,13 @@ from PyQt6.QtCore import QObject, pyqtSignal as Signal, pyqtSlot as Slot
 import random, time
 T = 0.125  #Period of control loop in seconds
 class TrainModel(QObject):
+    """ This signal is outgoing to the train controller """
     velocity_updated = Signal(float)  # Signal to send current velocity
+
+    """ This signal is to indicate block change """
+    block_change = Signal(int) # Signal to send block change to track model
+
+    """ These signals are for Train Model backend to Train Model View """
     acceleration_updated = Signal(float) # Signal to send acceleration
     passengerCount_updated = Signal(int) # Signal to send passengers onboard
     total_mass_updated = Signal(float)   # Signal to send current mass of train
@@ -33,9 +39,14 @@ class TrainModel(QObject):
         self.leftDoorStatus = False
         self.serviceBrakeStatus = False
         self.routeInfo = routeInfo
-        #self.blockID
-        #self.blockLength
-        #self.speedLimit
+        self.blockID
+        self.blockLength
+        self.speedLimit
+        self.totalRouteDistance = 0
+        self.totalDistanceTravelled = 0
+        self.i = 0
+        self.milestoneDistance = 0
+        self.parseRouteInfo()
         self.calcTotalMass()
 
     """ velocity calculation """
@@ -65,6 +76,8 @@ class TrainModel(QObject):
             self.vn_1 = self.vn
             self.an_1 = self.an
 
+        self.odometer()
+        self.checkBlockChange()
         #print("power: ", power, "\tvelocity: ", self.vn, "\tacceleration: ", self.an)
         self.velocity_updated.emit(self.vn)
         self.acceleration_updated.emit(self.an)
@@ -116,3 +129,22 @@ class TrainModel(QObject):
     def toggleServiceBrake(self, input: bool):
         self.serviceBrakeStatus = input
         self.service_brake_updated.emit(self.serviceBrakeStatus)
+
+    def parseRouteInfo(self):
+        groupedRouteInfo = list(zip(*self.routeInfo))
+        self.blockID = groupedRouteInfo[0]
+        self.blockLength = groupedRouteInfo[1]
+        self.speedLimit = groupedRouteInfo[2]
+
+        self.totalRouteDistance = sum(self.blockLength)
+
+        self.milestoneDistance += self.blockLength[0]
+
+    def odometer(self):
+        self.totalDistanceTravelled += self.totalDistanceTravelled + (T/2) * (self.vn + self.vn_1)
+
+    def checkBlockChange(self):
+        if(self.milestoneDistance <= self.totalDistanceTravelled):
+            self.i += 1
+            self.block_change.emit(self.blockID[self.i])
+            self.milestoneDistance += self.blockLength[self.i]
