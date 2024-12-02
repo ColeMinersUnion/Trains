@@ -39,9 +39,9 @@ class TrainModel(QObject):
         self.leftDoorStatus = False
         self.serviceBrakeStatus = False
         self.routeInfo = routeInfo
-        self.blockID
-        self.blockLength
-        self.speedLimit
+        self.blockID = []
+        self.blockLength = []
+        self.speedLimit = []
         self.totalRouteDistance = 0
         self.totalDistanceTravelled = 0
         self.i = 0
@@ -69,7 +69,7 @@ class TrainModel(QObject):
             if(self.vn <= 0):
                 self.an = (self.maxPower / (self.totalMass * self.maxSpeed))
             else: 
-                self.an = (power/ (self.totalMass * self.vn))
+                self.an = (power / (self.totalMass * self.vn))
             
             self.vn = self.vn_1 + (T/2) * (self.an + self.an_1)
 
