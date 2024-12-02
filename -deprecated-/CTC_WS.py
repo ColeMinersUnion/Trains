@@ -12,6 +12,7 @@ if __name__ == "__main__":
     
     #Emit Connect Slot
     ex2.wss_ctc_occupancy.connect(ex.updateOccupancy)
+    ex3.ws_ctc_occupancy.connect(ex.updateOccupancy)
     ex3.update_switch.connect(ex.handleGreenOutputSwitch)
 
     ex.show()
