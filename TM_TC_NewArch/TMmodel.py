@@ -39,9 +39,9 @@ class TrainModel(QObject):
         self.leftDoorStatus = False
         self.serviceBrakeStatus = False
         self.routeInfo = routeInfo
-        self.blockID
-        self.blockLength
-        self.speedLimit
+        self.blockID = []
+        self.blockLength = []
+        self.speedLimit = []
         self.totalRouteDistance = 0
         self.totalDistanceTravelled = 0
         self.i = 0
