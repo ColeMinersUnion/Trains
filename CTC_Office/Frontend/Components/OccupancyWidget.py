@@ -13,3 +13,4 @@ class OccupancyWidget(QWidget):
         self.widget.clear()
         for t in self.trains:
             self.widget.addItems([f'Train: {t.id}\tBlock: {t.block}'])
+            print(f'Train: {t.id}\tBlock: {t.block}')
