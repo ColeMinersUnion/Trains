@@ -8,7 +8,7 @@ try:
     from TCcontroller    import TCcontroller
 except:
     import os, sys
-    sys.path.insert(1, os.getcwd() + '/TM_TC_NewArch')
+    sys.path.insert(1, os.path.join(os.getcwd(), 'TM_TC_NewArch'))
     from TMmodel import TrainModel
     from TMview import TrainModelView
     from TMcontroller import TrainModelController
@@ -29,7 +29,7 @@ class Train(QWidget):
         # Create the train controller model and view
         self.train_controller_model = TCmodel()
         self.train_controller_view = TCView()
-        self.train_controller_controller = TCcontroller  (self.train_controller_model, self.train_controller_view, authority)
+        self.train_controller_controller = TCcontroller(self.train_controller_model, self.train_controller_view, authority)
 
         # Connect the train controller to the train model
         self.train_controller_model.power_command.connect(self.train_model.set_power)

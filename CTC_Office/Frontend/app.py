@@ -8,7 +8,7 @@ try:
 except:
     from CTC_Office.Frontend.Components.SchedulePreviewer import SchedulePreviewer
     from CTC_Office.Frontend.Components.NewTrainWidget import NewTrainWidget
-    sys.path.insert(1, os.getcwd() + '/CTC_Office/Backend')
+    sys.path.insert(1, os.path.join(os.getcwd(), 'CTC_Office', 'Backend'))
     print(os.getcwd())
     from CTC import CTC_Office    
     #print(os.getcwd())

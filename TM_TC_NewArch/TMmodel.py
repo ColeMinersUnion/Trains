@@ -19,6 +19,7 @@ class TrainModel(QObject):
     left_door_updated = Signal(bool) #Signal to toggle left doors
     right_door_updated = Signal(bool) #Signal to toggle right doors
     service_brake_updated = Signal(bool) #Signal to toggle service brake
+    emergency_brake_updated = Signal(bool) #Signal to communicate emergency brake status
     
     def __init__(self, routeInfo):
         super().__init__()
@@ -38,6 +39,7 @@ class TrainModel(QObject):
         self.rightDoorStatus = False
         self.leftDoorStatus = False
         self.serviceBrakeStatus = False
+        self.emergencyBrakeStatus = False
         self.routeInfo = routeInfo
         self.blockID = []
         self.blockLength = []
@@ -54,24 +56,40 @@ class TrainModel(QObject):
     def set_power(self, power: float):
 
         self.calcTotalMass()
+        
         if self.serviceBrakeStatus:
-            self.an = -1.2
 
-            while(self.vn > 0 and self.serviceBrakeStatus):
+            if(self.vn > 0):
+                self.an = (-1.2 / 8)
                 self.vn += self.an
-                time.sleep(1)
+            else:
+                self. an  = 0
+                self.vn = 0.0
 
-            self.vn = 0.0   
+        elif self.emergencyBrakeStatus:
+
+            if(self.vn > 0):
+                self.an = (-2.73 / 8)
+                self.vn += self.an
+            else:
+                self.an = 0
+                self.vn = 0.0
+
         else:
             """ Simulate the train's response to power. """
             if power <= 0:
                 self.an = 0
-            if(self.vn <= 0):
-                self.an = (self.maxPower / (self.totalMass * self.maxSpeed))
-            else: 
-                self.an = (power / (self.totalMass * self.vn))
-            
-            self.vn = self.vn_1 + (T/2) * (self.an + self.an_1)
+                self.vn = 0
+            else:
+                if(self.vn <= 0):
+                    self.an = (self.maxPower / (self.totalMass * self.maxSpeed))
+                else: 
+                    self.an = (power / (self.totalMass * self.vn))
+
+                self.vn = self.vn_1 + (T/2) * (self.an + self.an_1)
+
+            print(power)
+            print(self.vn)
 
             self.vn_1 = self.vn
             self.an_1 = self.an
@@ -130,21 +148,30 @@ class TrainModel(QObject):
         self.serviceBrakeStatus = input
         self.service_brake_updated.emit(self.serviceBrakeStatus)
 
+    @Slot(bool)
+    def toggleEmergencyBrake(self, input: bool):
+        self.emergencyBrakeStatus = input
+        self.emergency_brake_updated.emit(self.emergencyBrakeStatus)
+
     def parseRouteInfo(self):
         groupedRouteInfo = list(zip(*self.routeInfo))
         self.blockID = groupedRouteInfo[0]
         self.blockLength = groupedRouteInfo[1]
         self.speedLimit = groupedRouteInfo[2]
 
-        self.totalRouteDistance = sum(self.blockLength)
+        #print(self.blockID)
+        #self.totalRouteDistance = sum(self.blockLength)
 
         self.milestoneDistance += self.blockLength[0]
 
     def odometer(self):
-        self.totalDistanceTravelled += self.totalDistanceTravelled + (T/2) * (self.vn + self.vn_1)
+        self.totalDistanceTravelled += (T/2) * (self.vn + self.vn_1)
 
     def checkBlockChange(self):
-        if(self.milestoneDistance <= self.totalDistanceTravelled):
+        #print(self.totalDistanceTravelled)
+        #print(self.milestoneDistance)
+        if(self.milestoneDistance < self.totalDistanceTravelled):
             self.i += 1
             self.block_change.emit(self.blockID[self.i])
             self.milestoneDistance += self.blockLength[self.i]
+            #print("sent info")
