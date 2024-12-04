@@ -9,10 +9,6 @@ from TrackModel.TrackModelMain import Map, SignalHandler
 
 trains = []
 
-
-
-
-
 app = QApplication(sys.argv)
 
 ctc = CTCApplication()
