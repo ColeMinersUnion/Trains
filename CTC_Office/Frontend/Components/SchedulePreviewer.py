@@ -6,7 +6,7 @@ class SchedulePreviewer(QWidget):
     def __init__(self):
         super().__init__()
         self.trains = {}
-        self.display
+        #self.display
         self.widget = QListWidget()
     
     def update(self, id : int, block : str, next_stop : str, projected_arrival : datetime) -> None:

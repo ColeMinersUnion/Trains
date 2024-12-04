@@ -5,8 +5,10 @@ import sys, os
 try:
     from Components.SchedulePreviewer import SchedulePreviewer
     from Components.NewTrainWidget import NewTrainWidget
+    from Components.OccupancyWidget import OccupancyWidget
 except:
     from CTC_Office.Frontend.Components.SchedulePreviewer import SchedulePreviewer
+    from CTC_Office.Frontend.Components.OccupancyWidget import OccupancyWidget
     from CTC_Office.Frontend.Components.NewTrainWidget import NewTrainWidget
     sys.path.insert(1, os.path.join(os.getcwd(), 'CTC_Office', 'Backend'))
     print(os.getcwd())
@@ -33,7 +35,9 @@ class CTCApplication(QMainWindow):
         self.Office = Office
         self.Office.addGreenLine()
 
-        self.scheduleWidget = SchedulePreviewer()
+        #self.scheduleWidget = SchedulePreviewer()
+        self.GreenOcc = OccupancyWidget()
+        self.RedOcc = OccupancyWidget()
         self.newTrainWidget = NewTrainWidget(Green)
         self.button = QPushButton("Move")
         self.layout = QVBoxLayout()
@@ -92,10 +96,10 @@ class CTCApplication(QMainWindow):
         lbl.setText("Testbench Information")
 
         lbl1 = QLabel()
-        lbl1.setText("Moving Trains and seeing the track Schedule")
+        lbl1.setText("Green Line Occupancy")
         self.layout.addWidget(lbl1)
         self.layout.addWidget(self.button)
-        self.layout.addWidget(self.scheduleWidget.widget)
+        self.layout.addWidget(self.GreenOcc.widget)
 
         lbl2 = QLabel()
         lbl2.setText("Adding and removing trains")
@@ -237,6 +241,11 @@ class CTCApplication(QMainWindow):
         else:
             line = "Red"
         self.Office.updateTrack(line, occupancies)
+        trains = [(x.id, str(x.location)) for x in self.Office.Schedule[line].trains]
+        if(line == "Green"):
+            self.GreenOcc.update(trains)
+        else:
+            self.RedOcc.update(trains)
         return True
         
     #handles the emitted signals from the NewTrainWidget
