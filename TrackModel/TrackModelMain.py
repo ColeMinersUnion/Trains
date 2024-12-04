@@ -20,7 +20,7 @@ heaters = False
 speed = 1
 class Block:
     #instantiation
-    def __init__(self, linenum, section, number, length, grade, speed, twoway, elevation, underground,x1,y1,x2,y2,adj1,adj2):
+    def __init__(self, linenum, section, number, length, grade, speed, twoway, elevation, underground,x1,y1,x2,y2):
         self.linenum = linenum
         self.section = section
         self.number = number
@@ -33,7 +33,6 @@ class Block:
         self.x=x1
         self.y=y1
         self._occupied = False
-        self.adj = {adj1,adj2}
         self.center = [(x1+x2)/2,(y1+y2)/2] #center for front end
         self.mag = sqrt(((x2-x1)*(x2-x1))+((y2-y1)*(y2-y1))) #magnitude for front end
         self.angle = atan2((y2-y1),(x2-x1))*180/pi #angle for front end
@@ -67,10 +66,7 @@ class Block:
         occflag = True    
 
     def toString(self):
-        connections = ""
-        for a in self.adj:
-            connections = connections + " " + str(a)
-        return self.msg + str(self.occupied) + "\nAuthority: " + str(self.authority) + "\nFailure: " + failnames[self.failure] + "\nConnections:" + connections 
+        return self.msg + str(self.occupied) + "\nAuthority: " + str(self.authority) + "\nFailure: " + failnames[self.failure] 
     
     def switchOccupancy(self):
         self.occupied = not self.occupied
@@ -85,24 +81,6 @@ class Switch:
         self.switchid = switchid[linenum]
         switchid[linenum] = switchid[linenum]+1
         self.leftside=True #the first block is the central
-        self.updateEnds()
-
-    def updateEnds(self):
-        global lines
-        if(self.leftside): #connect 0 to 1
-            if(self.blocks[2] in lines[self.linenum].blocks[self.blocks[0]].adj):
-                lines[self.linenum].blocks[self.blocks[0]].adj.remove(self.blocks[2]) #change vertex direction
-            lines[self.linenum].blocks[self.blocks[0]].adj.add(self.blocks[1])
-            lines[self.linenum].blocks[self.blocks[1]].adj.add(self.blocks[0])
-            if(self.blocks[0] in lines[self.linenum].blocks[self.blocks[2]].adj):
-                lines[self.linenum].blocks[self.blocks[2]].adj.remove(self.blocks[0])
-        else: #connect 0 to 2
-            if(self.blocks[1] in lines[self.linenum].blocks[self.blocks[0]].adj):
-                lines[self.linenum].blocks[self.blocks[0]].adj.remove(self.blocks[1]) #change vertex direction
-            lines[self.linenum].blocks[self.blocks[0]].adj.add(self.blocks[2])
-            lines[self.linenum].blocks[self.blocks[2]].adj.add(self.blocks[0])
-            if(self.blocks[0] in lines[self.linenum].blocks[self.blocks[1]].adj):
-                lines[self.linenum].blocks[self.blocks[1]].adj.remove(self.blocks[0])
 
     #check if  matches central vertex
     #ALL TRAINS GOING 
@@ -119,12 +97,10 @@ class Switch:
     #switch the switch
     def switch(self):
         self.leftside = not self.leftside
-        self.updateEnds()
 
     #set switch to left
     def setToLeft(self,bool):
         self.leftside = bool
-        self.updateEnds()
     
     #get the open block
     def getopen(self):
@@ -274,9 +250,7 @@ def read(file):
                                                 XOFFSET+data.iat[i,15], #x1-coord
                                                 YOFFSET+data.iat[i,16], #y1-coord
                                                 XOFFSET+data.iat[i,17], #x2-coord
-                                                YOFFSET+data.iat[i,18], #y2-coord
-                                                data.iat[i,19], #adj1
-                                                data.iat[i,20]) #adj2
+                                                YOFFSET+data.iat[i,18]) #y2-coord
         if(not (pd.isnull(data.iat[i,9]) or pd.isnull(data.iat[i,10]))):
             tempswitch.append([linenum,data.iat[i,2],data.iat[i,9],data.iat[i,10]])
         if(not pd.isnull(data.iat[i,11])):
