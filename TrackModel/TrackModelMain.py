@@ -274,7 +274,7 @@ class SignalHandler(QObject):
         super().__init__()
         self.oldblock = 0
 
-    def callOccSend(self, occupancies):
+    def callOccSend(self, occupancies: list):
         self.sendOccupancies.emit(occupancies)
         print(array(occupancies))
 

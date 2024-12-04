@@ -237,7 +237,7 @@ class CTCApplication(QMainWindow):
     def updateOccupancy(self, occupancies: list):
         print("Got milk")
         line = ""
-        if(len(occupancies) == 150):
+        if(len(occupancies) == 151):
             line = "Green"
         else:
             line = "Red"

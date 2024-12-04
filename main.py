@@ -15,10 +15,10 @@ ctc = CTCApplication()
 wss_window = SoftwareShell()
 wsh_window = HardwareShell()
 tm_window = Map()   
-tm_signals = SignalHandler()
+tm_signals = tm_window.signals
 
 #Emit Connect Slot
-wss_window.wss_ctc_occupancy.connect(ctc.updateOccupancy)
+#wss_window.wss_ctc_occupancy.connect(ctc.updateOccupancy)
 #wsh_window.wsh_ctc_occupancy.connect(ctc.updateOccupancy)
 #wsh_window.ws_ctc_switch_result.connect(ctc.handleGreenOutputSwitch)
 
@@ -37,11 +37,9 @@ def trainFactory(routeInfo: list, authority: str):
         print('Train reach end of line. Went back to the yard')
 
 # Show both windows
-def didItGetHere():
-    print('Yes')
 
 #tk sending occupancies to wss
-tm_signals.sendOccupancies.connect(didItGetHere)
+tm_signals.sendOccupancies.connect(wss_window.update_occupancy)
 #wss sending updated authority to tk:
 wss_window.wss_tm_authority.connect(tm_signals.getAuthority)
 wss_window.wss_tm_switch_13.connect(tm_signals.getSwitch13)
@@ -54,10 +52,11 @@ wsh_window.wsh_tm_authority.connect(tm_signals.getAuthority)
 
 ctc.emitTrain.connect(trainFactory)
 
-ctc.show()
+
 wss_window.show()
 tm_window.show()
 wsh_window.show()
+ctc.show()
 
 
 #Emit Connect Slot
