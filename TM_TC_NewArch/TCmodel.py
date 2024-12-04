@@ -48,7 +48,7 @@ class TCmodel(QObject):
     def set_full_authority(self, auth):
         self.full_authority = auth
         #self.calculate_current_authority()
-        self.curr_authority = int(self.full_authority.split(';')[0])
+        self.curr_authority = float(self.full_authority.split(';')[0])
         self.curr_dist = self.curr_authority
         print(f"Full authority: {self.full_authority}")
         print(f"Current authority: {self.curr_authority}")

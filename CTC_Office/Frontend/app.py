@@ -235,6 +235,7 @@ class CTCApplication(QMainWindow):
 
     @pyqtSlot(list)
     def updateOccupancy(self, occupancies: list):
+        print("Got milk")
         line = ""
         if(len(occupancies) == 150):
             line = "Green"
