@@ -15,6 +15,8 @@ class TCmodel(QObject):
     left_doors_signal = Signal(bool)
     right_doors_signal = Signal(bool)
     update_current_speed_signal = Signal(float)
+    sbrake_change = Signal(bool)
+
 
     def __init__(self):
         super().__init__()
@@ -25,6 +27,9 @@ class TCmodel(QObject):
         self.prev_pwr_out = 0
         self.commandedSpeed = 0
         self.currentSpeed = 0
+        self.atStation = 0
+        self.speedlimits = []
+        self.current_speed_limit = 0
         self.ebrake = False
         self.sbrake = False
         self.pwr = 0
@@ -128,10 +133,29 @@ class TCmodel(QObject):
         self.stopping_dist()
         #check if it matches current distance from train (stopping distance should be GREATER or equal )
         #if matches, cut power and enable brake
-    #@Slot ()
-    #def block_switch(self):
+
+    
+    @Slot (int)
+    def block_switch(self):
         #set current distance to station to next value in authority string
-        #pop authority string
+        authority_list = self.full_authority.split(';')
+        authority_list.pop(0)
+        self.full_authority = ';'.join(authority_list)
+        self.curr_authority = self.full_authority.split(';')[0]
+        self.curr_dist = self.curr_authority
+        #update speed limit
+        self.speedlimits.pop(0)
+        self.current_speed_limit = self.speedlimits[0]
+        print (f"block switched, new speed limit: {self.current_speed_limit}")
+        #check underground
+
+    @Slot (list)
+    def set_speed_limits(self, speed_limits):
+        #take in speed limits
+        #define current speed limit value
+        self.speedlimits = speed_limits
+        self.current_speed_limit = self.speedlimits[0]
+
     def stopping_dist(self):
         if (self.acceleration <= 1):
             dist = 1
@@ -140,6 +164,7 @@ class TCmodel(QObject):
         if (self.curr_dist <= dist):
             self.cut_power_and_enable_brake
             print("cut power and enabled brake")
+
 
     def distance_traveled(self):
         delta_d = self.currentSpeed*T + (0.5*self.acceleration*T*T)
@@ -150,7 +175,10 @@ class TCmodel(QObject):
         self.curr_dist = self.curr_dist - self.distance_traveled()
         if (self.curr_dist < 0):
             self.curr_dist = 0
-        print(f"Current distance from station: {self.curr_dist} meters")
+            self.atStation = self.atStation + 1
+            self.station()
+        else:
+            print(f"Current distance from station: {self.curr_dist:.2f} meters")
 
     def cut_power_and_enable_brake(self):
         """ Cut power and enable the service brake. """
@@ -158,6 +186,7 @@ class TCmodel(QObject):
         self.sbrake = True
         print("Power cut and service brake enabled.")
 
+    
     #def set_block_length(self):
      #   """ Set the block length based on authority values. """
       #  auth_list = self.full_authority.split(';')
@@ -176,9 +205,27 @@ class TCmodel(QObject):
             authority_list.pop(0)
             self.full_authority = ';'.join(authority_list)
 
-            if int(self.full_authority.split(';')[1]) < int(self.full_authority.split(';')[2]):
+            if float(self.full_authority.split(';')[1]) < float(self.full_authority.split(';')[2]):
                 self.curr_authority = 0  # Placeholder for approaching a station
-
+    def station(self):
+        #at a station
+        if (self.atStation == 1):
+            if (self.currentSpeed > 0):
+                self.pwr = 0
+                self.sbrake = True
+                self.set_ebrake_from_driver(True)
+                #whatever else to stop immediatly
+            else:
+                #open correct doors
+                #start timer for 60 seconds
+                self.left_doors_signal(True)
+                self.right_doors_signal(True)
+                self.timer = 60
+                self.timer_countdown()
+                #finish station logic
+                #emit signal to add passengers?
+        else:
+            self.atStation = 0
 
     def toggle_underground(self):
         """ Toggle underground mode and update headlights. """
@@ -199,4 +246,4 @@ class TCmodel(QObject):
     def toggle_lights(self):
         """ Toggle the state of the lights. """
         self.lights = not self.lights
-        self.lights_signal.emit(self.lights)
+        self.lights_signal.emit(self.lights) 
