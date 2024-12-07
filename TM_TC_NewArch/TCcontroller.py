@@ -23,4 +23,6 @@ class TCcontroller (QObject):
         self.model.left_doors_signal.connect(self.view.left_door_status)
         self.model.right_doors_signal.connect(self.view.right_door_status)
         self.model.update_current_speed_signal.connect(self.view.current_speed_updated) 
+        self.model.authority_display.connect(self.view.update_authority_display)
+
 

@@ -46,7 +46,6 @@ class Block:
         r = r + "\n" + str(round(length*3.28084)) + " feet long\n"
         r = r + str(grade) + "% grade\n"
         r = r + str(round(speed*0.621371)) + " mph speed limit\n"
-        r = r + "Elevation of " + str(round(elevation*3.28084)) + " feet"
         r = r + "\nBidirectional: " + str(twoway)
         r = r + "\nUnderground: " + str(underground) 
         r = r + "\nOccupied: "
