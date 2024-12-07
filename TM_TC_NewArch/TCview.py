@@ -30,10 +30,12 @@ class TCView(QWidget):
             background-color: #f8f9fa;
             font-family: Arial, sans-serif;
             font-size: 14px;
+            
         }
         QLabel {
             font-weight: bold;
             margin-bottom: 5px;
+            color: black;
         }
         QPushButton {
             background-color: #007BFF;
@@ -295,6 +297,7 @@ class TCView(QWidget):
     def ebrake_changed(self, e):
         self.ebrake = e
         self.update_ebrake_ui()
+
     @Slot (float)
     def acceleration_changed(self, a):
         self.a_label.setText(f"Acceleration: {a:.2f} m/s^2")
