@@ -505,8 +505,6 @@ class FailureSelect(QWidget):
     def update(self):
         if(self.check!=failmode):
             self.label.move(180+failmode*45,50)
-            if(failmode==0):
-                self.label.move(-100,-100)
             self.check=failmode
 
 class FileButton(QWidget):
@@ -515,7 +513,7 @@ class FileButton(QWidget):
         pixmap = QPixmap('TrackModel/Icons/SelectFile.png')
         self.label = QLabel(window)
         self.label.setPixmap(pixmap)
-        self.label.move(135,0)
+        self.label.move(90,0)
         self.label.setStyleSheet(labelstyle)
         self.setStyleSheet(tooltipstyle)
         self.label.setToolTip("Select File")
@@ -679,7 +677,7 @@ class Map(QWidget):
         self.setStyleSheet("background-color: lightyellow;")
         passive.append(FileButton(self))
         passive.append(HeaterSystem(self))
-        for i in [1,2,3]:
+        for i in range(4):
             passive.append(FailureButton((i),self)) #add failure buttons
         active.append(FailureSelect(self)) #this goes after the dynamic icons, we hide them behind this widget system
         self.show()
