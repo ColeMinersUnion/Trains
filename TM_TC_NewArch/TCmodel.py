@@ -1,5 +1,5 @@
 # train_controller/model.py
-from PyQt6.QtCore import QObject, pyqtSignal as Signal, pyqtSlot as Slot
+from PyQt6.QtCore import QObject, pyqtSignal as Signal, pyqtSlot as Slot, QTimer
 import os
 
 T = 0.125  # Period of control loop in seconds
@@ -29,6 +29,7 @@ class TCmodel(QObject):
         self.currentSpeed = 0
         self.atStation = 0
         self.speedlimits = []
+        self.dist = 0
         self.current_speed_limit = 0
         self.ebrake = False
         self.sbrake = False
@@ -50,6 +51,22 @@ class TCmodel(QObject):
         self.underground = False
         self.service_brake_deceleration = 1.2  # m/s^2
         self.stopped_by_wayside = 0
+        self.approaching = 0
+
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.timer_countdown)
+
+    @Slot (float)
+    def update_acceleration(self, a):
+        self.acceleration = a
+    
+    def timer_countdown(self):
+        if self.timer_countdown_value > 0:
+            self.timer_countdown_value -= 1
+            print(f"Time remaining: {self.timer_countdown_value} seconds")
+        else:
+            self.timer.stop()  # Stop the timer when it reaches zero
+            print("Timer finished.")
 
     def set_full_authority(self, auth):
         self.full_authority = auth
@@ -70,6 +87,7 @@ class TCmodel(QObject):
         """ Set the current velocity. """
         self.currentSpeed = currentSpeed
         self.update_current_speed_signal.emit(self.currentSpeed)
+        print(f"current speed: {self.currentSpeed} m/s")
 
     @Slot(bool)
     def set_ebrake(self, ebrake):
@@ -105,6 +123,9 @@ class TCmodel(QObject):
         """ Perform a PID control loop iteration. """
         self.control_law(self.commandedSpeed, self.currentSpeed)
         self.update_distance()
+
+        if (self.approaching >= 1):
+            self.pwr = 0
         self.power_command.emit(self.pwr)
 
     def control_law(self, commandedSpeed, currentSpeed):
@@ -160,14 +181,20 @@ class TCmodel(QObject):
         self.current_speed_limit = self.speedlimits[0]
 
     def stopping_dist(self):
-        if (self.acceleration <= 1):
-            dist = 1
+        if (self.acceleration == 0):
+            self.dist = 1
         else:
-            dist = (self.currentSpeed*self.currentSpeed)/(2*self.acceleration)
-            print(f"stopping distance: {dist}")
-        if (self.curr_dist <= dist):
-            self.cut_power_and_enable_brake
-            print("cut power and enabled brake")
+           self.dist = (self.currentSpeed*self.currentSpeed)/(2*self.service_brake_deceleration)
+           print(f"stopping distance: {self.dist}")
+        if (self.curr_dist <= self.dist):
+            self.approaching = self.approaching + 1
+            print("added to val")
+            if (self.approaching == 1):
+                self.cut_power_and_enable_brake()
+            if (self.approaching >= 2):
+                self.dist = 1
+                self.pwr = 0
+                self.sbrake = True
     
     @Slot (bool)
     def wayside_stop(self, go_nogo):
@@ -198,7 +225,8 @@ class TCmodel(QObject):
     def cut_power_and_enable_brake(self):
         """ Cut power and enable the service brake. """
         self.pwr = 0
-        self.sbrake = True
+        self.sbrake = True #emit signal to try and enable service brake, wait for it back
+        self.sbrake_change.emit(self.sbrake)
         print("Power cut and service brake enabled.")
 
     
@@ -236,10 +264,11 @@ class TCmodel(QObject):
             else:
                 #open correct doors
                 #start timer for 60 seconds
-                self.left_doors_signal(True)
-                self.right_doors_signal(True)
-                self.timer = 60
-                self.timer_countdown()
+                self.left_doors_signal.emit(True)
+                self.right_doors_signal.emit(True)
+                self.timer_countdown_value = 60  # Set countdown to 60 seconds
+                self.timer.start(1000)  # Start the timer with 1-second intervals
+                print("Timer started for 60 seconds.")
                 #finish station logic
                 #emit signal to add passengers?
                 #add 25 to auth or some other way to figure that out...maybe go back and redo that authority value
