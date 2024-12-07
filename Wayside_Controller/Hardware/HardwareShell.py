@@ -109,6 +109,7 @@ class WaysideWindow(QMainWindow):
         for i in range(41, 77):
             item = self.wayside_block_table.item(i-41, 0)
             if self.occupancy[i]:
+                print("wsh occupied block:", i)
                 item.setBackground(QtGui.QColor(0, 0, 255))
 
             else:
@@ -179,7 +180,8 @@ class WaysideWindow(QMainWindow):
     @pyqtSlot(list)
     def update_occupancy(self, new_occ):
         # Slot to update the label text
-        self.occupancy = new_occ
+        self.occupancy[41:77] = new_occ[41:77]
+        self.wsh_ctc_occupancy.emit(self.occupancy)
         if self.connected:
             self.send_occupancy(new_occ)
         self.wsh_tm_authority.emit(self.authority)

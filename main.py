@@ -19,7 +19,7 @@ tm_signals = tm_window.signals
 
 #Emit Connect Slot
 wss_window.wss_ctc_occupancy.connect(ctc.updateOccupancy)
-wsh_window.wsh_ctc_occupancy.connect(ctc.updateOccupancy)
+#wsh_window.wsh_ctc_occupancy.connect(ctc.updateOccupancy)
 #wsh_window.ws_ctc_switch_result.connect(ctc.handleGreenOutputSwitch)
 
 
@@ -36,10 +36,12 @@ def trainFactory(routeInfo: list, authority: str):
     except IndexError:
         print('Train reach end of line. Went back to the yard')
 
+
 # Show both windows
 
 #tk sending occupancies to wss
 tm_signals.sendOccupancies.connect(wss_window.update_occupancy)
+tm_signals.sendOccupancies.connect(wsh_window.update_occupancy)
 #wss sending updated authority to tk:
 wss_window.wss_tm_authority.connect(tm_signals.getAuthority)
 wss_window.wss_tm_switch_13.connect(tm_signals.getSwitch13)
