@@ -1,5 +1,5 @@
 import sys
-from PyQt6.QtWidgets import QWidget, QLabel, QPushButton, QLineEdit, QSlider, QApplication
+from PyQt6.QtWidgets import QWidget, QLabel, QPushButton, QLineEdit, QSlider, QApplication, QFileDialog
 from PyQt6.QtGui import QTransform, QPixmap
 from PyQt6.QtCore import Qt,QTimer,QObject, pyqtSignal, pyqtSlot
 import pandas as pd #reading the excel file
@@ -10,14 +10,15 @@ XOFFSET = 0
 YOFFSET = 3
 SCL=20 #scale
 occflag = True
-linenames=[]
-lines=[] 
+linenames=["Green","Red"]
+lines=[]
 switchid=[] #track switch numbers for pinging
 crossingid=[] #track crossing numbers for pinging
 failmode = 0
 failnames = ["No","Rail","Circuit","Power"]
 heaters = False
 speed = 1
+fileselected = False
 class Block:
     #instantiation
     def __init__(self, linenum, section, number, length, grade, speed, twoway, elevation, underground,x1,y1,x2,y2):
@@ -144,10 +145,12 @@ class Station: #yard also
         self.name = name
         self.side = side
         self.msg = ""
+        self.passengers = 5
         if(name=="YARD"):  
             self.msg = "YARD"
         else:
             self.msg = "Station " + str(name) + "\nSide " + str(side) + "\n" + linenames[linenum] + " Line, Block " + str(block)
+
 
 class Train:
     def __init__(self,linenum,block1):
@@ -218,7 +221,9 @@ class Line:
             if (x.name==name):
                 return Station
         return None
-    
+
+lines=[Line(0),Line(1)]
+
 def readX(string): #return cross marks
     return (string=="X")
 def read(file):
@@ -268,6 +273,7 @@ from numpy import array
 class SignalHandler(QObject):
 
     sendOccupancies = pyqtSignal(list)
+    sendAuthorities = pyqtSignal(list)
 
     def __init__(self):
         super().__init__()
@@ -277,16 +283,30 @@ class SignalHandler(QObject):
         self.sendOccupancies.emit(occupancies)
         print(array(occupancies))
 
+    def callAuthSend(self): # call to send authorities to train
+        authorities=[]
+        for b in lines[0].blocks:
+            authorities.append(b.authority) 
+        self.sendAuthorities.emit(authorities)
+
     @pyqtSlot(int)
     def addOcc(self,message):
         lines[0].blocks[self.oldblock].occupied = False
         lines[0].blocks[message].occupied = True
         self.oldblock = message
 
-    @pyqtSlot(list)
-    def getAuthority(self,message):
+    @pyqtSlot(list) #authority for blocks 41 to 68
+    def getHardwareAuthority(self,message):
         for i in range(len(lines[0].blocks)):
-            lines[0].blocks[i].authority = message[i]
+            if (i>40 and i<69):
+                lines[0].blocks[i].authority = message[i]
+        
+
+    @pyqtSlot(list) #authority for all other blocks
+    def getSoftwareAuthority(self,message):
+        for i in range(len(lines[0].blocks)):
+            if (i<41 or i>68):
+                lines[0].blocks[i].authority = message[i]
 
     @pyqtSlot(bool)
     def getSwitch13(self,message):
@@ -478,13 +498,36 @@ class FailureSelect(QWidget):
         super().__init__()
         self.label = QLabel(window)
         self.label.setPixmap(QPixmap('TrackModel/Icons/FailureSelect.png'))
+        self.label.move(-100,-100)
         self.check=0
         self.update()
     
     def update(self):
         if(self.check!=failmode):
             self.label.move(180+failmode*45,50)
+            if(failmode==0):
+                self.label.move(-100,-100)
             self.check=failmode
+
+class FileButton(QWidget):
+    def __init__(self,window):
+        super().__init__()
+        pixmap = QPixmap('TrackModel/Icons/SelectFile.png')
+        self.label = QLabel(window)
+        self.label.setPixmap(pixmap)
+        self.label.move(135,0)
+        self.label.setStyleSheet(labelstyle)
+        self.setStyleSheet(tooltipstyle)
+        self.label.setToolTip("Select File")
+
+        self.label.mousePressEvent = self.selectFile
+
+    def selectFile(self,message):
+        global fileselected
+        filename, _ = QFileDialog.getOpenFileName(self, "Open File", "", "Excel Files (*.xlsx)")
+        if filename:
+            read(filename)
+        fileselected = True
 
 class FailureButton(QWidget):
     def __init__(self,failnum,window):
@@ -634,10 +677,16 @@ class Map(QWidget):
         self.move(0,0)
         self.setWindowTitle("Track Model Map")
         self.setStyleSheet("background-color: lightyellow;")
-        read('TrackModel/Green Line.xlsx')
+        passive.append(FileButton(self))
         passive.append(HeaterSystem(self))
-        for i in range(4):
+        for i in [1,2,3]:
             passive.append(FailureButton((i),self)) #add failure buttons
+        active.append(FailureSelect(self)) #this goes after the dynamic icons, we hide them behind this widget system
+        self.show()
+        passive[0].selectFile(None) #select a file
+        while(not fileselected):
+            1
+        print(str(len(lines[0].blocks)))
         for line in lines:
             for block in line.blocks:
                 active.append(BlockIcon(block,self)) #updates for view
@@ -649,7 +698,6 @@ class Map(QWidget):
                 passive.append(TransponderIcon(transponder,self))  
             for station in line.stations:
                 passive.append(StationIcon(station,self))
-        active.append(FailureSelect(self)) #this goes after the dynamic icons, we hide them behind this widget system
         active.append(SpeedMeter(self))
         self.timer=QTimer() #timer for active components
         self.timer.timeout.connect(self.update) #connect timer to update method
