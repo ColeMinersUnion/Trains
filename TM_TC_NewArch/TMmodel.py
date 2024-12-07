@@ -58,7 +58,6 @@ class TrainModel(QObject):
         self.currentBeaconInfo = "null"
         self.parseRouteInfo()
         self.calcTotalMass()
-        self.block_change.emit(self.blockID[self.i])
 
     """ velocity calculation """
     @Slot(float)
@@ -183,11 +182,10 @@ class TrainModel(QObject):
         self.totalDistanceTravelled += (T/2) * (self.vn + self.vn_1)
 
     def checkBlockChange(self):
-        #print(self.totalDistanceTravelled)
+        self.block_change.emit(self.blockID[self.i])
         #print(self.milestoneDistance)
         if(self.milestoneDistance < self.totalDistanceTravelled):
             self.i += 1
-            self.block_change.emit(self.blockID[self.i])
             self.milestoneDistance += self.blockLength[self.i]
 
     #@Slot(str)
