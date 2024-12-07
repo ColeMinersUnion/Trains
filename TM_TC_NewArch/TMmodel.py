@@ -20,6 +20,10 @@ class TrainModel(QObject):
     right_door_updated = Signal(bool) #Signal to toggle right doors
     service_brake_updated = Signal(bool) #Signal to toggle service brake
     emergency_brake_updated = Signal(bool) #Signal to communicate emergency brake status
+    signal_failure = Signal(bool)   # Signal for signal failure
+    engine_failure = Signal(bool)   # Signal for engine failure
+    brake_failure = Signal(bool)    # Signal for brake failure
+    speed_limits = Signal(list)     # speed limits for train controller
     
     def __init__(self, routeInfo):
         super().__init__()
@@ -40,6 +44,9 @@ class TrainModel(QObject):
         self.leftDoorStatus = False
         self.serviceBrakeStatus = False
         self.emergencyBrakeStatus = False
+        self.brakeFailureStatus = False
+        self.signalFailureStatus = False
+        self.engineFailureStatus = False
         self.routeInfo = routeInfo
         self.blockID = []
         self.blockLength = []
@@ -57,13 +64,13 @@ class TrainModel(QObject):
 
         self.calcTotalMass()
         
-        if self.serviceBrakeStatus:
+        if self.serviceBrakeStatus and (not self.brakeFailureStatus):
 
             if(self.vn > 0):
                 self.an = (-1.2 / 8)
                 self.vn += self.an
             else:
-                self. an  = 0
+                self.an = 0
                 self.vn = 0.0
 
         elif self.emergencyBrakeStatus:
@@ -81,6 +88,9 @@ class TrainModel(QObject):
                 self.an = 0
                 self.vn = 0
             else:
+                if(power > self.maxPower):
+                    power = self.maxPower
+
                 if(self.vn <= 0):
                     self.an = (self.maxPower / (self.totalMass * self.maxSpeed))
                 else: 
@@ -88,8 +98,7 @@ class TrainModel(QObject):
 
                 self.vn = self.vn_1 + (T/2) * (self.an + self.an_1)
 
-            print(power)
-            print(self.vn)
+            #print(self.vn)
 
             self.vn_1 = self.vn
             self.an_1 = self.an
@@ -101,9 +110,9 @@ class TrainModel(QObject):
         self.acceleration_updated.emit(self.an)
 
     """ Update for passengers of train """
-    @Slot(int)
-    def updatePassengerCount(self, num: int):
-        self.passengerCount += num
+    @Slot()
+    def updatePassengerCount(self):
+        self.passengerCount += 8
         self.passengerCount_updated.emit(self.passengerCount)
         self.calcTotalMass()
 
@@ -116,54 +125,58 @@ class TrainModel(QObject):
     @Slot(float)
     def setTemperature(self, temperature: float):
         self.temperature = temperature
-        self.temperature_updated(self.temperature)
+        self.temperature_updated.emit(self.temperature)
 
     """ Toggle for cabin (interior) lights """
-    @Slot(bool)
-    def toggleInteriorLights(self, input: bool):
-        self.intLightStatus = input
+    @Slot()
+    def toggleInteriorLights(self):
+        self.intLightStatus = not self.intLightStatus
         self.intLights_updated.emit(self.intLightStatus)
 
     """ Toggle for headlights of train """
-    @Slot(bool)
-    def toggleExteriorLights(self, input: bool):
-        self.extLightStatus = input
+    @Slot()
+    def toggleExteriorLights(self):
+        self.extLightStatus = not self.extLightStatus
         self.extLights_updated.emit(self.extLightStatus)
 
     """ For toggling the left doors (True = Open)"""
-    @Slot(bool)
-    def toggleLeftDoors(self, input: bool):
-        self.leftDoorStatus = input
+    @Slot()
+    def toggleLeftDoors(self):
+        self.leftDoorStatus = not self.leftDoorStatus
         self.left_door_updated.emit(self.leftDoorStatus)
 
         """ For toggling the right doors (True = Open)"""
-    @Slot(bool)
-    def toggleRightDoors(self, input: bool):
-        self.rightDoorStatus = input
+    @Slot()
+    def toggleRightDoors(self):
+        self.rightDoorStatus = not self.rightDoorStatus
         self.right_door_updated.emit(self.rightDoorStatus)
 
     """ For toggling the service brake (True = On)"""
-    @Slot(bool)
-    def toggleServiceBrake(self, input: bool):
-        self.serviceBrakeStatus = input
-        self.service_brake_updated.emit(self.serviceBrakeStatus)
+    @Slot()
+    def toggleServiceBrake(self):
+        if(not self.brakeFailureStatus):
+            self.serviceBrakeStatus = not self.serviceBrakeStatus
+            self.service_brake_updated.emit(self.serviceBrakeStatus)
 
-    @Slot(bool)
-    def toggleEmergencyBrake(self, input: bool):
-        self.emergencyBrakeStatus = input
+    """ For toggling the emergency brake """
+    @Slot()
+    def toggleEmergencyBrake(self):
+        self.emergencyBrakeStatus = not self.emergencyBrakeStatus
         self.emergency_brake_updated.emit(self.emergencyBrakeStatus)
 
+    """ Parsing the route information the train is initialized with """
     def parseRouteInfo(self):
         groupedRouteInfo = list(zip(*self.routeInfo))
         self.blockID = groupedRouteInfo[0]
         self.blockLength = groupedRouteInfo[1]
         self.speedLimit = groupedRouteInfo[2]
 
-        #print(self.blockID)
-        #self.totalRouteDistance = sum(self.blockLength)
+        #send speed limits to train controller here
+        self.speed_limits.emit(self.speedLimit)
 
         self.milestoneDistance += self.blockLength[0]
 
+    """ built in odometer, uses the distance travelled to calculate if the block changes """
     def odometer(self):
         self.totalDistanceTravelled += (T/2) * (self.vn + self.vn_1)
 
@@ -174,4 +187,20 @@ class TrainModel(QObject):
             self.i += 1
             self.block_change.emit(self.blockID[self.i])
             self.milestoneDistance += self.blockLength[self.i]
-            #print("sent info")
+
+
+    """ Failure (Murphy) toggles are the next three slot functions here """
+    @Slot()
+    def toggleBrakeFailure(self):
+        self.brakeFailureStatus = not self.brakeFailureStatus
+        self.brake_failure.emit(self.brakeFailureStatus)
+
+    @Slot()
+    def toggleEngineFailure(self):
+        self.engineFailureStatus = not self.engineFailureStatus
+        self.engine_failure.emit(self.engineFailureStatus)
+
+    @Slot()
+    def toggleSignalFailure(self):
+        self.signalFailureStatus = not self.signalFailureStatus
+        self.signal_failure.emit(self.signalFailureStatus)

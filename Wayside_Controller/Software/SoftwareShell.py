@@ -1,6 +1,6 @@
 import sys
 import os
-
+from numpy import array
 from PyQt6.QtCore import pyqtSignal, pyqtSlot, QObject
 from PyQt6 import QtCore, QtGui, QtWidgets, uic
 from PyQt6.QtWidgets import * 
@@ -67,14 +67,15 @@ class WaysideShell(QMainWindow):
     #slot to update occupancy which then updates the plc authority
     #then send out updated authority, switches, signals, crossings 
     @pyqtSlot(list)
-    def update_occupancy(self, new_occupancy):
+    def update_occupancy(self, new_occupancy: list):
+        print(len(new_occupancy))
         self.occupancy=new_occupancy
         #self.authority,self.switch_77,self.switch_85,self.switch_28,self.switch_13 = self.plc.update_values(new_occupancy) 
         self.authority,self.switch_77,self.switch_85,self.switch_28,self.switch_13,self.signal_77, self.signal_85, self.signal_28, self.signal_13, self.crossing_19, self.crossing_108 = self.plc.update_values(new_occupancy)
         #emitting updated authority and switch, signal, crossing states:
         self.wss_tm_authority.emit(self.authority) #sending updated authority to track model
         self.wss_ctc_occupancy.emit(self.occupancy) #sending occupancy to ctc
-        
+        print(f'Wayside Occ: {array(self.occupancy)}')
         self.wss_tm_switch_77.emit(self.switch_77)
         self.wss_tm_switch_85.emit(self.switch_85)
         self.wss_tm_switch_28.emit(self.switch_28)
@@ -89,8 +90,6 @@ class WaysideShell(QMainWindow):
         self.wss_tm_crossing_108.emit(self.crossing_108)
 
         self.update_ui()
-        #uncomment this when testing the shell:
-        #return self.authority,self.switch_77,self.switch_85,self.switch_28,self.switch_13,self.signal_77,self.signal_85,self.signal_28,self.signal_13,self.crossing_19,self.crossing_108
     
     #slot to receive maintenance occupancies from ctc
     @pyqtSlot(list)
@@ -98,6 +97,7 @@ class WaysideShell(QMainWindow):
         #maintenance_mode function will determine if it is safe to put a zone into maint mode
         #if so, it will implement maint mode
         self.plc.maintenance_mode(suggested_maintenance, self.occupancy)
+    
     #slot to receive dispatch info from ctc
     '''@pyqtSlot(tuple)
     def send_dispatch(self, dispatch):
@@ -170,11 +170,24 @@ class WaysideShell(QMainWindow):
     
     def update_ui(self):
         #update block table state and authority from Track Model
-        for i in range(len(self.occupancy)):
+        '''for i in range(len(self.occupancy)):
             self.wayside_block_table.setItem(i,0, QTableWidgetItem(str(self.occupancy[i])))
 
         for i in range(len(self.authority)):
-            self.wayside_block_table.setItem(i,1, QTableWidgetItem(str(self.authority[i])))
+            self.wayside_block_table.setItem(i,1, QTableWidgetItem(str(self.authority[i])))'''
+        #update block table state and authority from Track Model
+        for i in range(46):
+            self.wayside_block_table.setItem(i-0,0, QTableWidgetItem(str(self.occupancy[i])))
+
+        for i in range(46):
+            self.wayside_block_table.setItem(i-0,1, QTableWidgetItem(str(self.authority[i])))
+        
+        for i in range(68, 150):
+            self.wayside_block_table.setItem(i-0,0, QTableWidgetItem(str(self.occupancy[i])))
+        
+        for i in range(68, 150):
+            self.wayside_block_table.setItem(i-0,1, QTableWidgetItem(str(self.authority[i])))
+        
         
         #update switches 
         if(self.switch_13):

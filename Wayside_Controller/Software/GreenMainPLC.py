@@ -423,7 +423,7 @@ class GreenPLC:
             authority[120]=False
         else:
             authority[120]=True
-        if occupancy[120]==True and (occupancy[121]==True or any(occupancy[122:143]==True)):
+        if occupancy[120]==True and (occupancy[121]==True or any(occupancy[122:143])==True):
             authority[121]=False
         else:
             authority[121]=True

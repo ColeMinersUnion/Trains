@@ -159,16 +159,22 @@ class CTC_Office:
         
     def updateTrack(cls, line: str, states: list):
         #*Check to see if occupancies are trains or breakdowns
+        #this is one off and idk from where it gets misaligned
         for i, b in enumerate(states):
             #!i = block index, b block state
             if b:
                 isBroken = True
-                for t in cls.Schedule[line]:
+                for t in cls.Schedule[line].trains:
+                    print(f"Train is at block: {i}")
+                    print(f"Train Location: {t.location.connections}")
                     if i in t.location.connections:
                         t.location = cls.line[line].graph[i]
                         isBroken = False
+                        print("Train Moved!")
                 if isBroken:
                     cls.line[line].closed = True
+                    raise Exception("Track declared broken")
+                    print("Track Broken!")
 
 
                              

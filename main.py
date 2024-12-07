@@ -14,14 +14,15 @@ app = QApplication(sys.argv)
 ctc = CTCApplication()
 wss_window = SoftwareShell()
 wsh_window = HardwareShell()
+tm_window = Map()   
+tm_signals = tm_window.signals
 
 #Emit Connect Slot
 wss_window.wss_ctc_occupancy.connect(ctc.updateOccupancy)
 wsh_window.wsh_ctc_occupancy.connect(ctc.updateOccupancy)
 #wsh_window.ws_ctc_switch_result.connect(ctc.handleGreenOutputSwitch)
 
-tm_window = Map()   
-tm_signals = SignalHandler()
+
 
 @pyqtSlot(list, str)
 def trainFactory(routeInfo: list, authority: str):
@@ -32,11 +33,10 @@ def trainFactory(routeInfo: list, authority: str):
         trains[-1].train_model.block_change.connect(tm_signals.addOcc)
     except TypeError:
         print('Oops')
+    except IndexError:
+        print('Train reach end of line. Went back to the yard')
 
 # Show both windows
-wss_window.show()
-tm_window.show()
-wsh_window.show()
 
 #tk sending occupancies to wss
 tm_signals.sendOccupancies.connect(wss_window.update_occupancy)
@@ -52,9 +52,11 @@ wsh_window.wsh_tm_authority.connect(tm_signals.getAuthority)
 
 ctc.emitTrain.connect(trainFactory)
 
-ctc.show()
-wsh_window.show()
+
 wss_window.show()
+tm_window.show()
+wsh_window.show()
+ctc.show()
 
 
 #Emit Connect Slot

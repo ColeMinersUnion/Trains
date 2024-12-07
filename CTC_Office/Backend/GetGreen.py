@@ -115,9 +115,9 @@ def Green() -> Graph:
     Greenline.graph.append(Node(index=78, line="Green", section="N", block_length=300, block_grade=0, speed_limit=70, infrastructure="", elevation=0, cumulative_elevation=0.5, connections=[77, 79]))
     Greenline.graph.append(Node(index=79, line="Green", section="N", block_length=300, block_grade=0, speed_limit=70, infrastructure="", elevation=0, cumulative_elevation=0.5, connections=[78, 80]))
     Greenline.graph.append(Node(index=80, line="Green", section="N", block_length=300, block_grade=0, speed_limit=70, infrastructure="", elevation=0, cumulative_elevation=0.5, connections=[79, 81]))
-    Greenline.graph.append(Node(index=81, line="Green", section="N", block_length=300, block_grade=0, speed_limit=70, infrastructure="", elevation=0, cumulative_elevation=0.5, connections=[80, 79]))
-    Greenline.graph.append(Node(index=82, line="Green", section="N", block_length=300, block_grade=0, speed_limit=70, infrastructure="", elevation=0, cumulative_elevation=0.5, connections=[81, 79]))
-    Greenline.graph.append(Node(index=83, line="Green", section="N", block_length=300, block_grade=0, speed_limit=70, infrastructure="", elevation=0, cumulative_elevation=0.5, connections=[82, 79]))
+    Greenline.graph.append(Node(index=81, line="Green", section="N", block_length=300, block_grade=0, speed_limit=70, infrastructure="", elevation=0, cumulative_elevation=0.5, connections=[80, 82]))
+    Greenline.graph.append(Node(index=82, line="Green", section="N", block_length=300, block_grade=0, speed_limit=70, infrastructure="", elevation=0, cumulative_elevation=0.5, connections=[81, 83]))
+    Greenline.graph.append(Node(index=83, line="Green", section="N", block_length=300, block_grade=0, speed_limit=70, infrastructure="", elevation=0, cumulative_elevation=0.5, connections=[82, 84]))
     Greenline.graph.append(Node(index=84, line="Green", section="N", block_length=300, block_grade=0, speed_limit=70, infrastructure="", elevation=0, cumulative_elevation=0.5, connections=[83, 85]))
     Greenline.graph.append(Node(index=85, line="Green", section="N", block_length=300, block_grade=0, speed_limit=70, infrastructure="", elevation=0, cumulative_elevation=0.5, connections=[84, 86, 100]))
 
