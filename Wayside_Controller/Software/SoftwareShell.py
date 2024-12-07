@@ -67,8 +67,9 @@ class WaysideShell(QMainWindow):
     #then send out updated authority, switches, signals, crossings 
     @pyqtSlot(list)
     def update_occupancy(self, new_occupancy: list):
-        
-        self.occupancy=new_occupancy
+        #only pass to ctc the sections within software wayside control 
+        self.occupancy[1:41]=new_occupancy[1:41]
+        self.occupancy[69:151]=new_occupancy[69:151]
         #self.authority,self.switch_77,self.switch_85,self.switch_28,self.switch_13 = self.plc.update_values(new_occupancy) 
         self.authority,self.switch_77,self.switch_85,self.switch_28,self.switch_13,self.signal_77, self.signal_85, self.signal_28, self.signal_13, self.crossing_19, self.crossing_108 = self.plc.update_values(new_occupancy)
         #emitting updated authority and switch, signal, crossing states:
