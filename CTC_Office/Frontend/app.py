@@ -35,12 +35,20 @@ class CTCApplication(QMainWindow):
         self.Office = Office
         self.Office.addGreenLine()
 
+        self.navbar = QHBoxLayout()
+        self.manual = QPushButton("Manual")
+        self.auto_page = QPushButton("Automatic")
+        self.navbar.addWidget(self.manual)
+        self.navbar.addWidget(self.auto_page)
+        self.navbar.setSpacing(10)
+        self.navbar.setContentsMargins(0, 0, 0, 0)
+
         #self.scheduleWidget = SchedulePreviewer()
         self.GreenOcc = OccupancyWidget()
         self.RedOcc = OccupancyWidget()
         self.newTrainWidget = NewTrainWidget(Green)
         self.hlayout = QHBoxLayout()
-        self.layout = QVBoxLayout()
+        self.Manual_layout = QVBoxLayout()
         self.main = QWidget()
         self.clear = QPushButton("Clear")
         self.clear_state = True
@@ -54,10 +62,16 @@ class CTCApplication(QMainWindow):
         self.Auto = QPushButton("Schedule File")
         self.auto_state = True
 
+        self.Title = QLabel()
+        self.Title.setText("Manual Mode")
+        self.Title.styleSheet = "font-size: 60px; font-weight: bold;"
+        self.Manual_layout.addWidget(self.Title)
+
+
         self.hlayout.addWidget(self.newTrainWidget)
         self.hlayout.addWidget(self.GreenOcc)
-        self.layout.addLayout(self.hlayout)
-        self.layout.setSpacing(10)
+        self.Manual_layout.addLayout(self.hlayout)
+        self.Manual_layout.setSpacing(10)
         #!TestBench Stuff
         self.switchState = QLabel()
         self.speed = QLabel()
@@ -88,8 +102,8 @@ class CTCApplication(QMainWindow):
 
         lbl1 = QLabel()
         lbl1.setText("Green Line Occupancy")
-        self.layout.addWidget(lbl1)
-        self.layout.addWidget(self.GreenOcc.widget)
+        self.Manual_layout.addWidget(lbl1)
+        self.Manual_layout.addWidget(self.GreenOcc.widget)
 
         self.lbl10 = QLabel()
         self.lbl10.setWordWrap(True)
@@ -101,37 +115,37 @@ class CTCApplication(QMainWindow):
 
         lbl3 = QLabel()
         lbl3.setText("Automatic Mode")
-        self.layout.addWidget(lbl3)
-        self.layout.addWidget(self.Automatic)
-        self.layout.addWidget(self.Auto)
+        self.Manual_layout.addWidget(lbl3)
+        self.Manual_layout.addWidget(self.Automatic)
+        self.Manual_layout.addWidget(self.Auto)
 
         lbl4 = QLabel()
         lbl4.setText("Breaking the track")
-        self.layout.addWidget(lbl4)
-        self.layout.addWidget(self.breakBlok)
-        self.layout.addWidget(self.submitBreak)
+        self.Manual_layout.addWidget(lbl4)
+        self.Manual_layout.addWidget(self.breakBlok)
+        self.Manual_layout.addWidget(self.submitBreak)
 
         lbl5 = QLabel()
         lbl5.setText("Fixing the track")
-        self.layout.addWidget(lbl5)
-        self.layout.addWidget(self.fixBlock)
-        self.layout.addWidget(self.submitFix)
+        self.Manual_layout.addWidget(lbl5)
+        self.Manual_layout.addWidget(self.fixBlock)
+        self.Manual_layout.addWidget(self.submitFix)
         
         
 
 
-        self.layout.addWidget(lbl)
-        self.layout.addWidget(self.speed)
-        self.layout.addWidget(self.auth)
-        self.layout.addWidget(self.switchState)
-        self.layout.addWidget(scroll_area)
+        self.Manual_layout.addWidget(lbl)
+        self.Manual_layout.addWidget(self.speed)
+        self.Manual_layout.addWidget(self.auth)
+        self.Manual_layout.addWidget(self.switchState)
+        self.Manual_layout.addWidget(scroll_area)
 
         #setting signals
         self.newTrainWidget.emitTrain.connect(self.handleNewGreenTrain)
 
 
 
-        self.main.setLayout(self.layout)
+        self.main.setLayout(self.Manual_layout)
 
         self.setCentralWidget(self.main)
     
