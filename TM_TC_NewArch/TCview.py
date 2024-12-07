@@ -54,7 +54,10 @@ class TCView(QWidget):
     def init_ui(self):
         setpoint_layout = QVBoxLayout()
         self.setpoint_label = QLabel("Setpoint Speed: 50")
-        self.setpoint_slider = QSlider(Qt.Horizontal)
+        try:
+            self.setpoint_slider = QSlider(Qt.Horizontal)
+        except:
+            self.setpoint_slider = QSlider(Qt.Orientation.Horizontal)
         self.setpoint_slider.setRange(0, 100)
         self.setpoint_slider.setValue(50)
         self.setpoint_slider.valueChanged.connect(self.emit_setpoint_command)
