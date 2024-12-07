@@ -55,6 +55,7 @@ class TrainModel(QObject):
         self.totalDistanceTravelled = 0
         self.i = 0
         self.milestoneDistance = 0
+        self.currentBeaconInfo = "null"
         self.parseRouteInfo()
         self.calcTotalMass()
 
@@ -145,7 +146,7 @@ class TrainModel(QObject):
         self.leftDoorStatus = not self.leftDoorStatus
         self.left_door_updated.emit(self.leftDoorStatus)
 
-        """ For toggling the right doors (True = Open)"""
+    """ For toggling the right doors (True = Open)"""
     @Slot()
     def toggleRightDoors(self):
         self.rightDoorStatus = not self.rightDoorStatus
@@ -181,13 +182,15 @@ class TrainModel(QObject):
         self.totalDistanceTravelled += (T/2) * (self.vn + self.vn_1)
 
     def checkBlockChange(self):
-        #print(self.totalDistanceTravelled)
+        self.block_change.emit(self.blockID[self.i])
         #print(self.milestoneDistance)
         if(self.milestoneDistance < self.totalDistanceTravelled):
             self.i += 1
-            self.block_change.emit(self.blockID[self.i])
             self.milestoneDistance += self.blockLength[self.i]
 
+    #@Slot(str)
+    #def beaconIntake(self, beacon: str):
+        
 
     """ Failure (Murphy) toggles are the next three slot functions here """
     @Slot()

@@ -12,10 +12,10 @@ class GreenPLC:
         self.switch_77 = False
         self.switch_85 = True
         #signals
-        self.signal_13 = False
-        self.signal_28 = False
-        self.signal_77 = False
-        self.signal_85 = False
+        self.signal_13 = True
+        self.signal_28 = True
+        self.signal_77 = True
+        self.signal_85 = True
         #crossings
         self.crossing_19=False
         self.crossing_108=False
@@ -41,7 +41,7 @@ class GreenPLC:
     def update_values(self, occupancy):
         #update switches then signals then crossings then authority
         switch77, switch85, switch28, switch13 = self.update_switch(occupancy)
-        signal77, signal85, signal28, signal13 = self.update_signal(switch77, switch85, switch28, switch13)
+        signal77, signal85, signal28, signal13 = self.update_signal(occupancy)
         crossing19, crossing108 = self.update_crossing(occupancy)
         authority=self.update_authority(occupancy)
         return authority, switch77, switch85, switch28, switch13, signal77, signal85, signal28, signal13, crossing19, crossing108
@@ -76,28 +76,24 @@ class GreenPLC:
     def say_hi(self):
         print("PLC Uploaded Successfully")
     
-    def update_signal(self, sw77, sw85, sw28, sw13):
-        self.switch_77=sw77
-        self.switch_85=sw85
-        self.switch_28=sw28
-        self.switch_13=sw13
-        #update signals according to default path (they turn on when the switch changes from 'default' setting)
-        if self.switch_77==True:
-            self.signal_77=True
-        else: 
+    def update_signal(self, occupancy):
+        #update signals according to default path (they turn red when there's a train on the section of track)
+        if any(occupancy[77:100]):
             self.signal_77=False
-        if self.switch_85==False:
-            self.signal_85=True
         else: 
+            self.signal_77=True
+        if any(occupancy[86:100]):
             self.signal_85=False
-        if self.switch_28==True:
-            self.signal_28=True
         else: 
+            self.signal_85=True
+        if any(occupancy[1:27]):
             self.signal_28=False
-        if self.switch_13==False:
-            self.signal_13=True
         else: 
+            self.signal_28=True
+        if any(occupancy[1:12]):
             self.signal_13=False
+        else: 
+            self.signal_13=True
         return self.signal_77, self.signal_85, self.signal_28, self.signal_13
 
     
@@ -806,7 +802,7 @@ class GreenPLC:
             authority[40]=False
         else:
             authority[40]=True
-        if occupancy[40]==True and (any(occupancy[41:46])==True):
+        '''if occupancy[40]==True and (any(occupancy[41:46])==True):
             authority[41]=False
         else:
             authority[41]=True
@@ -829,7 +825,7 @@ class GreenPLC:
         if occupancy[45]==True and (occupancy[46]==True):
             authority[46]=False
         else:
-            authority[46]=True
+            authority[46]=True'''
         #end of zone I for main wayside
 
         return authority

@@ -1,6 +1,5 @@
 import sys
 import os
-from numpy import array
 from PyQt6.QtCore import pyqtSignal, pyqtSlot, QObject
 from PyQt6 import QtCore, QtGui, QtWidgets, uic
 from PyQt6.QtWidgets import * 
@@ -68,14 +67,15 @@ class WaysideShell(QMainWindow):
     #then send out updated authority, switches, signals, crossings 
     @pyqtSlot(list)
     def update_occupancy(self, new_occupancy: list):
-        print(len(new_occupancy))
-        self.occupancy=new_occupancy
+        #only pass to ctc the sections within software wayside control 
+        self.occupancy[1:41]=new_occupancy[1:41]
+        self.occupancy[69:151]=new_occupancy[69:151]
         #self.authority,self.switch_77,self.switch_85,self.switch_28,self.switch_13 = self.plc.update_values(new_occupancy) 
         self.authority,self.switch_77,self.switch_85,self.switch_28,self.switch_13,self.signal_77, self.signal_85, self.signal_28, self.signal_13, self.crossing_19, self.crossing_108 = self.plc.update_values(new_occupancy)
         #emitting updated authority and switch, signal, crossing states:
         self.wss_tm_authority.emit(self.authority) #sending updated authority to track model
         self.wss_ctc_occupancy.emit(self.occupancy) #sending occupancy to ctc
-        print(f'Wayside Occ: {array(self.occupancy)}')
+        
         self.wss_tm_switch_77.emit(self.switch_77)
         self.wss_tm_switch_85.emit(self.switch_85)
         self.wss_tm_switch_28.emit(self.switch_28)

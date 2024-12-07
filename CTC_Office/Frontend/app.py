@@ -1,5 +1,5 @@
 #from PyQt6.QtCore import QSize, Qt
-from PyQt6.QtWidgets import QMainWindow, QPushButton, QScrollArea, QVBoxLayout, QWidget, QLineEdit, QLabel
+from PyQt6.QtWidgets import QMainWindow, QPushButton, QScrollArea, QVBoxLayout, QHBoxLayout, QWidget, QLineEdit, QLabel
 from PyQt6.QtCore import pyqtSlot, pyqtSignal
 import sys, os
 try:
@@ -35,17 +35,21 @@ class CTCApplication(QMainWindow):
         self.Office = Office
         self.Office.addGreenLine()
 
+        self.navbar = QHBoxLayout()
+        self.manual = QPushButton("Manual")
+        self.auto_page = QPushButton("Automatic")
+        self.navbar.addWidget(self.manual)
+        self.navbar.addWidget(self.auto_page)
+        self.navbar.setSpacing(10)
+        self.navbar.setContentsMargins(0, 0, 0, 0)
+
         #self.scheduleWidget = SchedulePreviewer()
         self.GreenOcc = OccupancyWidget()
         self.RedOcc = OccupancyWidget()
         self.newTrainWidget = NewTrainWidget(Green)
-        self.button = QPushButton("Move")
-        self.layout = QVBoxLayout()
+        self.hlayout = QHBoxLayout()
+        self.Manual_layout = QVBoxLayout()
         self.main = QWidget()
-        self.button_state = True
-        self.addTrain = QLineEdit(parent=self)
-        self.submit = QPushButton("Submit")
-        self.submit_state = True
         self.clear = QPushButton("Clear")
         self.clear_state = True
         self.breakBlok = QLineEdit(parent=self)
@@ -58,8 +62,16 @@ class CTCApplication(QMainWindow):
         self.Auto = QPushButton("Schedule File")
         self.auto_state = True
 
-        self.layout.addWidget(self.newTrainWidget)
+        self.Title = QLabel()
+        self.Title.setText("Manual Mode")
+        self.Title.styleSheet = "font-size: 60px; font-weight: bold;"
+        self.Manual_layout.addWidget(self.Title)
 
+
+        self.hlayout.addWidget(self.newTrainWidget)
+        self.hlayout.addWidget(self.GreenOcc)
+        self.Manual_layout.addLayout(self.hlayout)
+        self.Manual_layout.setSpacing(10)
         #!TestBench Stuff
         self.switchState = QLabel()
         self.speed = QLabel()
@@ -68,13 +80,6 @@ class CTCApplication(QMainWindow):
 
         self.setWindowTitle("CTC Office")
         
-        self.button.setCheckable(True)
-        self.button.released.connect(self.onClick)
-        self.button.setChecked(self.button_state)
-
-        self.submit.setCheckable(True)
-        self.submit.released.connect(self.onSubmit)
-        self.submit.setChecked(self.submit_state)
 
         self.clear.setCheckable(True)
         self.clear.released.connect(self.onClear)
@@ -97,16 +102,8 @@ class CTCApplication(QMainWindow):
 
         lbl1 = QLabel()
         lbl1.setText("Green Line Occupancy")
-        self.layout.addWidget(lbl1)
-        self.layout.addWidget(self.button)
-        self.layout.addWidget(self.GreenOcc.widget)
-
-        lbl2 = QLabel()
-        lbl2.setText("Adding and removing trains")
-        self.layout.addWidget(lbl2)
-        self.layout.addWidget(self.addTrain)
-        self.layout.addWidget(self.submit)
-        self.layout.addWidget(self.clear)
+        self.Manual_layout.addWidget(lbl1)
+        self.Manual_layout.addWidget(self.GreenOcc.widget)
 
         self.lbl10 = QLabel()
         self.lbl10.setWordWrap(True)
@@ -118,37 +115,37 @@ class CTCApplication(QMainWindow):
 
         lbl3 = QLabel()
         lbl3.setText("Automatic Mode")
-        self.layout.addWidget(lbl3)
-        self.layout.addWidget(self.Automatic)
-        self.layout.addWidget(self.Auto)
+        self.Manual_layout.addWidget(lbl3)
+        self.Manual_layout.addWidget(self.Automatic)
+        self.Manual_layout.addWidget(self.Auto)
 
         lbl4 = QLabel()
         lbl4.setText("Breaking the track")
-        self.layout.addWidget(lbl4)
-        self.layout.addWidget(self.breakBlok)
-        self.layout.addWidget(self.submitBreak)
+        self.Manual_layout.addWidget(lbl4)
+        self.Manual_layout.addWidget(self.breakBlok)
+        self.Manual_layout.addWidget(self.submitBreak)
 
         lbl5 = QLabel()
         lbl5.setText("Fixing the track")
-        self.layout.addWidget(lbl5)
-        self.layout.addWidget(self.fixBlock)
-        self.layout.addWidget(self.submitFix)
+        self.Manual_layout.addWidget(lbl5)
+        self.Manual_layout.addWidget(self.fixBlock)
+        self.Manual_layout.addWidget(self.submitFix)
         
         
 
 
-        self.layout.addWidget(lbl)
-        self.layout.addWidget(self.speed)
-        self.layout.addWidget(self.auth)
-        self.layout.addWidget(self.switchState)
-        self.layout.addWidget(scroll_area)
+        self.Manual_layout.addWidget(lbl)
+        self.Manual_layout.addWidget(self.speed)
+        self.Manual_layout.addWidget(self.auth)
+        self.Manual_layout.addWidget(self.switchState)
+        self.Manual_layout.addWidget(scroll_area)
 
         #setting signals
         self.newTrainWidget.emitTrain.connect(self.handleNewGreenTrain)
 
 
 
-        self.main.setLayout(self.layout)
+        self.main.setLayout(self.Manual_layout)
 
         self.setCentralWidget(self.main)
     
@@ -240,6 +237,7 @@ class CTCApplication(QMainWindow):
             line = "Red"
         self.Office.updateTrack(line, occupancies)
         trains = [(x.id, str(x.location)) for x in self.Office.Schedule[line].trains]
+        print(f'Trains: {trains}')
         if(line == "Green"):
             self.GreenOcc.update(trains)
         else:
