@@ -31,7 +31,7 @@ class Train(QWidget):
         self.train_controller_view = TCView()
         self.train_controller_controller = TCcontroller(self.train_controller_model, self.train_controller_view, authority)
 
-        # Connect the train controller to the train model
+        # Connect the train controller to the train model for calculating velocity
         self.train_controller_model.power_command.connect(self.train_model.set_power)
         self.train_model.velocity_updated.connect(self.train_controller_model.set_current_speed)
 
@@ -47,3 +47,6 @@ class Train(QWidget):
         self.train_model.acceleration_updated.connect(self.train_controller_model.update_acceleration)
         self.train_controller_model.sbrake_change.connect(self.train_model.toggleServiceBrake)
         self.train_model.acceleration_updated.connect(self.train_controller_view.acceleration_changed)
+
+        # Connect the train controller to the train model for brake inputs and outputs
+        self.train_controller_model.ebrake_change.connect(self.train_model.toggleEmergencyBrake)
