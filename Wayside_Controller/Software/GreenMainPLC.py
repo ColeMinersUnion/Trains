@@ -806,7 +806,7 @@ class GreenPLC:
             authority[40]=False
         else:
             authority[40]=True
-        if occupancy[40]==True and (any(occupancy[41:46])==True):
+        '''if occupancy[40]==True and (any(occupancy[41:46])==True):
             authority[41]=False
         else:
             authority[41]=True
@@ -829,7 +829,7 @@ class GreenPLC:
         if occupancy[45]==True and (occupancy[46]==True):
             authority[46]=False
         else:
-            authority[46]=True
+            authority[46]=True'''
         #end of zone I for main wayside
 
         return authority
