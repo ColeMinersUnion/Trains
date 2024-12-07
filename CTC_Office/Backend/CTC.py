@@ -174,7 +174,6 @@ class CTC_Office:
                 if isBroken:
                     cls.line[line].closed = True
                     raise Exception("Track declared broken")
-                    print("Track Broken!")
 
 
                              

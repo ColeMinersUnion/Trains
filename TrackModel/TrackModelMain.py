@@ -264,8 +264,6 @@ def read(file):
         lines[s[0]].switches.append(Switch(s[0],[s[1],s[2],s[3]])) #add switch to appropriate line number
     return
 
-from numpy import array
-
 class SignalHandler(QObject):
 
     sendOccupancies = pyqtSignal(list)
@@ -276,7 +274,6 @@ class SignalHandler(QObject):
 
     def callOccSend(self, occupancies: list):
         self.sendOccupancies.emit(occupancies)
-        print(array(occupancies))
 
     @pyqtSlot(int)
     def addOcc(self,message):
