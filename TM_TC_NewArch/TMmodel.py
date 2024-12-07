@@ -58,6 +58,7 @@ class TrainModel(QObject):
         self.currentBeaconInfo = "null"
         self.parseRouteInfo()
         self.calcTotalMass()
+        self.block_change.emit(self.blockID[self.i])
 
     """ velocity calculation """
     @Slot(float)
@@ -146,7 +147,7 @@ class TrainModel(QObject):
         self.leftDoorStatus = not self.leftDoorStatus
         self.left_door_updated.emit(self.leftDoorStatus)
 
-        """ For toggling the right doors (True = Open)"""
+    """ For toggling the right doors (True = Open)"""
     @Slot()
     def toggleRightDoors(self):
         self.rightDoorStatus = not self.rightDoorStatus
