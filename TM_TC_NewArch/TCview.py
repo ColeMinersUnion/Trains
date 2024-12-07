@@ -12,6 +12,7 @@ class TCView(QWidget):
     manual_right_doors = Signal(bool)
     manual_lights = Signal(bool)
     manual_hl = Signal(bool)
+    temperature = Signal(float)
 
     def __init__(self):
         super().__init__()
@@ -53,7 +54,7 @@ class TCView(QWidget):
     def init_ui(self):
         setpoint_layout = QVBoxLayout()
         self.setpoint_label = QLabel("Setpoint Speed: 50")
-        self.setpoint_slider = QSlider(Qt.Orientation.Horizontal)
+        self.setpoint_slider = QSlider(Qt.Horizontal)
         self.setpoint_slider.setRange(0, 100)
         self.setpoint_slider.setValue(50)
         self.setpoint_slider.valueChanged.connect(self.emit_setpoint_command)
@@ -73,7 +74,7 @@ class TCView(QWidget):
         ebrake_group = QGroupBox("Emergency Controls")
         ebrake_group.setLayout(ebrake_layout)
 
-        self.auth_label = QLabel("Authority: ")
+        self.auth_label = QLabel("Authority: 0")
 
         # PID Controls Section
         pid_layout = QFormLayout()
@@ -106,10 +107,17 @@ class TCView(QWidget):
         self.headlights_button = QPushButton("Headlights: OFF")
         self.headlights_button.clicked.connect(self.toggle_headlights)
 
+        self.temp_input = QLineEdit()
+        self.temp_input.setPlaceholderText("Enter temperature value ")
+        self.set_temp_button = QPushButton("Set Temperature")
+        self.set_temp_button.clicked.connect(self.emit_temp_value)
+
         manual_layout.addWidget(self.left_door_button, 0, 0)
         manual_layout.addWidget(self.right_door_button, 0, 1)
         manual_layout.addWidget(self.lights_button, 1, 0)
         manual_layout.addWidget(self.headlights_button, 1, 1)
+        manual_layout.addWidget(self.temp_input)
+        manual_layout.addWidget(self.set_temp_button)
         manual_group = QGroupBox("Manual Controls")
         manual_group.setLayout(manual_layout)
 
@@ -118,9 +126,11 @@ class TCView(QWidget):
         self.a_label = QLabel("Acceleration: 0.00 m/s²")
         self.current_speed_label = QLabel("Current Speed: 0.00 m/s")
         self.pwr_label = QLabel("Power: 0.00 W")
+        self.auth_label = QLabel("Authority: 0")
         status_layout.addWidget(self.a_label)
         status_layout.addWidget(self.current_speed_label)
         status_layout.addWidget(self.pwr_label)
+        status_layout.addWidget(self.auth_label)
         status_group = QGroupBox("Status Information")
         status_group.setLayout(status_layout)
 
@@ -198,7 +208,6 @@ class TCView(QWidget):
         #emit signal
         self.manual_left_doors.emit(self.left_doors)
         #change label
-        self.left_door_button.setText(f"Left Doors: {'OPEN' if self.left_doors else 'CLOSED'}")
 
     def toggle_right_doors(self):
         #change value internally
@@ -206,7 +215,7 @@ class TCView(QWidget):
         #emit signal
         self.manual_right_doors.emit(self.right_doors)
         #change label
-        self.right_door_button.setText(f"Right Doors: {'OPEN' if self.right_doors else 'CLOSED'}")
+        #
 
     def toggle_headlights(self):
         #change value internally
@@ -214,7 +223,7 @@ class TCView(QWidget):
         #emit signal
         self.manual_hl.emit(self.headlights)
         #change label
-        self.headlights_button.setText(f"Headlights: {'ON' if self.headlights else 'OFF'}")
+        #
 
     def toggle_lights(self):
         #change value internally
@@ -222,7 +231,17 @@ class TCView(QWidget):
         #emit signal
         self.manual_lights.emit(self.lights)
         #change label
+        #
+
+    def update_lights_label(self):
         self.lights_button.setText(f"Lights: {'ON' if self.lights else 'OFF'}")
+
+    def update_hl_label(self):
+        self.headlights_button.setText(f"Headlights: {'ON' if self.headlights else 'OFF'}")
+    def update_rd_label(self):
+        self.right_door_button.setText(f"Right Doors: {'OPEN' if self.right_doors else 'CLOSED'}")
+    def update_ld_label(self):
+        self.left_door_button.setText(f"Left Doors: {'OPEN' if self.left_doors else 'CLOSED'}")
 
     @Slot (bool)
     def headlights_status(self, hl):
@@ -258,17 +277,16 @@ class TCView(QWidget):
         self.pid_tick_signal.emit()
     
     def ebrake_toggle(self):
-        """ Toggle the emergency brake. """
-        #self.ebrake = not self.ebrake
+        #ATTEMPT to toggle ebrake
+        self.ebrake = not self.ebrake
         self.ebrake_signal.emit(self.ebrake)
-        #self.update_ebrake_ui()
-
+        self.update_ebrake_ui()
+    def emit_temp_value(self):
+        self.temperature_label.setText(f"Temperature: {self.temperature}°C")
+        self.temperature_signal.emit(self.temperature)
+        
     def update_ebrake_ui(self):
         self.ebrake_button.setText("Emergency Brake: ON" if self.ebrake else "Emergency Brake: OFF")
-        
-    @Slot (str)
-    def full_auth(self, auth):
-        self.auth_label = QLabel(f"Authority String: {auth}")
 
     @Slot(bool)
     def ebrake_changed(self, e):
@@ -300,3 +318,6 @@ class TCView(QWidget):
             self.ki_signal.emit(ki_value)
         except ValueError: 
             pass  # Handle invalid input if necessary
+    @Slot (float)
+    def update_authority_display(self, auth):
+        self.auth_label.setText(f"Authority value: {auth}")
