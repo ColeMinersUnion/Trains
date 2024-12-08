@@ -66,13 +66,15 @@ class TrainModel(QObject):
         self.calcTotalMass()
         
         if self.serviceBrakeStatus and (not self.brakeFailureStatus):
-
+            self.vn_1 = self.vn
             if(self.vn > 0):
                 self.an = (-1.2 / 8)
                 self.vn += self.an
             else:
                 self.an = 0
                 self.vn = 0.0
+
+            
 
         elif self.emergencyBrakeStatus:
 
@@ -102,6 +104,7 @@ class TrainModel(QObject):
             #print(self.vn)
 
             self.vn_1 = self.vn
+           
             self.an_1 = self.an
 
         self.odometer()
@@ -182,7 +185,7 @@ class TrainModel(QObject):
         self.totalDistanceTravelled += (T/2) * (self.vn + self.vn_1)
 
     def checkBlockChange(self):
-        #print(self.milestoneDistance)
+        #print("odometer: ", self.totalDistanceTravelled, "currentVel: ", self.vn, "prevVel ", self.vn_1)
         if(self.milestoneDistance < self.totalDistanceTravelled):
             self.i += 1
             self.milestoneDistance += self.blockLength[self.i]
