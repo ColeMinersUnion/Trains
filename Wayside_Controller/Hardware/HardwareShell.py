@@ -23,7 +23,7 @@ class WaysideWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         uic.loadUi("Wayside_Controller/Hardware/app.ui", self)
-
+        
         self.occupancy = [False for i in range(151)]
         self.authority = [False for i in range(151)]
         self.switch_58 = False
@@ -31,6 +31,7 @@ class WaysideWindow(QMainWindow):
         self.maintenance = [False for i in range(151)]
         self.signal_58 = False
         self.signal_62 = False
+        self.connected = False
 
 
 
@@ -38,21 +39,40 @@ class WaysideWindow(QMainWindow):
         self.server_ip = '127.0.0.1'
         self.server_port = 9000
 
+        
 
+        for i in range(41, 77):
+            
+            self.wayside_block_table.setItem(i-41, 0, QTableWidgetItem(""))   
 
-        start = time()
-        self.client_socket.connect((self.server_ip, self.server_port))
-        end = time()    
-        print(f"Connected to server {end - start} seconds") 
-        data = {
-            "input" : "say_hi"
-        }
-        self.send(data)
-        decoded_json = self.receive()
+        for i in range(41, 69):
+            self.wayside_block_table.setItem(i-41,1, QTableWidgetItem(""))
+
+        self.wayside_block_table.setSelectionMode(QTableWidget.SelectionMode.NoSelection)
+
+        self.update_ui()
+
         #reads inputs from the user
         self.user_inputs()
 
         
+    def connect(self):
+        try:
+            start = time()
+            self.client_socket.connect((self.server_ip, self.server_port))
+            end = time()    
+            print(f"Connected to server {end - start} seconds") 
+            data = {
+                "input" : "say_hi"
+            }
+            self.send(data)
+            decoded_json = self.receive()
+            self.connected = True
+
+        except socket.error as e:
+            print(f"socket error: {e}")
+            self.client_socket.close()
+            print("socket closed")
     
     #view
     def user_inputs(self):
@@ -60,7 +80,7 @@ class WaysideWindow(QMainWindow):
         self.manual_sw62_button.clicked.connect(self.toggle_sw62)
         self.manual_sig58_button.clicked.connect(self.toggle_sig58)
         self.manual_sig62_button.clicked.connect(self.toggle_sig62)
-
+        self.connect_green.clicked.connect(self.connect)
 
 
 
@@ -87,10 +107,20 @@ class WaysideWindow(QMainWindow):
     #view
     def update_ui(self):
         for i in range(41, 77):
-            self.wayside_block_table.setItem(i-41, 0, QTableWidgetItem(str(self.occupancy[i])))   
+            item = self.wayside_block_table.item(i-41, 0)
+            if self.occupancy[i]:
+                print("wsh occupied block:", i)
+                item.setBackground(QtGui.QColor(0, 0, 255))
+
+            else:
+                item.setBackground(QtGui.QColor(16, 16, 16))
 
         for i in range(41, 69):
-            self.wayside_block_table.setItem(i-41,1, QTableWidgetItem(str(self.authority[i])))
+            item = self.wayside_block_table.item(i-41, 1)
+            if self.authority[i]:
+                item.setBackground(QtGui.QColor(0, 255, 0))
+            else:
+                item.setBackground(QtGui.QColor(255, 0, 0))
 
         if(self.switch_58):
             self.wayside_elements_table.setItem(0,0, QTableWidgetItem("57 -> 58"))
@@ -150,13 +180,16 @@ class WaysideWindow(QMainWindow):
     @pyqtSlot(list)
     def update_occupancy(self, new_occ):
         # Slot to update the label text
-        self.send_occupancy(new_occ)
+        self.occupancy[41:77] = new_occ[41:77]
+        self.wsh_ctc_occupancy.emit(self.occupancy)
+        if self.connected:
+            self.send_occupancy(new_occ)
         self.wsh_tm_authority.emit(self.authority)
         self.update_ui()
 
 
     def send_occupancy(self, occupancy):
-        self.occupancy = occupancy
+        
         data = {
             "input" : "tm_occupancy",
             "occupancy": occupancy
@@ -173,9 +206,14 @@ class WaysideWindow(QMainWindow):
         data = {
             "input": "ws_sw58"
         }
-        self.send(data)
-        decoded_json = self.receive()
-        self.switch_58 = decoded_json["sw58"]
+        if self.connected:
+            self.send(data)
+            decoded_json = self.receive()
+            self.switch_58 = decoded_json["sw58"]
+
+        else:
+            self.switch_58 = not self.switch_58
+        
         self.ws_ctc_switch_result.emit({"result": True, "switch_58": self.switch_58, "switch_62": self.switch_62, "signal_58": self.signal_58, "signal_62": self.signal_62})
         self.wsh_tm_switch_58.emit(not self.switch_58)
         self.wsh_tm_authority.emit(self.authority)
@@ -186,9 +224,13 @@ class WaysideWindow(QMainWindow):
         data = {
             "input": "ws_sw62"
         }
-        self.send(data)
-        decoded_json = self.receive()
-        self.switch_62 = decoded_json["sw62"]
+        if self.connected:
+            self.send(data)
+            decoded_json = self.receive()
+            self.switch_62 = decoded_json["sw62"]
+
+        else:
+            self.switch_62 = not self.switch_62
         self.ws_ctc_switch_result.emit({"result": True, "switch_58": self.switch_58, "switch_62": self.switch_62, "signal_58": self.signal_58, "signal_62": self.signal_62})
         self.wsh_tm_switch_62.emit(not self.switch_62)
         self.wsh_tm_authority.emit(self.authority)
@@ -199,10 +241,10 @@ class WaysideWindow(QMainWindow):
         data = {
             "input": "ws_sig58"
         }
-        self.send(data)
-        decoded_json = self.receive()
-        self.signal_58 = decoded_json["sig58"]
-
+        if self.connected:
+            self.send(data)
+            decoded_json = self.receive()
+            self.signal_58 = decoded_json["sig58"]
         self.ws_ctc_switch_result.emit({"result": True, "switch_58": self.switch_58, "switch_62": self.switch_62, "signal_58": self.signal_58, "signal_62": self.signal_62})
         self.wsh_tm_sig58.emit(self.signal_58)
         self.wsh_tm_authority.emit(self.authority)
@@ -213,10 +255,10 @@ class WaysideWindow(QMainWindow):
         data = {
             "input": "ws_sig62"
         }
-        self.send(data)
-        decoded_json = self.receive()
-        self.signal_62 = decoded_json["sig62"]
-
+        if self.connected:
+            self.send(data)
+            decoded_json = self.receive()
+            self.signal_62 = decoded_json["sig62"]
         self.ws_ctc_switch_result.emit({"result": True, "switch_58": self.switch_58, "switch_62": self.switch_62, "signal_58": self.signal_58, "signal_62": self.signal_62})
         self.wsh_tm_sig62.emit(self.signal_62)
         self.wsh_tm_authority.emit(self.authority)
@@ -238,6 +280,7 @@ class WaysideWindow(QMainWindow):
         self.ws_ctc_occupancy.emit(self.occupancy)
         self.update_ui()
 
+
     @pyqtSlot(int)
     def update_switch(self, exit_block):
         sw = False
@@ -250,14 +293,15 @@ class WaysideWindow(QMainWindow):
             "input" : "ctc_suggested_switch",
             "switch": sw
         }
-        self.send(data)
-        decoded_json = self.receive()
-        result = decoded_json["result"]
-        self.switch_58 = decoded_json["sw58"]
-        self.switch_62 = decoded_json["sw62"]
-        self.signal_58 = decoded_json["sig58"]
-        self.signal_62 = decoded_json["sig62"]
-        self.ws_ctc_switch_result.emit({"result": result, "switch_58": self.switch_58, "switch_62": self.switch_62, "signal_58": self.signal_58, "signal_62": self.signal_62})
+        if self.connected:
+            self.send(data)
+            decoded_json = self.receive()
+            result = decoded_json["result"]
+            self.switch_58 = decoded_json["sw58"]
+            self.switch_62 = decoded_json["sw62"]
+            self.signal_58 = decoded_json["sig58"]
+            self.signal_62 = decoded_json["sig62"]
+        #self.ws_ctc_switch_result.emit({"result": result, "switch_58": self.switch_58, "switch_62": self.switch_62, "signal_58": self.signal_58, "signal_62": self.signal_62})
         self.wsh_tm_switch_58.emit(self.switch_58)
         self.wsh_tm_sig58.emit(self.signal_58)
         self.wsh_tm_switch_62.emit(self.switch_62)

@@ -1,5 +1,5 @@
 import sys
-from PyQt6.QtWidgets import QWidget, QLabel, QPushButton, QLineEdit, QSlider, QApplication
+from PyQt6.QtWidgets import QWidget, QLabel, QPushButton, QLineEdit, QSlider, QApplication, QFileDialog
 from PyQt6.QtGui import QTransform, QPixmap
 from PyQt6.QtCore import Qt,QTimer,QObject, pyqtSignal, pyqtSlot
 import pandas as pd #reading the excel file
@@ -10,14 +10,15 @@ XOFFSET = 0
 YOFFSET = 3
 SCL=20 #scale
 occflag = True
-linenames=[]
-lines=[] 
+linenames=["Green","Red"]
+lines=[]
 switchid=[] #track switch numbers for pinging
 crossingid=[] #track crossing numbers for pinging
 failmode = 0
 failnames = ["No","Rail","Circuit","Power"]
 heaters = False
 speed = 1
+fileselected = False
 class Block:
     #instantiation
     def __init__(self, linenum, section, number, length, grade, speed, twoway, elevation, underground,x1,y1,x2,y2):
@@ -46,7 +47,6 @@ class Block:
         r = r + "\n" + str(round(length*3.28084)) + " feet long\n"
         r = r + str(grade) + "% grade\n"
         r = r + str(round(speed*0.621371)) + " mph speed limit\n"
-        r = r + "Elevation of " + str(round(elevation*3.28084)) + " feet"
         r = r + "\nBidirectional: " + str(twoway)
         r = r + "\nUnderground: " + str(underground) 
         r = r + "\nOccupied: "
@@ -145,10 +145,12 @@ class Station: #yard also
         self.name = name
         self.side = side
         self.msg = ""
+        self.passengers = 5
         if(name=="YARD"):  
             self.msg = "YARD"
         else:
             self.msg = "Station " + str(name) + "\nSide " + str(side) + "\n" + linenames[linenum] + " Line, Block " + str(block)
+
 
 class Train:
     def __init__(self,linenum,block1):
@@ -219,7 +221,9 @@ class Line:
             if (x.name==name):
                 return Station
         return None
-    
+
+lines=[Line(0),Line(1)]
+
 def readX(string): #return cross marks
     return (string=="X")
 def read(file):
@@ -263,18 +267,23 @@ def read(file):
     for s in tempswitch: #add switches now, blocks should update
         lines[s[0]].switches.append(Switch(s[0],[s[1],s[2],s[3]])) #add switch to appropriate line number
     return
-
 class SignalHandler(QObject):
 
     sendOccupancies = pyqtSignal(list)
+    sendAuthorities = pyqtSignal(list)
 
     def __init__(self):
         super().__init__()
         self.oldblock = 0
 
-    def callOccSend(self,occupancies):
+    def callOccSend(self, occupancies: list):
         self.sendOccupancies.emit(occupancies)
-        print(occupancies[1])
+
+    def callAuthSend(self): # call to send authorities to train
+        authorities=[]
+        for b in lines[0].blocks:
+            authorities.append(b.authority) 
+        self.sendAuthorities.emit(authorities)
 
     @pyqtSlot(int)
     def addOcc(self,message):
@@ -484,6 +493,7 @@ class FailureSelect(QWidget):
         super().__init__()
         self.label = QLabel(window)
         self.label.setPixmap(QPixmap('TrackModel/Icons/FailureSelect.png'))
+        self.label.move(-100,-100)
         self.check=0
         self.update()
     
@@ -491,6 +501,26 @@ class FailureSelect(QWidget):
         if(self.check!=failmode):
             self.label.move(180+failmode*45,50)
             self.check=failmode
+
+class FileButton(QWidget):
+    def __init__(self,window):
+        super().__init__()
+        pixmap = QPixmap('TrackModel/Icons/SelectFile.png')
+        self.label = QLabel(window)
+        self.label.setPixmap(pixmap)
+        self.label.move(90,0)
+        self.label.setStyleSheet(labelstyle)
+        self.setStyleSheet(tooltipstyle)
+        self.label.setToolTip("Select File")
+
+        self.label.mousePressEvent = self.selectFile
+
+    def selectFile(self, message):
+        global fileselected
+        filename, _ = QFileDialog.getOpenFileName(self, "Open File", "", "Excel Files (*.xlsx)")
+        if filename:
+            read(filename)
+        fileselected = True
 
 class FailureButton(QWidget):
     def __init__(self,failnum,window):
@@ -640,10 +670,17 @@ class Map(QWidget):
         self.move(0,0)
         self.setWindowTitle("Track Model Map")
         self.setStyleSheet("background-color: lightyellow;")
-        read('TrackModel/Green Line.xlsx')
+        self.show()
+        passive.append(FileButton(self))
         passive.append(HeaterSystem(self))
         for i in range(4):
             passive.append(FailureButton((i),self)) #add failure buttons
+        active.append(FailureSelect(self)) #this goes after the dynamic icons, we hide them behind this widget system
+        self.show()
+        passive[0].selectFile(None) #select a file
+        while(not fileselected):
+            1
+        print(str(len(lines[0].blocks)))
         for line in lines:
             for block in line.blocks:
                 active.append(BlockIcon(block,self)) #updates for view
@@ -655,7 +692,6 @@ class Map(QWidget):
                 passive.append(TransponderIcon(transponder,self))  
             for station in line.stations:
                 passive.append(StationIcon(station,self))
-        active.append(FailureSelect(self)) #this goes after the dynamic icons, we hide them behind this widget system
         active.append(SpeedMeter(self))
         self.timer=QTimer() #timer for active components
         self.timer.timeout.connect(self.update) #connect timer to update method
@@ -666,6 +702,7 @@ class Map(QWidget):
         self.tenBaud.start(1) #set clock speed of timer
 
         self.signals=SignalHandler()
+        
     
     def tenBaudClock(self):
         global lines

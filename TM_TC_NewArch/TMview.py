@@ -1,8 +1,15 @@
 # train_model/view.py
-from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout
+from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout, QPushButton
+from PyQt6.QtCore import pyqtSignal as Signal
+from PyQt6.QtCore import pyqtSlot as Slot
+from PyQt6.QtWidgets import QSlider, QButtonGroup, QLineEdit, QGroupBox, QFormLayout, QGridLayout, QComboBox, QSpinBox, QDoubleSpinBox, QCheckBox, QRadioButton
 
 class TrainModelView(QWidget):
+    
+    eBrake_toggle = Signal()
+    
     def __init__(self):
+
         super().__init__()
 
         # Create labels
@@ -17,6 +24,9 @@ class TrainModelView(QWidget):
         self.right_door_label = QLabel("Right Doors: Closed")
         self.service_brake_label = QLabel("Service Brake: OFF")
 
+        self.emergencyBrakeButton = QPushButton("Emergency Brake: OFF")
+        self.emergencyBrakeButton.clicked.connect(self.update_emergency_brake_status)
+
         # Create a single layout
         layout = QVBoxLayout(self)
         layout.addWidget(self.v_label)         # Add velocity label
@@ -29,6 +39,7 @@ class TrainModelView(QWidget):
         layout.addWidget(self.left_door_label)
         layout.addWidget(self.right_door_label)
         layout.addWidget(self.service_brake_label)
+        layout.addWidget(self.emergencyBrakeButton)
 
         # Set the layout and window title
         self.setLayout(layout)
@@ -78,3 +89,12 @@ class TrainModelView(QWidget):
         """ Update the status of the service brake """
         status = "ON" if servBrake_status else "OFF"
         self.service_brake_label.setText(f"Service Brake: {status}")
+
+    @Slot()
+    def update_emergency_brake_status(self):
+        """ Update the emergency brake button """
+        self.eBrake_toggle.emit()
+
+    @Slot(bool)
+    def update_eBrake_label(self, eBrake_status: bool):
+        self.emergencyBrakeButton.setText("Emergency Brake: ON" if eBrake_status else "Emergency Brake: OFF")

@@ -19,6 +19,11 @@ class TrainModel(QObject):
     left_door_updated = Signal(bool) #Signal to toggle left doors
     right_door_updated = Signal(bool) #Signal to toggle right doors
     service_brake_updated = Signal(bool) #Signal to toggle service brake
+    emergency_brake_updated = Signal(bool) #Signal to communicate emergency brake status
+    signal_failure = Signal(bool)   # Signal for signal failure
+    engine_failure = Signal(bool)   # Signal for engine failure
+    brake_failure = Signal(bool)    # Signal for brake failure
+    speed_limits = Signal(list)     # speed limits for train controller
     
     def __init__(self, routeInfo):
         super().__init__()
@@ -38,6 +43,10 @@ class TrainModel(QObject):
         self.rightDoorStatus = False
         self.leftDoorStatus = False
         self.serviceBrakeStatus = False
+        self.emergencyBrakeStatus = False
+        self.brakeFailureStatus = False
+        self.signalFailureStatus = False
+        self.engineFailureStatus = False
         self.routeInfo = routeInfo
         self.blockID = []
         self.blockLength = []
@@ -46,6 +55,7 @@ class TrainModel(QObject):
         self.totalDistanceTravelled = 0
         self.i = 0
         self.milestoneDistance = 0
+        self.currentBeaconInfo = "null"
         self.parseRouteInfo()
         self.calcTotalMass()
 
@@ -54,24 +64,42 @@ class TrainModel(QObject):
     def set_power(self, power: float):
 
         self.calcTotalMass()
-        if self.serviceBrakeStatus:
-            self.an = -1.2
+        
+        if self.serviceBrakeStatus and (not self.brakeFailureStatus):
 
-            while(self.vn > 0 and self.serviceBrakeStatus):
+            if(self.vn > 0):
+                self.an = (-1.2 / 8)
                 self.vn += self.an
-                time.sleep(1)
+            else:
+                self.an = 0
+                self.vn = 0.0
 
-            self.vn = 0.0   
+        elif self.emergencyBrakeStatus:
+
+            if(self.vn > 0):
+                self.an = (-2.73 / 8)
+                self.vn += self.an
+            else:
+                self.an = 0
+                self.vn = 0.0
+
         else:
             """ Simulate the train's response to power. """
             if power <= 0:
                 self.an = 0
-            if(self.vn <= 0):
-                self.an = (self.maxPower / (self.totalMass * self.maxSpeed))
-            else: 
-                self.an = (power / (self.totalMass * self.vn))
-            
-            self.vn = self.vn_1 + (T/2) * (self.an + self.an_1)
+                self.vn = 0
+            else:
+                if(power > self.maxPower):
+                    power = self.maxPower
+
+                if(self.vn <= 0):
+                    self.an = (self.maxPower / (self.totalMass * self.maxSpeed))
+                else: 
+                    self.an = (power / (self.totalMass * self.vn))
+
+                self.vn = self.vn_1 + (T/2) * (self.an + self.an_1)
+
+            #print(self.vn)
 
             self.vn_1 = self.vn
             self.an_1 = self.an
@@ -83,9 +111,9 @@ class TrainModel(QObject):
         self.acceleration_updated.emit(self.an)
 
     """ Update for passengers of train """
-    @Slot(int)
-    def updatePassengerCount(self, num: int):
-        self.passengerCount += num
+    @Slot()
+    def updatePassengerCount(self):
+        self.passengerCount += 8
         self.passengerCount_updated.emit(self.passengerCount)
         self.calcTotalMass()
 
@@ -98,53 +126,84 @@ class TrainModel(QObject):
     @Slot(float)
     def setTemperature(self, temperature: float):
         self.temperature = temperature
-        self.temperature_updated(self.temperature)
+        self.temperature_updated.emit(self.temperature)
 
     """ Toggle for cabin (interior) lights """
-    @Slot(bool)
-    def toggleInteriorLights(self, input: bool):
-        self.intLightStatus = input
+    @Slot()
+    def toggleInteriorLights(self):
+        self.intLightStatus = not self.intLightStatus
         self.intLights_updated.emit(self.intLightStatus)
 
     """ Toggle for headlights of train """
-    @Slot(bool)
-    def toggleExteriorLights(self, input: bool):
-        self.extLightStatus = input
+    @Slot()
+    def toggleExteriorLights(self):
+        self.extLightStatus = not self.extLightStatus
         self.extLights_updated.emit(self.extLightStatus)
 
     """ For toggling the left doors (True = Open)"""
-    @Slot(bool)
-    def toggleLeftDoors(self, input: bool):
-        self.leftDoorStatus = input
+    @Slot()
+    def toggleLeftDoors(self):
+        self.leftDoorStatus = not self.leftDoorStatus
         self.left_door_updated.emit(self.leftDoorStatus)
 
-        """ For toggling the right doors (True = Open)"""
-    @Slot(bool)
-    def toggleRightDoors(self, input: bool):
-        self.rightDoorStatus = input
+    """ For toggling the right doors (True = Open)"""
+    @Slot()
+    def toggleRightDoors(self):
+        self.rightDoorStatus = not self.rightDoorStatus
         self.right_door_updated.emit(self.rightDoorStatus)
 
     """ For toggling the service brake (True = On)"""
-    @Slot(bool)
-    def toggleServiceBrake(self, input: bool):
-        self.serviceBrakeStatus = input
-        self.service_brake_updated.emit(self.serviceBrakeStatus)
+    @Slot()
+    def toggleServiceBrake(self):
+        if(not self.brakeFailureStatus):
+            self.serviceBrakeStatus = not self.serviceBrakeStatus
+            self.service_brake_updated.emit(self.serviceBrakeStatus)
 
+    """ For toggling the emergency brake """
+    @Slot()
+    def toggleEmergencyBrake(self):
+        self.emergencyBrakeStatus = not self.emergencyBrakeStatus
+        self.emergency_brake_updated.emit(self.emergencyBrakeStatus)
+
+    """ Parsing the route information the train is initialized with """
     def parseRouteInfo(self):
         groupedRouteInfo = list(zip(*self.routeInfo))
         self.blockID = groupedRouteInfo[0]
         self.blockLength = groupedRouteInfo[1]
         self.speedLimit = groupedRouteInfo[2]
 
-        self.totalRouteDistance = sum(self.blockLength)
+        #send speed limits to train controller here
+        self.speed_limits.emit(self.speedLimit)
 
         self.milestoneDistance += self.blockLength[0]
 
+    """ built in odometer, uses the distance travelled to calculate if the block changes """
     def odometer(self):
-        self.totalDistanceTravelled += self.totalDistanceTravelled + (T/2) * (self.vn + self.vn_1)
+        self.totalDistanceTravelled += (T/2) * (self.vn + self.vn_1)
 
     def checkBlockChange(self):
-        if(self.milestoneDistance <= self.totalDistanceTravelled):
+        #print(self.milestoneDistance)
+        if(self.milestoneDistance < self.totalDistanceTravelled):
             self.i += 1
-            self.block_change.emit(self.blockID[self.i])
             self.milestoneDistance += self.blockLength[self.i]
+            self.block_change.emit(self.blockID[self.i])
+
+    #@Slot(str)
+    #def beaconIntake(self, beacon: str):
+        
+
+    """ Failure (Murphy) toggles are the next three slot functions here """
+    @Slot()
+    def toggleBrakeFailure(self):
+        self.brakeFailureStatus = not self.brakeFailureStatus
+        self.brake_failure.emit(self.brakeFailureStatus)
+
+    @Slot()
+    def toggleEngineFailure(self):
+        self.engineFailureStatus = not self.engineFailureStatus
+        self.engine_failure.emit(self.engineFailureStatus)
+
+    @Slot()
+    def toggleSignalFailure(self):
+        self.signalFailureStatus = not self.signalFailureStatus
+        self.signal_failure.emit(self.signalFailureStatus)
