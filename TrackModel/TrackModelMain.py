@@ -283,9 +283,16 @@ class SignalHandler(QObject):
         self.oldblock = message
 
     @pyqtSlot(list)
-    def getAuthority(self,message):
+    def getSoftwareAuthority(self,message):
         for i in range(len(lines[0].blocks)):
-            lines[0].blocks[i].authority = message[i]
+            if(i<41 or i>68):
+                lines[0].blocks[i].authority = message[i]
+
+    @pyqtSlot(list)
+    def getSoftwareAuthority(self,message):
+        for i in range(len(lines[0].blocks)):
+            if(i>40 and i<69):
+                lines[0].blocks[i].authority = message[i]
 
     @pyqtSlot(bool)
     def getSwitch13(self,message):
