@@ -5,7 +5,7 @@ from PyQt6.QtCore import pyqtSlot
 from TM_TC_NewArch.TrainWrapper import Train
 from Wayside_Controller.Software.SoftwareShell import WaysideShell as SoftwareShell
 from Wayside_Controller.Hardware.HardwareShell import WaysideWindow as HardwareShell
-from TrackModel.TrackModelMain import Map, SignalHandler
+from TrackModel.TrackModelMain import Map
 
 trains = []
 

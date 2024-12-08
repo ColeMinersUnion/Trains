@@ -1,4 +1,5 @@
 import sys
+import time
 from PyQt6.QtWidgets import QWidget, QLabel, QPushButton, QLineEdit, QSlider, QApplication, QFileDialog
 from PyQt6.QtGui import QTransform, QPixmap
 from PyQt6.QtCore import Qt,QTimer,QObject, pyqtSignal, pyqtSlot
@@ -149,45 +150,7 @@ class Station: #yard also
         if(name=="YARD"):  
             self.msg = "YARD"
         else:
-            self.msg = "Station " + str(name) + "\nSide " + str(side) + "\n" + linenames[linenum] + " Line, Block " + str(block)
-
-
-class Train:
-    def __init__(self,linenum,block1):
-        global lines
-        self.linenum = linenum
-        self.blocks = {block1}
-        lines[self.linenum].blocks[self.block1].occupied = True
-        '''
-        msgqueue = 10 Baud messages passed by wayside to train via track
-        tenbaud = 10 bauds available after processing the bud limit
-        possible inputs through here: speed, authority, train temp, doors,
-        '''
-        self.msgqueue = []
-        self.tenbaud = [False,False,False,False,False,False,False,False,False,False]
-        self.beacondata = ""
-
-    def toggleOcc(self,block):
-        lines[self.linenum].blocks[block].occupied = not lines[self.linenum].blocks[block].occupied
-
-    def addOcc(self,block):
-        self.blocks.add(block)
-        lines[self.linenum].blocks[block].occupied = True
-    
-    def removeOcc(self,block):
-        if(block in self.blocks):
-            self.blocks.remove(block)
-        lines[self.linenum].blocks[block].occupied = False
-    
-    def queueMessage(self,bool):
-        self.msgqueue.append(bool)
-    def tenBaudMessage(self):
-        if(len(self.msgqueue)>0):
-            self.tenbaud.append(self.msgqueue[0])
-            while(len(self.tenbaud>10)):
-                self.tenbaud.remove(0)
-
-        
+            self.msg = "Station " + str(name) + "\nSide " + str(side) + "\n" + linenames[linenum] + " Line, Block " + str(block)        
 
 class Line:
     def __init__(self,linenum):
@@ -289,7 +252,7 @@ class SignalHandler(QObject):
 
     @pyqtSlot(int)
     def toggleOcc(self,message):
-        lines[0].blocks[message].occupied = not lines[0].blocks[message].occupied
+        lines[0].blocks[message].switchOccupancy()
 
     @pyqtSlot(list)
     def getHardwareAuthority(self,message):
@@ -732,6 +695,10 @@ class Testbench(QWidget):
         self.move(1500,0)
         self.setWindowTitle("Track Model Testbench")
 
+        testbutton = QPushButton("Full test",self)
+        testbutton.move(100,25)
+        testbutton.clicked.connect(self.test)
+
         occupybutton = QPushButton("Switch occupancy", self)
         occupybutton.move(100,50)
         occupybutton.clicked.connect(self.switchOccupancy)
@@ -754,6 +721,32 @@ class Testbench(QWidget):
         self.input2 = QLineEdit(self)
         self.input2.move(100,275)
 
+    def test(self):
+        print("Failure test")
+        for i in [1,2,3,0]:
+            time.sleep(30)
+            for l in lines:
+                for b in l.blocks:
+                    b.failure = i
+            print(failnames[i]+ " Failure complete! Please hover over the blocks to check their status")
+        print("Occupancy test")
+        for i in [True,False]:
+            time.sleep(30)
+            for l in lines:
+                for b in l.blocks:
+                    b.occupied = True
+            print(str(i) + " Occupancy complete! Please hover over the blocks to check their status")
+        for i in range(2):
+            time.sleep(30)
+            for l in lines:
+                for s in l.switches:
+                    s.switch()
+                for c in l.crossings:
+                    c.switch()
+            print("Switches and crossings toggled! Please hover over the blocks to check their status")
+                    
+
+    
     def switchOccupancy(self):
         line = int(self.input1.text())
         comp = int(self.input2.text())
@@ -781,6 +774,8 @@ def main():
     trackmap.show()
     testbench.show()
     sys.exit(app.exec())
+    print("Finished main")
 
 if __name__ == "__main__":
     main()
+    test()
