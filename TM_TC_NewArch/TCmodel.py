@@ -1,6 +1,6 @@
 # train_controller/model.py
 from PyQt6.QtCore import QObject, pyqtSignal as Signal, pyqtSlot as Slot, QTimer
-import os
+import os, time as timer
 
 T = 0.125  # Period of control loop in seconds 
 P_MAX = 120000  # Maximum power output
@@ -28,6 +28,7 @@ class TCmodel(QObject):
         self.commandedSpeed = 0
         self.currentSpeed = 0
         self.atStation = 0
+        self.leaving_station = 0
         self.speedlimits = []
         self.dist = 0
         self.current_speed_limit = 0
@@ -48,7 +49,7 @@ class TCmodel(QObject):
         self.maxPower = int(os.getenv("MAX_POWER", 120000))  # in watts
         self.left_doors = False
         self.right_doors = False
-        self.headlights = False
+        self.headlights = True
         self.lights = False
         self.underground = False
         self.service_brake_deceleration = 1.2  # m/s^2
@@ -56,19 +57,12 @@ class TCmodel(QObject):
         self.approaching = 0
 
         self.timer = QTimer()
-        self.timer.timeout.connect(self.timer_countdown)
+        self.timer.setSingleShot(True)
+        self.timer.timeout.connect(self.on_timer_timeout)
 
     @Slot (float)
     def update_acceleration(self, a):
         self.acceleration = a
-    
-    def timer_countdown(self):
-        if self.timer_countdown_value > 0:
-            self.timer_countdown_value -= 1
-            print(f"Time remaining: {self.timer_countdown_value} seconds")
-        else:
-            self.timer.stop()  # Stop the timer when it reaches zero
-            print("Timer finished.")
 
     def set_full_authority(self, auth):
         self.full_authority = auth
@@ -89,7 +83,7 @@ class TCmodel(QObject):
         """ Set the current velocity. """
         self.currentSpeed = currentSpeed
         self.update_current_speed_signal.emit(self.currentSpeed)
-        #print(f"current speed: {self.currentSpeed} m/s")
+        print(f"current speed: {self.currentSpeed} m/s")
 
     @Slot(bool)
     def set_ebrake(self, ebrake):
@@ -129,6 +123,8 @@ class TCmodel(QObject):
         if (self.approaching >= 1):
             self.pwr = 0
         self.power_command.emit(self.pwr)
+        self.authority_display.emit(self.curr_authority)
+
 
     def control_law(self, commandedSpeed, currentSpeed):
         """ PID control law implementation. """
@@ -163,26 +159,29 @@ class TCmodel(QObject):
     def block_switch(self, id):
         #set current distance to station to next value in authority string
         self.blockID = id
+        print(f" Block ID: {self.blockID}")
         if (self.blockID != self.prev_ID & self.prev_ID != 0):
-            authority_list = self.full_authority.split(';')
-            authority_list.pop(0)
-            self.full_authority = ';'.join(authority_list)
-            self.curr_authority = float(self.full_authority.split(';')[0])
+            self.next_authority_value()
             self.curr_dist = self.curr_authority
             self.authority_display.emit(float(self.curr_authority))
             self.prev_ID = self.blockID
             #update speed limit
-            #self.speedlimits.pop(0)
-            #self.current_speed_limit = self.speedlimits[0]
+            self.speedlimits.pop(0)
+            self.current_speed_limit = self.speedlimits[0]
             #print (f"block switched, new speed limit: {self.current_speed_limit}")
             #check underground
+    def next_authority_value(self):
+        authority_list = self.full_authority.split(';')
+        authority_list.pop(0)
+        self.full_authority = ';'.join(authority_list)
+        self.curr_authority = float(self.full_authority.split(';')[0])
 
     @Slot (list)
     def set_speed_limits(self, speed_limits):
         #take in speed limits
         #define current speed limit value
         self.speedlimits = speed_limits
-        print(f"speed limits: {self.speedlimits}")
+        #print(f"speed limits: {self.speedlimits}")
         self.current_speed_limit = self.speedlimits[0]
 
     def stopping_dist(self):
@@ -197,7 +196,7 @@ class TCmodel(QObject):
             if (self.approaching == 1):
                 self.cut_power_and_enable_brake()
             if (self.approaching >= 2):
-                self.dist = 1
+                self.dist = 1 #is this needed
                 self.pwr = 0
                 self.sbrake = True
     
@@ -222,17 +221,20 @@ class TCmodel(QObject):
     def dist_from_station(self):
         """ Calculate the distance from the station based on current speed and deceleration. """
         self.curr_dist = self.curr_dist - float(self.distance_traveled())
-        if (self.curr_dist < 0):
-            self.curr_dist = 0
+        if (self.curr_dist <= 0 and self.currentSpeed <= 0.2 and self.leaving_station == False):
+            #self.curr_dist = 0
             self.atStation = self.atStation + 1
-            self.station()
+        elif(self.leaving_station == True):
+            self.atStation = 0
+            self.leaving_station = False
         else:
             print(f"Current distance from station: {self.curr_dist:.2f} meters")
-
+        self.station()
 
     def cut_power_and_enable_brake(self):
         """ Cut power and enable the service brake. """
         self.pwr = 0
+        self.commandedSpeed = 0
         self.sbrake = True #emit signal to try and enable service brake, wait for it back
         self.sbrake_change.emit(self.sbrake)
         print("Power cut and service brake enabled.") 
@@ -261,27 +263,40 @@ class TCmodel(QObject):
 
             if float(self.full_authority.split(';')[1]) < float(self.full_authority.split(';')[2]):
                 self.curr_authority = 0  # Placeholder for approaching a station
+        print (f"Current Authority: {self.curr_authority}")
+
     def station(self):
         #at a station
+        #print(f"station value: {self.atStation}")
         if (self.atStation == 1):
             if (self.currentSpeed > 0):
                 self.pwr = 0
                 self.sbrake = True
+                self.commandedSpeed = 0
                 self.set_ebrake_from_driver(True)
+                self.atStation = 0 #maybeeee
                 #whatever else to stop immediatly
-            else:
-                #open correct doors
-                #start timer for 60 seconds
+            #open correct doors
+            #start timer for 60 seconds
+            if (self.currentSpeed <= 0):
+                self.currentSpeed = 0
                 self.left_doors_signal.emit(True)
                 self.right_doors_signal.emit(True)
-                self.timer_countdown_value = 60  # Set countdown to 60 seconds
-                self.timer.start(1000)  # Start the timer with 1-second intervals
-                print("Timer started for 60 seconds.")
-                #finish station logic
-                #emit signal to add passengers?
-                #add 25 to auth or some other way to figure that out...maybe go back and redo that authority value
-        else:
-            self.atStation = 0
+                #sleep for 60 seconds
+                print("stopped at station, Timer started for 60 seconds.")
+                self.timer.start(10000) #not 60 seconds yet, put 60000 for 60 sec
+
+    def on_timer_timeout(self):
+        self.left_doors_signal.emit(False)
+        self.right_doors_signal.emit(False)
+        print("timer done, doors closed")
+        self.atStation = -1 #no longer at station, can resume
+        self.commandedSpeed = self.current_speed_limit
+        self.leaving_station = True
+        self.sbrake = False
+        self.approaching = False
+        self.next_authority_value()
+
 
     def toggle_underground(self):
         """ Toggle underground mode and update headlights. """
