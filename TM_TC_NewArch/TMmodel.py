@@ -184,6 +184,7 @@ class TrainModel(QObject):
     def checkBlockChange(self):
         #print(self.milestoneDistance)
         if(self.milestoneDistance < self.totalDistanceTravelled):
+            self.block_change.emit(self.blockID[self.i]) #Hi Zach! This is Dominic, I added this line so I could turn occupancies off after they pass the block
             self.i += 1
             self.milestoneDistance += self.blockLength[self.i]
             self.block_change.emit(self.blockID[self.i])

@@ -167,6 +167,9 @@ class Train:
         self.tenbaud = [False,False,False,False,False,False,False,False,False,False]
         self.beacondata = ""
 
+    def toggleOcc(self,block):
+        lines[self.linenum].blocks[block].occupied = not lines[self.linenum].blocks[block].occupied
+
     def addOcc(self,block):
         self.blocks.add(block)
         lines[self.linenum].blocks[block].occupied = True
@@ -274,7 +277,6 @@ class SignalHandler(QObject):
 
     def __init__(self):
         super().__init__()
-        self.oldblock = 0
 
     def callOccSend(self, occupancies: list):
         self.sendOccupancies.emit(occupancies)
@@ -286,10 +288,8 @@ class SignalHandler(QObject):
         self.sendAuthorities.emit(authorities)
 
     @pyqtSlot(int)
-    def addOcc(self,message):
-        lines[0].blocks[self.oldblock].occupied = False
-        lines[0].blocks[message].occupied = True
-        self.oldblock = message
+    def toggleOcc(self,message):
+        lines[0].blocks[message].occupied = not lines[0].blocks[message].occupied
 
     @pyqtSlot(list)
     def getHardwareAuthority(self,message):
