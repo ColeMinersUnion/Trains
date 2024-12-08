@@ -175,25 +175,25 @@ class Line:
     def getSwitch(self,block):
         for x in self.switches:
             if x.hasBlock(block):
-                return x
+                return x.switchid
         return None
             
     def getCrossing(self,block):
         for x in self.crossings:
             if (x.block==block):
-                return x.blocknum
+                return x.crossingid
         return None
     
     def stationByBlock(self,block):
         for x in self.stations:
             if (x.block==block):
-                return x.block
+                return x.stationid
         return None
     
     def stationByName(self,name):
         for x in self.stations:
             if (x.name==name):
-                return x.block
+                return x.stationid
         return None
 
 lines=[Line(0),Line(1)]
@@ -260,9 +260,14 @@ class SignalHandler(QObject):
             authorities.append(b.authority) 
         self.sendAuthorities.emit(authorities)
 
-    @pyqtSlot(int)
+    @pyqtSlot(list) #expecting block and number of passengers
     def sendPassengers(self,message):
-        block=lines[0].stationByBlock(message)
+        stationid=lines[0].stationByBlock(message[0])
+        waiting = lines[0].stations[stationid].passengers
+        boarding = waiting - 2 if (waiting>2) else 0
+        self.sendPassengers.emit([message[0],boarding])
+        lines[0].stations[stationid].passengers = waiting - boarding + message[1]
+
 
 
     @pyqtSlot(int)
