@@ -675,6 +675,7 @@ class Map(QWidget):
         for i in range(4):
             passive.append(FailureButton((i),self)) #add failure buttons
         active.append(FailureSelect(self)) #this goes after the dynamic icons, we hide them behind this widget system
+        read("TrackModel/Red Line.xlsx")
         read("TrackModel/Green Line.xlsx")
         print(str(len(lines[0].blocks)))
         for line in lines:
