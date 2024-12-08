@@ -267,7 +267,6 @@ def read(file):
     for s in tempswitch: #add switches now, blocks should update
         lines[s[0]].switches.append(Switch(s[0],[s[1],s[2],s[3]])) #add switch to appropriate line number
     return
-from numpy import array
 class SignalHandler(QObject):
 
     sendOccupancies = pyqtSignal(list)
@@ -278,7 +277,6 @@ class SignalHandler(QObject):
         self.oldblock = 0
 
     def callOccSend(self, occupancies: list):
-        print(array(occupancies))
         self.sendOccupancies.emit(occupancies)
 
     def callAuthSend(self): # call to send authorities to train
@@ -673,6 +671,7 @@ class Map(QWidget):
         self.move(0,0)
         self.setWindowTitle("Track Model Map")
         self.setStyleSheet("background-color: lightyellow;")
+        self.show()
         passive.append(FileButton(self))
         passive.append(HeaterSystem(self))
         for i in range(4):
@@ -704,6 +703,7 @@ class Map(QWidget):
         self.tenBaud.start(1) #set clock speed of timer
 
         self.signals=SignalHandler()
+        
     
     def tenBaudClock(self):
         global lines
