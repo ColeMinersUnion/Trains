@@ -292,7 +292,7 @@ class SignalHandler(QObject):
         self.oldblock = message
 
     @pyqtSlot(list)
-    def getSoftwareAuthority(self,message):
+    def getHardwareAuthority(self,message):
         for i in range(len(lines[0].blocks)):
             if(i<41 or i>68):
                 lines[0].blocks[i].authority = message[i]
@@ -670,16 +670,12 @@ class Map(QWidget):
         self.move(0,0)
         self.setWindowTitle("Track Model Map")
         self.setStyleSheet("background-color: lightyellow;")
-        self.show()
         passive.append(FileButton(self))
         passive.append(HeaterSystem(self))
         for i in range(4):
             passive.append(FailureButton((i),self)) #add failure buttons
         active.append(FailureSelect(self)) #this goes after the dynamic icons, we hide them behind this widget system
-        self.show()
-        passive[0].selectFile(None) #select a file
-        while(not fileselected):
-            1
+        read("TrackModel/Green Line.xlsx")
         print(str(len(lines[0].blocks)))
         for line in lines:
             for block in line.blocks:
@@ -702,7 +698,7 @@ class Map(QWidget):
         self.tenBaud.start(1) #set clock speed of timer
 
         self.signals=SignalHandler()
-        
+        self.show()
     
     def tenBaudClock(self):
         global lines
