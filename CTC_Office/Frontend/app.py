@@ -79,7 +79,6 @@ class CTCApplication(QMainWindow):
 
 
         self.setWindowTitle("CTC Office")
-        
 
         self.clear.setCheckable(True)
         self.clear.released.connect(self.onClear)
@@ -130,7 +129,6 @@ class CTCApplication(QMainWindow):
         self.Manual_layout.addWidget(lbl5)
         self.Manual_layout.addWidget(self.fixBlock)
         self.Manual_layout.addWidget(self.submitFix)
-        
         
 
 
