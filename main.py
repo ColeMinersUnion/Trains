@@ -5,7 +5,7 @@ from PyQt6.QtCore import pyqtSlot
 from TM_TC_NewArch.TrainWrapper import Train
 from Wayside_Controller.Software.SoftwareShell import WaysideShell as SoftwareShell
 from Wayside_Controller.Hardware.HardwareShell import WaysideWindow as HardwareShell
-from TrackModel.TrackModelMain import Map, SignalHandler
+from TrackModel.TrackModelMain import Map
 
 trains = []
 
@@ -30,7 +30,7 @@ def trainFactory(routeInfo: list, authority: str):
         trains.append(Train(routeInfo, authority))
         trains[-1].train_model_view.show()
         trains[-1].train_controller_view.show()
-        trains[-1].train_model.block_change.connect(tm_signals.addOcc)
+        trains[-1].train_model.block_change.connect(tm_signals.toggleOcc)
     except TypeError:
         print('Oops')
     except IndexError:
