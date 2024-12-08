@@ -13,8 +13,9 @@ SCL=20 #scale
 occflag = True
 linenames=["Green","Red"]
 lines=[]
-switchid=[] #track switch numbers for pinging
-crossingid=[] #track crossing numbers for pinging
+switchid=[0,0] #track switch numbers for pinging
+crossingid=[0,0] #track crossing numbers for pinging
+stationid=[0,0] #station numbers for pinging
 failmode = 0
 failnames = ["No","Rail","Circuit","Power"]
 heaters = False
@@ -146,11 +147,18 @@ class Station: #yard also
         self.name = name
         self.side = side
         self.msg = ""
-        self.passengers = 5
-        if(name=="YARD"):  
+        self.stationid=stationid[linenum]
+        stationid[linenum]=stationid[linenum]+1
+
+        if(name=="YARD"):
+            self.passengers = 0  
             self.msg = "YARD"
         else:
-            self.msg = "Station " + str(name) + "\nSide " + str(side) + "\n" + linenames[linenum] + " Line, Block " + str(block)        
+            self.passengers = 10
+            self.msg = "Station " + str(name) + "\nSide " + str(side) + "\n" + linenames[linenum] + " Line, Block " + str(block)
+
+    def toString(self):
+        return self.msg + "\n" + str(self.passengers) + " people waiting" 
 
 class Line:
     def __init__(self,linenum):
@@ -173,19 +181,19 @@ class Line:
     def getCrossing(self,block):
         for x in self.crossings:
             if (x.block==block):
-                return x
+                return x.blocknum
         return None
     
     def stationByBlock(self,block):
         for x in self.stations:
             if (x.block==block):
-                return x
+                return x.block
         return None
     
     def stationByName(self,name):
         for x in self.stations:
             if (x.name==name):
-                return Station
+                return x.block
         return None
 
 lines=[Line(0),Line(1)]
@@ -208,6 +216,7 @@ def read(file):
             lines[linenum].blocks.append(None) #add values to list to fit block
             crossingid.append(0)
             switchid.append(0)
+            stationid.append(0)
         lines[linenum].blocks[data.iat[i,2]]=Block(linenum,
                                                 data.iat[i,1], #section
                                                 data.iat[i,2], #block
@@ -237,6 +246,7 @@ class SignalHandler(QObject):
 
     sendOccupancies = pyqtSignal(list)
     sendAuthorities = pyqtSignal(list)
+    sendPassengers = pyqtSignal(list)
 
     def __init__(self):
         super().__init__()
@@ -249,6 +259,11 @@ class SignalHandler(QObject):
         for b in lines[0].blocks:
             authorities.append(b.authority) 
         self.sendAuthorities.emit(authorities)
+
+    @pyqtSlot(int)
+    def sendPassengers(self,message):
+        block=lines[0].stationByBlock(message)
+
 
     @pyqtSlot(int)
     def toggleOcc(self,message):
@@ -612,19 +627,29 @@ class TransponderIcon(QWidget):
 class StationIcon(QWidget):
     def __init__(self,obj,window):
         super().__init__()
-        self.obj=obj
-        if(self.obj.name=="Yard"):
+        self.linenum=obj.linenum
+        self.stationid=obj.stationid
+        self.check=obj.passengers #front end check
+        if(obj.name=="Yard" or obj.name=="YARD"):
             pixmap = QPixmap('TrackModel/Icons/Yard.png')
         else:
             pixmap = QPixmap('TrackModel/Icons/Station.png')
         self.label=QLabel(window)
         pixmap = pixmap.transformed(QTransform().scale(SCL/100,SCL/100))
         self.label.setPixmap(pixmap)
-        self.label.setToolTip(obj.msg) #no toString, station message is static
+        self.label.setToolTip(obj.toString()) #no toString, station message is static
         center = lines[obj.linenum].blocks[obj.block].center
         self.label.move(int((center[0]-0.05)*SCL),int((center[1]-0.125)*SCL))
         self.label.setStyleSheet(labelstyle)
         self.setStyleSheet(tooltipstyle)
+        self.update()
+
+    def update(self):
+        obj = lines[self.linenum].stations[self.stationid]
+        if(self.check!=obj.passengers):
+            self.check=obj.passengers
+            self.label.setToolTip(obj.toString())
+            self.label.show()
 
 class Map(QWidget):
     def __init__(self):
@@ -640,7 +665,7 @@ class Map(QWidget):
         active.append(FailureSelect(self)) #this goes after the dynamic icons, we hide them behind this widget system
         read("TrackModel/Red Line.xlsx")
         read("TrackModel/Green Line.xlsx")
-        print(str(len(lines[0].blocks)))
+
         for line in lines:
             for block in line.blocks:
                 active.append(BlockIcon(block,self)) #updates for view
@@ -651,7 +676,7 @@ class Map(QWidget):
             for transponder in line.transponders:
                 passive.append(TransponderIcon(transponder,self))  
             for station in line.stations:
-                passive.append(StationIcon(station,self))
+                active.append(StationIcon(station,self))
         active.append(SpeedMeter(self))
         self.timer=QTimer() #timer for active components
         self.timer.timeout.connect(self.update) #connect timer to update method
@@ -681,7 +706,6 @@ class Map(QWidget):
         for a in active:
             a.update() #update every active component
         if(occflag):
-            print("occ update")
             occupancies=[]
             for b in lines[0].blocks:
                 occupancies.append(b.occupied)
@@ -694,8 +718,9 @@ class Testbench(QWidget):
         self.resize(400,400)
         self.move(1500,0)
         self.setWindowTitle("Track Model Testbench")
+        self.cyclenum = 0
 
-        testbutton = QPushButton("Full test",self)
+        testbutton = QPushButton("Full test cycle (click to cycle)",self)
         testbutton.move(100,25)
         testbutton.clicked.connect(self.test)
 
@@ -722,28 +747,27 @@ class Testbench(QWidget):
         self.input2.move(100,275)
 
     def test(self):
-        print("Failure test")
-        for i in [1,2,3,0]:
-            time.sleep(30)
-            for l in lines:
-                for b in l.blocks:
-                    b.failure = i
-            print(failnames[i]+ " Failure complete! Please hover over the blocks to check their status")
-        print("Occupancy test")
-        for i in [True,False]:
-            time.sleep(30)
-            for l in lines:
-                for b in l.blocks:
-                    b.occupied = True
-            print(str(i) + " Occupancy complete! Please hover over the blocks to check their status")
-        for i in range(2):
-            time.sleep(30)
-            for l in lines:
-                for s in l.switches:
-                    s.switch()
-                for c in l.crossings:
-                    c.switch()
+        global lines
+        if(self.cyclenum<4):
+            for l in range(len(lines)):
+                for b in range(len(lines[l].blocks)):
+                    lines[l].blocks[b].failure = 3-self.cyclenum
+            print(failnames[3-self.cyclenum] + " Failure complete! Please hover over the blocks to check their status")
+        elif(self.cyclenum<6):
+            for l in range(len(lines)):
+                for b in range(len(lines[l].blocks)):
+                    lines[l].blocks[b].occupied = (self.cyclenum==4)
+            print(str((self.cyclenum==4)) + " Occupancy complete! Please hover over the blocks to check their status")
+        elif(self.cyclenum<8):
+            for l in range(len(lines)):
+                for s in range(len(lines[l].switches)):
+                    lines[l].switches[s].switch()
+                for c in range(len(lines[l].crossings)):
+                    lines[l].crossings[c].switch()
             print("Switches and crossings toggled! Please hover over the blocks to check their status")
+        self.cyclenum=self.cyclenum+1
+        if(self.cyclenum==8):
+            self.cyclenum=0
                     
 
     
@@ -778,4 +802,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    test()
