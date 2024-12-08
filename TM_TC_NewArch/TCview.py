@@ -6,6 +6,7 @@ class TCView(QWidget):
     setpoint_command_signal = Signal(float)
     pid_tick_signal = Signal()
     ebrake_signal = Signal(bool)
+    sbrake_signal = Signal(bool)
     kp_signal = Signal(float)
     ki_signal = Signal(float)
     manual_left_doors = Signal(bool)
@@ -78,6 +79,16 @@ class TCView(QWidget):
         ebrake_layout.addWidget(self.ebrake_button)
         ebrake_group = QGroupBox("Emergency Controls")
         ebrake_group.setLayout(ebrake_layout)
+
+        # Service Brake Section
+        self.sbrake_button = QPushButton("Service Brake: OFF")
+        self.sbrake_button.clicked.connect(self.sbrake_toggle)
+        self.sbrake_button.setToolTip("Toggle the service brake")
+        sbrake_layout = QVBoxLayout()
+        sbrake_layout.addWidget(self.sbrake_button)
+        sbrake_group = QGroupBox("Service Controls")
+        sbrake_group.setLayout(sbrake_layout)
+
 
         self.auth_label = QLabel("Authority: 0")
 
@@ -286,6 +297,15 @@ class TCView(QWidget):
         self.ebrake = not self.ebrake
         self.ebrake_signal.emit(self.ebrake)
         self.update_ebrake_ui()
+
+
+    def sbrake_toggle(self):
+        #attempt to toggle, wont work if theres a brake failure
+        self.sbrake_signal.emit
+
+    def update_sbrake(self, sb):
+        self.sbrake = sb
+        self.sbrake_button.setText("Service Brake: ON" if self.sbrake else "Service Brake: OFF")
     def emit_temp_value(self):
         self.temperature_label.setText(f"Temperature: {self.temperature}°C")
         self.temperature_signal.emit(self.temperature)
