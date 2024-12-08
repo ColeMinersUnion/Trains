@@ -43,14 +43,14 @@ def trainFactory(routeInfo: list, authority: str):
 tm_signals.sendOccupancies.connect(wss_window.update_occupancy)
 tm_signals.sendOccupancies.connect(wsh_window.update_occupancy)
 #wss sending updated authority to tk:
-wss_window.wss_tm_authority.connect(tm_signals.getAuthority)
+wss_window.wss_tm_authority.connect(tm_signals.getSoftwareAuthority)
 wss_window.wss_tm_switch_13.connect(tm_signals.getSwitch13)
 wss_window.wss_tm_switch_28.connect(tm_signals.getSwitch28)
 wss_window.wss_tm_switch_77.connect(tm_signals.getSwitch77)
 wss_window.wss_tm_switch_85.connect(tm_signals.getSwitch85)
 wsh_window.wsh_tm_switch_58.connect(tm_signals.getSwitch58)
 wsh_window.wsh_tm_switch_62.connect(tm_signals.getSwitch62)
-wsh_window.wsh_tm_authority.connect(tm_signals.getAuthority)
+wsh_window.wsh_tm_authority.connect(tm_signals.getHardwareAuthority)
 
 ctc.emitTrain.connect(trainFactory)
 

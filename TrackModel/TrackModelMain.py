@@ -517,7 +517,7 @@ class FileButton(QWidget):
 
         self.label.mousePressEvent = self.selectFile
 
-    def selectFile(self,message):
+    def selectFile(self, message):
         global fileselected
         filename, _ = QFileDialog.getOpenFileName(self, "Open File", "", "Excel Files (*.xlsx)")
         if filename:
