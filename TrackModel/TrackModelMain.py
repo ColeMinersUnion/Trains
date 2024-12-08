@@ -9,7 +9,7 @@ from math import atan2,pi,sqrt,pow,sin,cos
 #offsets are multiplied by scl
 XOFFSET = 0
 YOFFSET = 3
-SCL=20 #scale
+SCL=25 #scale
 occflag = True
 linenames=["Green","Red"]
 lines=[]
@@ -654,7 +654,7 @@ class StationIcon(QWidget):
 class Map(QWidget):
     def __init__(self):
         super().__init__()
-        self.resize(1280,720)
+        self.resize(1080,1080)
         self.move(0,0)
         self.setWindowTitle("Track Model Map")
         self.setStyleSheet("background-color: lightyellow;")
