@@ -182,11 +182,11 @@ class TrainModel(QObject):
         self.totalDistanceTravelled += (T/2) * (self.vn + self.vn_1)
 
     def checkBlockChange(self):
-        self.block_change.emit(self.blockID[self.i])
         #print(self.milestoneDistance)
         if(self.milestoneDistance < self.totalDistanceTravelled):
             self.i += 1
             self.milestoneDistance += self.blockLength[self.i]
+            self.block_change.emit(self.blockID[self.i])
 
     #@Slot(str)
     #def beaconIntake(self, beacon: str):
