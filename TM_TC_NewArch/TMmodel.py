@@ -57,7 +57,6 @@ class TrainModel(QObject):
         self.i = 0
         self.milestoneDistance = 0
         self.currentBeaconInfo = "null"
-        self.parseRouteInfo()
         self.calcTotalMass()
         self.stationName = "N/A"
 
@@ -184,9 +183,9 @@ class TrainModel(QObject):
         #print("odometer: ", self.totalDistanceTravelled, "currentVel: ", self.vn, "prevVel ", self.vn_1)
         if(self.milestoneDistance <= self.totalDistanceTravelled):
             #self.block_change.emit(self.blockID[self.i]) #Hi Zach! This is Dominic, I added this line so I could turn occupancies off after they pass the block
-            self.i += 1
-            self.milestoneDistance += self.blockLength[self.i]
             self.block_change.emit(self.blockID[self.i])
+            self.milestoneDistance += self.blockLength[self.i]
+            self.i += 1
 
     #@Slot(str)
     #def beaconIntake(self, beacon: str):
