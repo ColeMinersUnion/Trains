@@ -354,5 +354,5 @@ class TCView(QWidget):
 
     @Slot (float)
     def curr_speed_limit(self, sl):
-        self.speed_limit_label.setText(f"Speed Limit: {sl} m/s")
+        #self.speed_limit_label.setText(f"Speed Limit: {sl} m/s")
         self.curr_speed_limit = sl
