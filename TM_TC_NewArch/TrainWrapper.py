@@ -48,5 +48,7 @@ class Train(QWidget):
         self.train_controller_model.sbrake_change.connect(self.train_model.toggleServiceBrake)
         self.train_model.acceleration_updated.connect(self.train_controller_view.acceleration_changed)
 
+        #parse route info 
+        self.train_model.parseRouteInfo()
         # Connect the train controller to the train model for brake inputs and outputs
         self.train_controller_model.ebrake_change.connect(self.train_model.toggleEmergencyBrake)
