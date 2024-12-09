@@ -22,3 +22,4 @@ class TrainModelController(QObject):
         self.model.right_door_updated.connect(self.view.update_right_door_status)
         self.model.service_brake_updated.connect(self.view.update_service_brake_status)
         self.model.emergency_brake_updated.connect(self.view.update_eBrake_label)
+        #self.model.station_name.connect(self.view.)

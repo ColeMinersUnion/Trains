@@ -24,6 +24,7 @@ class TrainModel(QObject):
     engine_failure = Signal(bool)   # Signal for engine failure
     brake_failure = Signal(bool)    # Signal for brake failure
     speed_limits = Signal(list)     # speed limits for train controller
+    station_name = Signal(str)      # name of station being arrived at
     
     def __init__(self, routeInfo):
         super().__init__()
@@ -56,8 +57,8 @@ class TrainModel(QObject):
         self.i = 0
         self.milestoneDistance = 0
         self.currentBeaconInfo = "null"
-        self.parseRouteInfo()
         self.calcTotalMass()
+        self.stationName = "N/A"
 
     """ velocity calculation """
     @Slot(float)
@@ -73,9 +74,6 @@ class TrainModel(QObject):
             else:
                 self.an = 0
                 self.vn = 0.0
-
-            
-
         elif self.emergencyBrakeStatus:
 
             if(self.vn > 0):
@@ -84,7 +82,6 @@ class TrainModel(QObject):
             else:
                 self.an = 0
                 self.vn = 0.0
-
         else:
             """ Simulate the train's response to power. """
             if power <= 0:
@@ -178,19 +175,17 @@ class TrainModel(QObject):
         #send speed limits to train controller here
         self.speed_limits.emit(self.speedLimit)
 
-        self.milestoneDistance += self.blockLength[0]
-
     """ built in odometer, uses the distance travelled to calculate if the block changes """
     def odometer(self):
         self.totalDistanceTravelled += (T/2) * (self.vn + self.vn_1)
 
     def checkBlockChange(self):
         #print("odometer: ", self.totalDistanceTravelled, "currentVel: ", self.vn, "prevVel ", self.vn_1)
-        if(self.milestoneDistance < self.totalDistanceTravelled):
-            self.block_change.emit(self.blockID[self.i]) #Hi Zach! This is Dominic, I added this line so I could turn occupancies off after they pass the block
-            self.i += 1
-            self.milestoneDistance += self.blockLength[self.i]
+        if(self.milestoneDistance <= self.totalDistanceTravelled):
+            #self.block_change.emit(self.blockID[self.i]) #Hi Zach! This is Dominic, I added this line so I could turn occupancies off after they pass the block
             self.block_change.emit(self.blockID[self.i])
+            self.milestoneDistance += self.blockLength[self.i]
+            self.i += 1
 
     #@Slot(str)
     #def beaconIntake(self, beacon: str):

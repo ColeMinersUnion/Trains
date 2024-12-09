@@ -31,7 +31,7 @@ class TCmodel(QObject):
         self.leaving_station = 0
         self.speedlimits = []
         self.dist = 0
-        self.current_speed_limit = 0
+        self.current_speed_limit = 40
         self.ebrake = False
         self.sbrake = False
         self.pwr = 0
@@ -160,7 +160,7 @@ class TCmodel(QObject):
         #set current distance to station to next value in authority string
         self.blockID = id
         print(f" Block ID: {self.blockID}")
-        if (self.blockID != self.prev_ID & self.prev_ID != 0):
+        if (self.blockID != self.prev_ID):
             self.next_authority_value()
             self.curr_dist = self.curr_authority
             self.authority_display.emit(float(self.curr_authority))
@@ -175,13 +175,14 @@ class TCmodel(QObject):
         authority_list.pop(0)
         self.full_authority = ';'.join(authority_list)
         self.curr_authority = float(self.full_authority.split(';')[0])
+        #print(f"new authority value : {self.curr_authority}")
 
     @Slot (list)
-    def set_speed_limits(self, speed_limits):
+    def set_speed_limits(self, sl):
         #take in speed limits
         #define current speed limit value
-        self.speedlimits = speed_limits
-        #print(f"speed limits: {self.speedlimits}")
+        self.speedlimits = sl
+        print(f"speed limits: {self.speedlimits}")
         self.current_speed_limit = self.speedlimits[0]
 
     def stopping_dist(self):
@@ -189,7 +190,7 @@ class TCmodel(QObject):
             self.dist = 1
         else:
            self.dist = (self.currentSpeed*self.currentSpeed)/(2*self.service_brake_deceleration)
-           #print(f"stopping distance: {self.dist}")
+           print(f"stopping distance: {self.dist}")
         if (self.curr_dist <= self.dist):
             self.approaching = self.approaching + 1
             #print("added to val")
@@ -227,8 +228,10 @@ class TCmodel(QObject):
         elif(self.leaving_station == True):
             self.atStation = 0
             self.leaving_station = False
-        else:
-            print(f"Current distance from station: {self.curr_dist:.2f} meters")
+        #else:
+            #print(f"Current distance from station: {self.curr_dist:.2f} meters")
+            #print(f"commanded speed: {self.commandedSpeed:.2f} m/s")
+            #print(f"pwr output : {self.pwr:.2f} W")
         self.station()
 
     def cut_power_and_enable_brake(self):
@@ -251,7 +254,7 @@ class TCmodel(QObject):
     def calculate_current_authority(self):
         """ Calculate the current authority based on speed and acceleration. """
         self.curr_authority = self.currentSpeed * T + (0.5 * self.acceleration * T * T)
-        print(f"Current Authority: {self.curr_authority}")
+        #print(f"Current Authority: {self.curr_authority}")
         #emit signal for display
         self.authority_display.emit(self.curr_authority)
 
@@ -263,7 +266,7 @@ class TCmodel(QObject):
 
             if float(self.full_authority.split(';')[1]) < float(self.full_authority.split(';')[2]):
                 self.curr_authority = 0  # Placeholder for approaching a station
-        print (f"Current Authority: {self.curr_authority}")
+        #print (f"Current Authority: {self.curr_authority}")
 
     def station(self):
         #at a station
@@ -285,17 +288,22 @@ class TCmodel(QObject):
                 #sleep for 60 seconds
                 print("stopped at station, Timer started for 60 seconds.")
                 self.timer.start(10000) #not 60 seconds yet, put 60000 for 60 sec
+        elif (self.leaving_station == True):
+            self.sbrake = False
+            self.commandedSpeed = self.current_speed_limit
 
     def on_timer_timeout(self):
-        self.left_doors_signal.emit(False)
-        self.right_doors_signal.emit(False)
-        print("timer done, doors closed")
         self.atStation = -1 #no longer at station, can resume
         self.commandedSpeed = self.current_speed_limit
         self.leaving_station = True
         self.sbrake = False
-        self.approaching = False
-        self.next_authority_value()
+        self.approaching = 0
+        self.left_doors_signal.emit(False)
+        self.right_doors_signal.emit(False)
+        print("timer done, doors closed")
+        self.curr_dist = self.curr_authority + float(self.full_authority.split(';')[1])
+        #print(f"at station: {self.atStation}, current speed: {self.currentSpeed}, approaching: {self.approaching}, leaving : {self.leaving_station}, curr authority : {self.curr_authority}, pwr command: {self.pwr}, commanded speed: {self.commandedSpeed}")
+
 
 
     def toggle_underground(self):
