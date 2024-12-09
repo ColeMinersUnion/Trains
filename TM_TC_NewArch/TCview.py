@@ -25,6 +25,7 @@ class TCView(QWidget):
         self.right_doors = False
         self.lights = False
         self.headlights = False
+        self.speed_limit = 50
 
         self.setStyleSheet("""
         QWidget {
@@ -232,7 +233,6 @@ class TCView(QWidget):
         self.manual_right_doors.emit(self.right_doors)
         #change label
         #
-
     def toggle_headlights(self):
         #change value internally
         self.headlights = not self.headlights
@@ -285,6 +285,10 @@ class TCView(QWidget):
 
     def emit_setpoint_command(self, value):
         """ Emit power command when the slider value changes. """
+        if (value > self.speed_limit):
+            value = self.speed_limit
+            self.setpoint_label.setText(f"Setpoint Speed: MAX ({self.speed_limit})")
+            self.setpoint_slider.setValue(value)
         self.setpoint_label.setText(f"Setpoint Speed: {value}")
         self.setpoint_command_signal.emit(value)
 
@@ -347,3 +351,8 @@ class TCView(QWidget):
     @Slot (float)
     def update_authority_display(self, auth):
         self.auth_label.setText(f"Authority value: {auth}")
+
+    @Slot (float)
+    def curr_speed_limit(self, sl):
+        self.speed_limit_label.setText(f"Speed Limit: {sl} m/s")
+        self.curr_speed_limit = sl
