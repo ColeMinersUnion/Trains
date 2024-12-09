@@ -24,6 +24,7 @@ class TrainModel(QObject):
     engine_failure = Signal(bool)   # Signal for engine failure
     brake_failure = Signal(bool)    # Signal for brake failure
     speed_limits = Signal(list)     # speed limits for train controller
+    station_name = Signal(str)      # name of station being arrived at
     
     def __init__(self, routeInfo):
         super().__init__()
@@ -58,6 +59,7 @@ class TrainModel(QObject):
         self.currentBeaconInfo = "null"
         self.parseRouteInfo()
         self.calcTotalMass()
+        self.stationName = "N/A"
 
     """ velocity calculation """
     @Slot(float)
