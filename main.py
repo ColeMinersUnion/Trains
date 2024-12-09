@@ -19,7 +19,7 @@ tm_signals = tm_window.signals
 
 #Emit Connect Slot
 wss_window.wss_ctc_occupancy.connect(ctc.updateOccupancy)
-#wsh_window.wsh_ctc_occupancy.connect(ctc.updateOccupancy)
+wsh_window.wsh_ctc_occupancy.connect(ctc.updateOccupancy)
 #wsh_window.ws_ctc_switch_result.connect(ctc.handleGreenOutputSwitch)
 
 

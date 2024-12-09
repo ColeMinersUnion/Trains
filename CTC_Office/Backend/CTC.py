@@ -167,13 +167,16 @@ class CTC_Office:
                 for t in cls.Schedule[line].trains:
                     print(f"Train is at block: {i}")
                     print(f"Train Location: {t.location.connections}")
+                    if i == t.location.index:
+                        isBroken = False
+                        continue
                     if i in t.location.connections:
                         t.location = cls.line[line].graph[i]
                         isBroken = False
-                        print("Train Moved!")
+                        #print("Train Moved!")
                 if isBroken:
                     cls.line[line].closed = True
-                    #raise Exception("Track declared broken")
+                    raise Exception("Track declared broken")
 
 
                              
