@@ -170,7 +170,11 @@ class Line:
         self.stations = []
         self.trains = []
 
-
+    def beaconByBlock(self,block):
+        for x in self.transponders:
+            if (x.block==block):
+                return x.data
+        return None
 
     def getSwitch(self,block):
         for x in self.switches:
@@ -247,6 +251,7 @@ class SignalHandler(QObject):
     sendOccupancies = pyqtSignal(list)
     sendAuthorities = pyqtSignal(list)
     sendPassengers = pyqtSignal(list)
+    sendBeacon = pyqtSignal(list)
 
     def __init__(self):
         super().__init__()
@@ -268,7 +273,11 @@ class SignalHandler(QObject):
         self.sendPassengers.emit([message[0],boarding])
         lines[0].stations[stationid].passengers = waiting - boarding + message[1]
 
-
+    @pyqtSlot(int) #expecting block number
+    def sendBeacon(self,message):
+        data = lines[0].beaconByBlock(message)
+        if(data!=None):
+            self.sendBeacon.emit([data,message])
 
     @pyqtSlot(int)
     def toggleOcc(self,message):
