@@ -24,7 +24,7 @@ class TrainModel(QObject):
     engine_failure = Signal(bool)   # Signal for engine failure
     brake_failure = Signal(bool)    # Signal for brake failure
     speed_limits = Signal(list)     # speed limits for train controller
-    station_name = Signal(str)      # name of station being arrived at
+    station_name_updated = Signal(str)      # name of station being arrived at
     
     def __init__(self, routeInfo):
         super().__init__()
@@ -187,10 +187,12 @@ class TrainModel(QObject):
             self.milestoneDistance += self.blockLength[self.i]
             self.i += 1
 
-    #@Slot(str)
-    #def beaconIntake(self, beacon: str):
+    #incomplete, but exists for future use
+    @Slot(str)
+    def beaconIntake(self, beacon: str):
+        self.stationName = beacon
+        self.station_name_updated.emit(self.stationName)
         
-
     """ Failure (Murphy) toggles are the next three slot functions here """
     @Slot()
     def toggleBrakeFailure(self):

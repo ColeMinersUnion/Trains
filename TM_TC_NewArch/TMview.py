@@ -23,7 +23,7 @@ class TrainModelView(QWidget):
         self.left_door_label = QLabel("Left Doors: Closed")
         self.right_door_label = QLabel("Right Doors: Closed")
         self.service_brake_label = QLabel("Service Brake: OFF")
-        self.station_label = QLabel("Current Station: Pioneer")
+        self.station_label = QLabel("Current Station: ")
 
         self.emergencyBrakeButton = QPushButton("Emergency Brake: OFF")
         self.emergencyBrakeButton.clicked.connect(self.update_emergency_brake_status)
@@ -40,6 +40,7 @@ class TrainModelView(QWidget):
         layout.addWidget(self.left_door_label)
         layout.addWidget(self.right_door_label)
         layout.addWidget(self.service_brake_label)
+        layout.addWidget(self.station_label)
         layout.addWidget(self.emergencyBrakeButton)
 
         # Set the layout and window title
@@ -91,9 +92,9 @@ class TrainModelView(QWidget):
         status = "ON" if servBrake_status else "OFF"
         self.service_brake_label.setText(f"Service Brake: {status}")
 
-    def update_staion_name(self, station_name: str):
+    def update_station_name(self, station_name: str):
         """ Update the name of the station being arrived at """
-        self.station_label.setText(f"Current Station:  {station_name}")
+        self.station_label.setText(f"Current Station: {station_name}")
 
     @Slot()
     def update_emergency_brake_status(self):
