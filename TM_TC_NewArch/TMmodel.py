@@ -178,16 +178,14 @@ class TrainModel(QObject):
         #send speed limits to train controller here
         self.speed_limits.emit(self.speedLimit)
 
-        self.milestoneDistance += self.blockLength[0]
-
     """ built in odometer, uses the distance travelled to calculate if the block changes """
     def odometer(self):
         self.totalDistanceTravelled += (T/2) * (self.vn + self.vn_1)
 
     def checkBlockChange(self):
         #print("odometer: ", self.totalDistanceTravelled, "currentVel: ", self.vn, "prevVel ", self.vn_1)
-        if(self.milestoneDistance < self.totalDistanceTravelled):
-            self.block_change.emit(self.blockID[self.i]) #Hi Zach! This is Dominic, I added this line so I could turn occupancies off after they pass the block
+        if(self.milestoneDistance <= self.totalDistanceTravelled):
+            #self.block_change.emit(self.blockID[self.i]) #Hi Zach! This is Dominic, I added this line so I could turn occupancies off after they pass the block
             self.i += 1
             self.milestoneDistance += self.blockLength[self.i]
             self.block_change.emit(self.blockID[self.i])
