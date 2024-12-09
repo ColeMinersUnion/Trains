@@ -175,10 +175,13 @@ class CTC_Office:
                         isBroken = False
                         #print("Train Moved!")
                 if isBroken:
-                    cls.line[line].closed = True
+                    cls.line[line].graph[i].closed = True
                     #raise Exception(f"Track {i} declared broken")
                     print(f"Track {i} declared broken")
-
+            else:
+                if cls.line[line].graph[i].closed:
+                    cls.line[line].graph[i].closed = False
+                    print(f"Track {i} was fixed")
 
                              
         

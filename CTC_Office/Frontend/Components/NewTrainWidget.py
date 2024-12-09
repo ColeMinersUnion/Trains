@@ -76,6 +76,7 @@ class NewTrainWidget(QWidget):
         self.timebox.addWidget(self.second)
 
         self.layout.addWidget(self.station)
+        self.layout.addWidget(QLabel("Time: (HH:MM:SS)"))
         self.layout.addLayout(self.timebox)
         self.layout.addWidget(self.submit)
 
