@@ -73,9 +73,6 @@ class TrainModel(QObject):
             else:
                 self.an = 0
                 self.vn = 0.0
-
-            
-
         elif self.emergencyBrakeStatus:
 
             if(self.vn > 0):
@@ -84,7 +81,6 @@ class TrainModel(QObject):
             else:
                 self.an = 0
                 self.vn = 0.0
-
         else:
             """ Simulate the train's response to power. """
             if power <= 0:
