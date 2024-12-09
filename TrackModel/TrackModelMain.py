@@ -1,4 +1,5 @@
 import sys
+import time
 from PyQt6.QtWidgets import QWidget, QLabel, QPushButton, QLineEdit, QSlider, QApplication, QFileDialog
 from PyQt6.QtGui import QTransform, QPixmap
 from PyQt6.QtCore import Qt,QTimer,QObject, pyqtSignal, pyqtSlot
@@ -8,12 +9,13 @@ from math import atan2,pi,sqrt,pow,sin,cos
 #offsets are multiplied by scl
 XOFFSET = 0
 YOFFSET = 3
-SCL=20 #scale
+SCL=25 #scale
 occflag = True
 linenames=["Green","Red"]
 lines=[]
-switchid=[] #track switch numbers for pinging
-crossingid=[] #track crossing numbers for pinging
+switchid=[0,0] #track switch numbers for pinging
+crossingid=[0,0] #track crossing numbers for pinging
+stationid=[0,0] #station numbers for pinging
 failmode = 0
 failnames = ["No","Rail","Circuit","Power"]
 heaters = False
@@ -145,46 +147,18 @@ class Station: #yard also
         self.name = name
         self.side = side
         self.msg = ""
-        self.passengers = 5
-        if(name=="YARD"):  
+        self.stationid=stationid[linenum]
+        stationid[linenum]=stationid[linenum]+1
+
+        if(name=="YARD"):
+            self.passengers = 0  
             self.msg = "YARD"
         else:
+            self.passengers = 10
             self.msg = "Station " + str(name) + "\nSide " + str(side) + "\n" + linenames[linenum] + " Line, Block " + str(block)
 
-
-class Train:
-    def __init__(self,linenum,block1):
-        global lines
-        self.linenum = linenum
-        self.blocks = {block1}
-        lines[self.linenum].blocks[self.block1].occupied = True
-        '''
-        msgqueue = 10 Baud messages passed by wayside to train via track
-        tenbaud = 10 bauds available after processing the bud limit
-        possible inputs through here: speed, authority, train temp, doors,
-        '''
-        self.msgqueue = []
-        self.tenbaud = [False,False,False,False,False,False,False,False,False,False]
-        self.beacondata = ""
-
-    def addOcc(self,block):
-        self.blocks.add(block)
-        lines[self.linenum].blocks[block].occupied = True
-    
-    def removeOcc(self,block):
-        if(block in self.blocks):
-            self.blocks.remove(block)
-        lines[self.linenum].blocks[block].occupied = False
-    
-    def queueMessage(self,bool):
-        self.msgqueue.append(bool)
-    def tenBaudMessage(self):
-        if(len(self.msgqueue)>0):
-            self.tenbaud.append(self.msgqueue[0])
-            while(len(self.tenbaud>10)):
-                self.tenbaud.remove(0)
-
-        
+    def toString(self):
+        return self.msg + "\n" + str(self.passengers) + " people waiting" 
 
 class Line:
     def __init__(self,linenum):
@@ -201,25 +175,25 @@ class Line:
     def getSwitch(self,block):
         for x in self.switches:
             if x.hasBlock(block):
-                return x
+                return x.switchid
         return None
             
     def getCrossing(self,block):
         for x in self.crossings:
             if (x.block==block):
-                return x
+                return x.crossingid
         return None
     
     def stationByBlock(self,block):
         for x in self.stations:
             if (x.block==block):
-                return x
+                return x.stationid
         return None
     
     def stationByName(self,name):
         for x in self.stations:
             if (x.name==name):
-                return Station
+                return x.stationid
         return None
 
 lines=[Line(0),Line(1)]
@@ -242,6 +216,7 @@ def read(file):
             lines[linenum].blocks.append(None) #add values to list to fit block
             crossingid.append(0)
             switchid.append(0)
+            stationid.append(0)
         lines[linenum].blocks[data.iat[i,2]]=Block(linenum,
                                                 data.iat[i,1], #section
                                                 data.iat[i,2], #block
@@ -271,10 +246,10 @@ class SignalHandler(QObject):
 
     sendOccupancies = pyqtSignal(list)
     sendAuthorities = pyqtSignal(list)
+    sendPassengers = pyqtSignal(list)
 
     def __init__(self):
         super().__init__()
-        self.oldblock = 0
 
     def callOccSend(self, occupancies: list):
         self.sendOccupancies.emit(occupancies)
@@ -285,11 +260,19 @@ class SignalHandler(QObject):
             authorities.append(b.authority) 
         self.sendAuthorities.emit(authorities)
 
+    @pyqtSlot(list) #expecting block and number of passengers
+    def sendPassengers(self,message):
+        stationid=lines[0].stationByBlock(message[0])
+        waiting = lines[0].stations[stationid].passengers
+        boarding = waiting - 2 if (waiting>2) else 0
+        self.sendPassengers.emit([message[0],boarding])
+        lines[0].stations[stationid].passengers = waiting - boarding + message[1]
+
+
+
     @pyqtSlot(int)
-    def addOcc(self,message):
-        lines[0].blocks[self.oldblock].occupied = False
-        lines[0].blocks[message].occupied = True
-        self.oldblock = message
+    def toggleOcc(self,message):
+        lines[0].blocks[message].switchOccupancy()
 
     @pyqtSlot(list)
     def getHardwareAuthority(self,message):
@@ -649,24 +632,34 @@ class TransponderIcon(QWidget):
 class StationIcon(QWidget):
     def __init__(self,obj,window):
         super().__init__()
-        self.obj=obj
-        if(self.obj.name=="Yard"):
+        self.linenum=obj.linenum
+        self.stationid=obj.stationid
+        self.check=obj.passengers #front end check
+        if(obj.name=="Yard" or obj.name=="YARD"):
             pixmap = QPixmap('TrackModel/Icons/Yard.png')
         else:
             pixmap = QPixmap('TrackModel/Icons/Station.png')
         self.label=QLabel(window)
         pixmap = pixmap.transformed(QTransform().scale(SCL/100,SCL/100))
         self.label.setPixmap(pixmap)
-        self.label.setToolTip(obj.msg) #no toString, station message is static
+        self.label.setToolTip(obj.toString()) #no toString, station message is static
         center = lines[obj.linenum].blocks[obj.block].center
         self.label.move(int((center[0]-0.05)*SCL),int((center[1]-0.125)*SCL))
         self.label.setStyleSheet(labelstyle)
         self.setStyleSheet(tooltipstyle)
+        self.update()
+
+    def update(self):
+        obj = lines[self.linenum].stations[self.stationid]
+        if(self.check!=obj.passengers):
+            self.check=obj.passengers
+            self.label.setToolTip(obj.toString())
+            self.label.show()
 
 class Map(QWidget):
     def __init__(self):
         super().__init__()
-        self.resize(1280,720)
+        self.resize(1080,1080)
         self.move(0,0)
         self.setWindowTitle("Track Model Map")
         self.setStyleSheet("background-color: lightyellow;")
@@ -675,8 +668,9 @@ class Map(QWidget):
         for i in range(4):
             passive.append(FailureButton((i),self)) #add failure buttons
         active.append(FailureSelect(self)) #this goes after the dynamic icons, we hide them behind this widget system
+        read("TrackModel/Red Line.xlsx")
         read("TrackModel/Green Line.xlsx")
-        print(str(len(lines[0].blocks)))
+
         for line in lines:
             for block in line.blocks:
                 active.append(BlockIcon(block,self)) #updates for view
@@ -687,7 +681,7 @@ class Map(QWidget):
             for transponder in line.transponders:
                 passive.append(TransponderIcon(transponder,self))  
             for station in line.stations:
-                passive.append(StationIcon(station,self))
+                active.append(StationIcon(station,self))
         active.append(SpeedMeter(self))
         self.timer=QTimer() #timer for active components
         self.timer.timeout.connect(self.update) #connect timer to update method
@@ -717,7 +711,6 @@ class Map(QWidget):
         for a in active:
             a.update() #update every active component
         if(occflag):
-            print("occ update")
             occupancies=[]
             for b in lines[0].blocks:
                 occupancies.append(b.occupied)
@@ -730,6 +723,11 @@ class Testbench(QWidget):
         self.resize(400,400)
         self.move(1500,0)
         self.setWindowTitle("Track Model Testbench")
+        self.cyclenum = 0
+
+        testbutton = QPushButton("Full test cycle (click to cycle)",self)
+        testbutton.move(100,25)
+        testbutton.clicked.connect(self.test)
 
         occupybutton = QPushButton("Switch occupancy", self)
         occupybutton.move(100,50)
@@ -753,6 +751,31 @@ class Testbench(QWidget):
         self.input2 = QLineEdit(self)
         self.input2.move(100,275)
 
+    def test(self):
+        global lines
+        if(self.cyclenum<4):
+            for l in range(len(lines)):
+                for b in range(len(lines[l].blocks)):
+                    lines[l].blocks[b].failure = 3-self.cyclenum
+            print(failnames[3-self.cyclenum] + " Failure complete! Please hover over the blocks to check their status")
+        elif(self.cyclenum<6):
+            for l in range(len(lines)):
+                for b in range(len(lines[l].blocks)):
+                    lines[l].blocks[b].occupied = (self.cyclenum==4)
+            print(str((self.cyclenum==4)) + " Occupancy complete! Please hover over the blocks to check their status")
+        elif(self.cyclenum<8):
+            for l in range(len(lines)):
+                for s in range(len(lines[l].switches)):
+                    lines[l].switches[s].switch()
+                for c in range(len(lines[l].crossings)):
+                    lines[l].crossings[c].switch()
+            print("Switches and crossings toggled! Please hover over the blocks to check their status")
+        self.cyclenum=self.cyclenum+1
+        if(self.cyclenum==8):
+            self.cyclenum=0
+                    
+
+    
     def switchOccupancy(self):
         line = int(self.input1.text())
         comp = int(self.input2.text())
@@ -780,6 +803,7 @@ def main():
     trackmap.show()
     testbench.show()
     sys.exit(app.exec())
+    print("Finished main")
 
 if __name__ == "__main__":
     main()
