@@ -1,7 +1,6 @@
 #from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtWidgets import QMainWindow, QPushButton, QScrollArea, QVBoxLayout, QHBoxLayout, QWidget, QLineEdit, QLabel
 from PyQt6.QtCore import pyqtSlot, pyqtSignal
-from numpy import array
 import sys, os
 try:
     from Components.SchedulePreviewer import SchedulePreviewer
@@ -36,15 +35,25 @@ class CTCApplication(QMainWindow):
         self.Office = Office
         self.Office.addGreenLine()
 
-        self.navbar = QHBoxLayout()
-        self.manual = QPushButton("Manual")
-        self.auto_page = QPushButton("Automatic")
-        self.navbar.addWidget(self.manual)
-        self.navbar.addWidget(self.auto_page)
-        self.navbar.setSpacing(10)
-        self.navbar.setContentsMargins(0, 0, 0, 0)
+        #Navbar widgets
+        self.navbar = QWidget()
+        self.navbar_layout = QHBoxLayout()
 
-        #self.scheduleWidget = SchedulePreviewer()
+        self.manual = QPushButton("Manual")
+        self.manstate = True
+        self.manual.released.connect(self.onManualMode)
+        self.auto_page = QPushButton("Automatic")
+        self.autostate = False
+        self.auto_page.released.connect(self.onAutoMode)
+
+        self.navbar_layout.addWidget(self.manual)
+        self.navbar_layout.addWidget(self.auto_page)
+        self.navbar_layout.setSpacing(10)
+        self.navbar_layout.setContentsMargins(0, 0, 0, 0)
+        self.navbar.setLayout(self.navbar_layout)
+
+
+        #Manual widgets
         self.GreenOcc = OccupancyWidget()
         self.RedOcc = OccupancyWidget()
         self.newTrainWidget = NewTrainWidget(Green)
@@ -59,14 +68,13 @@ class CTCApplication(QMainWindow):
         self.fixBlock = QLineEdit(parent=self)
         self.submitFix =QPushButton("Fix Block")
         self.fix_state = True
-        self.Automatic = QLineEdit(parent=self)
-        self.Auto = QPushButton("Schedule File")
-        self.auto_state = True
+
 
         self.Title = QLabel()
         self.Title.setText("Manual Mode")
         self.Title.styleSheet = "font-size: 60px; font-weight: bold;"
         self.Manual_layout.addWidget(self.Title)
+        self.Manual_layout.addWidget(self.navbar)
 
 
         self.hlayout.addWidget(self.newTrainWidget)
@@ -93,9 +101,7 @@ class CTCApplication(QMainWindow):
         self.submitFix.released.connect(self.onFix)
         self.submitFix.setChecked(self.fix_state)
 
-        self.Auto.setCheckable(True)
-        self.Auto.released.connect(self.onAuto)
-        self.Auto.setChecked(self.auto_state)
+        
 
         lbl = QLabel()
         lbl.setText("Testbench Information")
@@ -113,12 +119,6 @@ class CTCApplication(QMainWindow):
         self.lbl10.setText("Outputted String for Train")
         
 
-        lbl3 = QLabel()
-        lbl3.setText("Automatic Mode")
-        self.Manual_layout.addWidget(lbl3)
-        self.Manual_layout.addWidget(self.Automatic)
-        self.Manual_layout.addWidget(self.Auto)
-
         lbl4 = QLabel()
         lbl4.setText("Breaking the track")
         self.Manual_layout.addWidget(lbl4)
@@ -132,7 +132,7 @@ class CTCApplication(QMainWindow):
         self.Manual_layout.addWidget(self.submitFix)
         
 
-
+        #Test bench stuff
         self.Manual_layout.addWidget(lbl)
         self.Manual_layout.addWidget(self.speed)
         self.Manual_layout.addWidget(self.auth)
@@ -143,36 +143,21 @@ class CTCApplication(QMainWindow):
         self.newTrainWidget.emitTrain.connect(self.handleNewGreenTrain)
 
 
-
+        
         self.main.setLayout(self.Manual_layout)
 
-        self.setCentralWidget(self.main)
+        self.setCentralWidget(self.main)        
+
+
+    def onManualMode(self):
+        self.main.setLayout(self.Manual_layout)
+        self.autostate = False
+        self.manstate = True
     
-    def onClick(self):
-        id = self.Office.nextID - 1
-        #print(id)
-        train = self.Office.Schedule["Green"].trains[id]
-        if(train.move()):
-            self.scheduleWidget.update(train.id, str(train.location), train.Next_Stop, datetime.now())
-
-        self.speed.setText(f'Speed: {train.speedy()/1.609344} Mph')
-        self.auth.setText(f'Authority {train.auth()/1609.344} Miles')
-
-        self.switchState.setText("To the Yard")
-
-
-            
-
-        self.button_state = self.button.isChecked()
-
-    def onSubmit(self):
-        txt = self.addTrain.text()
-        if(txt == 'Pioneer'):
-            self.lbl10.setText(f"String Auth: {self.Office.Schedule['Green'].trains[0].stringAuth()}")
-            self.lbl10.setWordWrap(True)
-        else:
-            self.addTrain.setText("That station Does not exist, try again.")
-        self.submit_state = self.submit.isChecked()
+    def onAutoMode(self):
+        self.main.setLayout(self.Auto_layout)
+        self.autostate = True
+        self.manstate = False
 
     
     def onClear(self):

@@ -176,7 +176,8 @@ class CTC_Office:
                         #print("Train Moved!")
                 if isBroken:
                     cls.line[line].closed = True
-                    raise Exception("Track declared broken")
+                    #raise Exception(f"Track {i} declared broken")
+                    print(f"Track {i} declared broken")
 
 
                              
