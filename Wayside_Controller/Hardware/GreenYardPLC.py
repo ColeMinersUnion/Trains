@@ -112,35 +112,41 @@ class PLC:
     def update_authority(self, occ):
         self.occupancy = occ
 
-        self.authority[41] = not any(occ[47:58])
-        self.authority[42] = not any(occ[47:58]) and not any(occ[41:42])
-        self.authority[43] = not any(occ[47:58]) and not any(occ[41:43])
-        self.authority[44] = not any(occ[47:58]) and not any(occ[41:44])
-        self.authority[45] = not any(occ[47:58]) and not any(occ[41:45])
-        self.authority[46] = not any(occ[47:58]) and not any(occ[41:46])
-        self.authority[47] = not any(occ[58:63]) or self.sw58 == False
-        self.authority[48] = not any(occ[58:63]) and not any(occ[47:48]) or self.sw58 == False
-        self.authority[49] = not any(occ[58:63]) and not any(occ[47:49]) or self.sw58 == False
-        self.authority[50] = not any(occ[58:63]) and not any(occ[47:50]) or self.sw58 == False
-        self.authority[51] = not any(occ[58:63]) and not any(occ[47:51]) or self.sw58 == False
-        self.authority[52] = not any(occ[58:63]) and not any(occ[47:52]) or self.sw58 == False
-        self.authority[53] = not any(occ[58:63]) and not any(occ[47:53]) or self.sw58 == False
-        self.authority[54] = not any(occ[58:63]) and not any(occ[47:54]) or self.sw58 == False
-        self.authority[55] = not any(occ[58:63]) and not any(occ[47:55]) or self.sw58 == False
-        self.authority[56] = not any(occ[58:63]) and not any(occ[47:56]) or self.sw58 == False
-        self.authority[57] = not any(occ[58:63]) and not any(occ[47:57]) or self.sw58 == False
-        self.authority[58] = not any(occ[63:69]) and self.sw62 == True
-        self.authority[59] = not any(occ[63:69]) and not any(occ[58:59]) and self.sw62 == True
-        self.authority[60] = not any(occ[63:69]) and not any(occ[58:60]) and self.sw62 == True
-        self.authority[61] = not any(occ[63:69]) and not any(occ[58:61]) and self.sw62 == True
-        self.authority[62] = not any(occ[63:69]) and not any(occ[58:62]) and self.sw62 == True
-        self.authority[63] = not any(occ[69:77])
-        self.authority[64] = not any(occ[69:77]) and not any(occ[63:64])
-        self.authority[65] = not any(occ[69:77]) and not any(occ[63:65])
-        self.authority[66] = not any(occ[69:77]) and not any(occ[63:66])
-        self.authority[67] = not any(occ[69:77]) and not any(occ[63:67])
-        self.authority[68] = not any(occ[69:77]) and not any(occ[63:68])
+        self.authority[41] = not any(occ[47:58]) and not any(occ[42:47])
+        self.authority[42] = not any(occ[47:58]) and not any(occ[43:47])
+        self.authority[43] = not any(occ[47:58]) and not any(occ[44:47])
+        self.authority[44] = not any(occ[47:58]) and not any(occ[45:47])
+        self.authority[45] = not any(occ[47:58]) and not any(occ[46:47])
+        self.authority[46] = not any(occ[47:58])\
+        
 
+        self.authority[47] = (not any(occ[58:63]) or self.sw58 == False) and not any(occ[48:58])
+        self.authority[48] = (not any(occ[58:63]) or self.sw58 == False) and not any(occ[49:58])
+        self.authority[49] = (not any(occ[58:63]) or self.sw58 == False) and not any(occ[50:58])
+        self.authority[50] = (not any(occ[58:63]) or self.sw58 == False) and not any(occ[51:58])
+        self.authority[51] = (not any(occ[58:63]) or self.sw58 == False) and not any(occ[52:58])
+        self.authority[52] = (not any(occ[58:63]) or self.sw58 == False) and not any(occ[53:58])
+        self.authority[53] = (not any(occ[58:63]) or self.sw58 == False) and not any(occ[54:58])
+        self.authority[54] = (not any(occ[58:63]) or self.sw58 == False) and not any(occ[55:58])
+        self.authority[55] = (not any(occ[58:63]) or self.sw58 == False) and not any(occ[56:58])
+        self.authority[56] = (not any(occ[58:63]) or self.sw58 == False) and not any(occ[57:58])
+        self.authority[57] = (not any(occ[58:63]) or self.sw58 == False) and not any(occ[58:59])
+        
+        self.authority[58] = (not any(occ[63:69]) and self.sw62 == True) and not any(occ[59:63])
+        self.authority[59] = (not any(occ[63:69]) and self.sw62 == True) and not any(occ[60:63])
+        self.authority[60] = (not any(occ[63:69]) and self.sw62 == True) and not any(occ[61:63])
+        self.authority[61] = (not any(occ[63:69]) and self.sw62 == True) and not any(occ[62:63])
+        self.authority[62] = (not any(occ[63:69]) and self.sw62 == True) and not any(occ[63:64])
+        
+
+        self.authority[63] = not any(occ[69:77]) and not any(occ[64:69])
+        self.authority[64] = not any(occ[69:77]) and not any(occ[65:69])
+        self.authority[65] = not any(occ[69:77]) and not any(occ[66:69])
+        self.authority[66] = not any(occ[69:77]) and not any(occ[67:69])
+        self.authority[67] = not any(occ[69:77]) and not any(occ[68:69])
+        self.authority[68] = not any(occ[69:77]) and not any(occ[69:70])
+        
+        
 
 
         # auth = [True for i in range(151)]
@@ -161,7 +167,7 @@ class PLC:
         #     if any(occ[69:77]):
         #         auth[i] = False
         # self.authority = auth
-        
+
         self.update_signals()
         return self.authority
     
