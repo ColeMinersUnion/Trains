@@ -7,7 +7,7 @@ from GreenYardPLC import PLC
 def main():
     plc = PLC()
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind(('127.0.0.1', 9000))
+    server_socket.bind(('192.168.2.2', 9000))
     server_socket.listen(5)
     print("Server is listening")
 
@@ -134,11 +134,15 @@ def main():
                         }
 
                     case "say_hi":
-                        response = {"response": "server connect"}
-                        
+                        plc.update_authority(decoded_json["occ"])
+                        response = {"response": "server connect",
+                                    "auth": plc.authority
+                                    }
+                
+                print(response)
                 json_data = json.dumps(response)
                 length_prefix = f"{len(json_data):<10}" # Fixed 10-byte length prefix
-                print(length_prefix)
+                print(int(length_prefix))
                 client_socket.sendall(length_prefix.encode('utf-8') + json_data.encode('utf-8'))
 
             except json.JSONDecodeError:
