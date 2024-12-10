@@ -14,7 +14,7 @@ class TrainModel(QObject):
     passengerCount_updated = Signal(int) # Signal to send passengers onboard
     total_mass_updated = Signal(float)   # Signal to send current mass of train
     temperature_updated = Signal(float)  # Signal to send current temperature
-    intLights_updated = Signal(float)    # Signal to update cabin lights
+    intLights_updated = Signal(bool)    # Signal to update cabin lights
     extLights_updated = Signal(bool)  # Signal to update the headlights
     left_door_updated = Signal(bool) #Signal to toggle left doors
     right_door_updated = Signal(bool) #Signal to toggle right doors
