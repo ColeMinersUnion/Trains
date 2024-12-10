@@ -19,6 +19,9 @@ class GreenPLC:
         #crossings
         self.crossing_19=False
         self.crossing_108=False
+
+        self.maint_safety=True
+        self.sw_safety=True
         '''
         #stores block occupancies
         self.occupancies=[False for i in range(1,150)]
@@ -46,7 +49,33 @@ class GreenPLC:
         authority=self.update_authority(occupancy)
         return authority, switch77, switch85, switch28, switch13, signal77, signal85, signal28, signal13, crossing19, crossing108
     
-
+    def update_switch(self, sw:int, occupancy):
+        if sw==13:
+            if any(occupancy[1:29])==True:
+                self.sw_safety=False
+            else:
+                self.sw_safety=True
+                self.switch_13=not self.switch_13
+        if sw==28:
+            if any(occupancy[1:29]) or any(occupancy[144:150])==True:
+                self.sw_safety=False
+            else:
+                self.sw_safety=True
+                self.switch_28=not self.switch_28
+        if sw==77:
+            if any(occupancy[74:100])==True:
+                self.sw_safety=False
+            else:
+                self.sw_safety=True
+                self.switch_77=not self.switch_77
+        if sw==85:
+            if any(occupancy[82:100])==True:
+                self.sw_safety=False
+            else:
+                self.sw_safety=True
+                self.switch_85=not self.switch_85
+        return self.sw_safety
+            
     #takes in list of occupancies from ctc, updates with current occupancy list from the shell
     def maintenance_mode(self, suggested_maintenance, occupancy):
         #if theres an occupancy in the region, no maintenance or manual mode, it's disabled
@@ -54,25 +83,25 @@ class GreenPLC:
             if suggested_maintenance[i] == False and self.maintenance_occ[i] == True:
                 self.maintenance_occ[i] = False
             elif suggested_maintenance[i] == True and self.maintenance_occ[i] == False:
-                maint_safety = True
+                self.maint_safety = True
                 for j in range(69, 100):
                     if occupancy[j] == True and self.maintenance_occ[j] == False:
-                        maint_safety = False
+                        self.maint_safety = False
                         break
-                if maint_safety == True:
+                if self.maint_safety == True:
                     self.maintenance_occ[i] = True
         for i in range(1, 29):
             if suggested_maintenance[i] == False and self.maintenance_occ[i] == True:
                 self.maintenance_occ[i] = False
             elif suggested_maintenance[i] == True and self.maintenance_occ[i] == False:
-                maint_safety = True
+                self.maint_safety = True
                 for j in range(1, 13):
                     if occupancy[j] == True and self.maintenance_occ[j] == False:
-                        maint_safety = False
+                        self.maint_safety = False
                         break
-                if maint_safety == True:
+                if self.maint_safety == True:
                     self.maintenance_occ[i] = True
-        return self.maintenance_occ, maint_safety
+        return suggested_maintenance, self.maint_safety
     
     #confirm PLC is uploaded
     def say_hi(self):

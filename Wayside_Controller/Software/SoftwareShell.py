@@ -31,6 +31,7 @@ class WaysideShell(QMainWindow):
     wss_tm_crossing_108 = pyqtSignal(bool)
 
     wss_ctc_safetyCheck = pyqtSignal(bool)
+    wss_ctc_safetySwitch = pyqtSignal(bool)
 
     def __init__(self):
         super().__init__()
@@ -104,7 +105,11 @@ class WaysideShell(QMainWindow):
         self.update_ui()
         self.wss_ctc_safetyCheck.emit(safetyCheck)
 
-    
+    @pyqtSlot(bool)
+    def receive_maint_switch(self, suggested_switch):
+        safetySwitch=self.plc.update_switch(suggested_switch,self.occupancy)
+        self.update_ui()
+        self.wss_ctc_safetySwitch.emit(safetySwitch)
     #slot to receive dispatch info from ctc to slow down the train
     '''@pyqtSlot(tuple)
     def send_dispatch(self, dispatch):
