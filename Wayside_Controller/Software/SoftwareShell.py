@@ -105,7 +105,7 @@ class WaysideShell(QMainWindow):
         self.update_ui()
         self.wss_ctc_safetyCheck.emit(safetyCheck)
 
-    @pyqtSlot(bool)
+    @pyqtSlot(int)
     def receive_maint_switch(self, suggested_switch):
         safetySwitch=self.plc.update_switch(suggested_switch,self.occupancy)
         self.update_ui()
