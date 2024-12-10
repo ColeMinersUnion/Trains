@@ -90,7 +90,7 @@ class TCmodel(QObject):
         """ Set the current velocity. """
         self.currentSpeed = currentSpeed
         self.update_current_speed_signal.emit(self.currentSpeed)
-        print(f"current speed: {self.currentSpeed} m/s")
+        #print(f"current speed: {self.currentSpeed} m/s")
 
     @Slot(bool)
     def set_ebrake(self, ebrake):
@@ -198,7 +198,7 @@ class TCmodel(QObject):
             self.dist = 1
         else:
            self.dist = (self.currentSpeed*self.currentSpeed)/(2*self.service_brake_deceleration)
-           print(f"stopping distance: {self.dist}")
+           #print(f"stopping distance: {self.dist}")
         if (self.curr_dist <= self.dist):
             self.approaching = self.approaching + 1
             #print("added to val")
@@ -237,10 +237,10 @@ class TCmodel(QObject):
         elif(self.leaving_station == True):
             self.atStation = 0
             self.leaving_station = False
-        else:
-            print(f"Current distance from station: {self.curr_dist:.2f} meters")
-            print(f"commanded speed: {self.commandedSpeed:.2f} m/s")
-            print(f"pwr output : {self.pwr:.2f} W")
+        #else:
+            #print(f"Current distance from station: {self.curr_dist:.2f} meters")
+            #print(f"commanded speed: {self.commandedSpeed:.2f} m/s")
+            #print(f"pwr output : {self.pwr:.2f} W")
         self.station()
 
     def cut_power_and_enable_brake(self):
@@ -263,7 +263,7 @@ class TCmodel(QObject):
     def calculate_current_authority(self):
         """ Calculate the current authority based on speed and acceleration. """
         self.curr_authority = self.currentSpeed * T + (0.5 * self.acceleration * T * T)
-        print(f"Current Authority: {self.curr_authority}")
+        #print(f"Current Authority: {self.curr_authority}")
         #emit signal for display
         self.authority_display.emit(self.curr_authority)
 
@@ -275,7 +275,7 @@ class TCmodel(QObject):
 
             if float(self.full_authority.split(';')[1]) < float(self.full_authority.split(';')[2]):
                 self.curr_authority = 0  # Placeholder for approaching a station
-        print (f"Current Authority: {self.curr_authority}")
+        #print (f"Current Authority: {self.curr_authority}")
 
     def station(self):
         #at a station
@@ -313,7 +313,7 @@ class TCmodel(QObject):
         self.right_doors_signal.emit(False)
         print("timer done, doors closed")
         self.curr_dist = self.curr_authority + float(self.full_authority.split(';')[1])
-        print(f"at station: {self.atStation}, current speed: {self.currentSpeed}, approaching: {self.approaching}, leaving : {self.leaving_station}, curr authority : {self.curr_authority}, pwr command: {self.pwr}, commanded speed: {self.commandedSpeed}")
+        #print(f"at station: {self.atStation}, current speed: {self.currentSpeed}, approaching: {self.approaching}, leaving : {self.leaving_station}, curr authority : {self.curr_authority}, pwr command: {self.pwr}, commanded speed: {self.commandedSpeed}")
 
 
 
