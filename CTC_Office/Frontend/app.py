@@ -170,18 +170,23 @@ class CTCApplication(QMainWindow):
             self.breakBlok.setText("That block does not exist, try again.")
         blockState = [x.maintenance for x in self.Office.line["Green"].graph]
         self.emitMaintenance.emit(blockState)
-        
-    def MaintenanceResponse(self, success: bool):
-        pass
-
     
+    @pyqtSlot(bool)
+    def MaintenanceResponse(self, success: bool):
+        if(success):
+            self.updateBlocks()
+        else:
+            self.breakBlok.setText("The Wayside Office deemed maintenance operation irresponsible.")
+        
     def onFix(self):
         txt = self.fixBlock.text()
-        if(self.Office.fixTrack(int(txt))):
+        if(self.Office.fixTrack("Green", int(txt))):
             self.fixBlock.setText(f'Block {int(txt)} is now fixed. ')
         else:
             self.fixBlock.setText("That block does not exist or was not broken, try again.")
-        self.fix_state = self.submitBreak.isChecked()
+        blockState = [x.maintenance for x in self.Office.line["Green"].graph]
+        self.emitMaintenance.emit(blockState)
+    
         
     def onAuto(self):
         fn = self.Automatic.text()
