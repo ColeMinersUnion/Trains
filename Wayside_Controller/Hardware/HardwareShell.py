@@ -68,12 +68,15 @@ class WaysideWindow(QMainWindow):
             self.send(data)
             decoded_json = self.receive()
             self.connected = True
-
+            self.authority[41:69] = [True] * (69 - 41)
+            self.update_ui()
+            self.wsh_tm_authority.emit(self.authority)
         except socket.error as e:
             print(f"socket error: {e}")
             self.client_socket.close()
             print("socket closed")
-    
+
+
     #view
     def user_inputs(self):
         self.manual_sw58_button.clicked.connect(self.toggle_sw58)
