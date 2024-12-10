@@ -117,7 +117,7 @@ class PLC:
         self.authority[43] = not any(occ[47:58]) and not any(occ[44:47])
         self.authority[44] = not any(occ[47:58]) and not any(occ[45:47])
         self.authority[45] = not any(occ[47:58]) and not any(occ[46:47])
-        self.authority[46] = not any(occ[47:58])\
+        self.authority[46] = not any(occ[47:58])
         
 
         self.authority[47] = (not any(occ[58:63]) or self.sw58 == False) and not any(occ[48:58])

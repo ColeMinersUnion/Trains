@@ -4,6 +4,17 @@ import json
 from GreenYardPLC import PLC
 #import RPi.GPIO as GPIO
 
+# 62 yard: GPIO 12
+# 62-63 : GPIO 6
+# 62 red: GPIO 25
+# 62 green: GPIO 24
+
+# 58 green: GPIO 23
+# 58 red: GPIO 22
+# 58-57: GPIO 27
+# 58 yard: GPIO 17
+
+
 def main():
     plc = PLC()
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
