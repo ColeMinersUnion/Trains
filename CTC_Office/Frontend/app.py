@@ -164,13 +164,16 @@ class CTCApplication(QMainWindow):
     def onBreak(self):
         
         txt = self.breakBlok.text()
-        if(self.Office.breakTrack(int(txt))):
+        if(self.Office.breakTrack("Green", int(txt))):
             self.breakBlok.setText(f'Block {int(txt)} is now broken. ')
         else:
             self.breakBlok.setText("That block does not exist, try again.")
         blockState = [x.maintenance for x in self.Office.line["Green"].graph]
         self.emitMaintenance.emit(blockState)
         
+    def MaintenanceResponse(self, success: bool):
+        pass
+
     
     def onFix(self):
         txt = self.fixBlock.text()
