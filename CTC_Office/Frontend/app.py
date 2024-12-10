@@ -37,23 +37,6 @@ class CTCApplication(QMainWindow):
         self.Office = Office
         self.Office.addGreenLine()
 
-        #Navbar widgets
-        self.navbar = QWidget()
-        self.navbar_layout = QHBoxLayout()
-
-        self.manual = QPushButton("Manual")
-        self.manstate = True
-        self.manual.released.connect(self.onManualMode)
-        self.auto_page = QPushButton("Automatic")
-        self.autostate = False
-        self.auto_page.released.connect(self.onAutoMode)
-
-        self.navbar_layout.addWidget(self.manual)
-        self.navbar_layout.addWidget(self.auto_page)
-        self.navbar_layout.setSpacing(10)
-        self.navbar_layout.setContentsMargins(0, 0, 0, 0)
-        self.navbar.setLayout(self.navbar_layout)
-
 
         #Manual widgets
         self.GreenOcc = OccupancyWidget()
@@ -61,6 +44,7 @@ class CTCApplication(QMainWindow):
         self.newTrainWidget = NewTrainWidget(Green)
         self.hlayout = QHBoxLayout()
         self.Manual_layout = QVBoxLayout()
+        self.Auto_layout = QVBoxLayout()
         self.main = QWidget()
         self.clear = QPushButton("Clear")
         self.clear_state = True
@@ -72,12 +56,12 @@ class CTCApplication(QMainWindow):
         self.fix_state = True
         self.GreenBlocks = MaintenanceWidget()
 
+        self.maintenance_layout = QVBoxLayout()
         
         self.Title = QLabel()
         self.Title.setText("Manual Mode")
         self.Title.styleSheet = "font-size: 60px; font-weight: bold;"
         self.Manual_layout.addWidget(self.Title)
-        self.Manual_layout.addWidget(self.navbar)
 
 
         self.hlayout.addWidget(self.newTrainWidget)
