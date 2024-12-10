@@ -267,7 +267,7 @@ class SignalHandler(QObject):
         self.sendAuthorities.emit(authorities)
 
     @pyqtSlot(list) #expecting block and number of passengers
-    def sendPassengers(self,message):
+    def getPassengers(self,message):
         stationid=lines[0].stationByBlock(message[0])
         waiting = lines[0].stations[stationid].passengers
         boarding = waiting - 2 if (waiting>2) else 0
@@ -275,7 +275,7 @@ class SignalHandler(QObject):
         lines[0].stations[stationid].passengers = waiting - boarding + message[1]
 
     @pyqtSlot(int) #expecting block number
-    def sendBeacon(self,message):
+    def getBeacon(self,message):
         data = lines[0].beaconByBlock(message)
         if(data!=None):
             self.sendBeacon.emit([data,message])

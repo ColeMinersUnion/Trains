@@ -31,6 +31,16 @@ def trainFactory(routeInfo: list, authority: str):
         trains[-1].train_model_view.show()
         trains[-1].train_controller_view.show()
         trains[-1].train_model.block_change.connect(tm_signals.toggleOcc)
+        # sends authorities as list of booleans
+        #tm_signals.sendAuthorities.connect(trains[-1].)
+        # sends list as station block number and passengers boarding
+        #tm_signals.sendPassengers.connect(trains[-1].)
+        # sends list as station block number and passengers unboarding
+        #trains[-1].train_model.###.connect(tm_signals.getPassengers)
+        # sends request for beacon data as block number
+        #trains[-1].train_model.###.connect(tm_signals.getBeacon)
+        # sends beacon data as list with block number and beacon data
+        #tm_signals.sendBeacon.connect(trains[-1].beaconIntake)
     except TypeError:
         print('Oops')
     except IndexError:
@@ -52,7 +62,7 @@ wsh_window.wsh_tm_switch_58.connect(tm_signals.getSwitch58)
 wsh_window.wsh_tm_switch_62.connect(tm_signals.getSwitch62)
 wsh_window.wsh_tm_authority.connect(tm_signals.getHardwareAuthority)
 #tk passes authority to tm
-#tm_signals.sendAuthorities.connect()
+
 
 ctc.emitTrain.connect(trainFactory)
 
