@@ -32,6 +32,7 @@ Green = ['Pioneer', 'Edgebrook', 'Station D',
 class CTCApplication(QMainWindow):
     emitTrain = pyqtSignal(list, str)
     emitSwitch = pyqtSignal(int)
+    emitMaintenance = pyqtSignal(list)
     def __init__(self, Office = CTC_Office()):
         super().__init__()
         self.Office = Office
@@ -167,7 +168,9 @@ class CTCApplication(QMainWindow):
             self.breakBlok.setText(f'Block {int(txt)} is now broken. ')
         else:
             self.breakBlok.setText("That block does not exist, try again.")
-        self.break_state = self.submitBreak.isChecked()
+        blockState = [x.maintenance for x in self.Office.line["Green"].graph]
+        self.emitMaintenance.emit(blockState)
+        
     
     def onFix(self):
         txt = self.fixBlock.text()
@@ -228,10 +231,10 @@ class CTCApplication(QMainWindow):
     def updateBlocks(self):
         blockList = []
         for block in self.Office.line["Green"].graph:
-            if block.closed:
-                blockList.append((block.index, "Closed"))
-            elif block.maintenance:
+            if block.maintenance:
                 blockList.append((block.index, "Maintenance"))
+            elif block.closed:
+                blockList.append((block.index, "Closed"))
         self.GreenBlocks.update(blockList)
             
 
