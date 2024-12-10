@@ -7,7 +7,7 @@ class TrainModel(QObject):
     velocity_updated = Signal(float)  # Signal to send current velocity
 
     """ This signal is to indicate block change """
-    block_change = Signal(int) # Signal to send block change to track model
+    block_change = Signal(int) #changes block
 
     """ These signals are for Train Model backend to Train Model View """
     acceleration_updated = Signal(float) # Signal to send acceleration
@@ -59,6 +59,7 @@ class TrainModel(QObject):
         self.currentBeaconInfo = "null"
         self.calcTotalMass()
         self.stationName = "N/A"
+
 
     """ velocity calculation """
     @Slot(float)
@@ -192,10 +193,13 @@ class TrainModel(QObject):
     def checkBlockChange(self):
         #print("odometer: ", self.totalDistanceTravelled, "currentVel: ", self.vn, "prevVel ", self.vn_1)
         if(self.milestoneDistance <= self.totalDistanceTravelled):
-            #self.block_change.emit(self.blockID[self.i]) #Hi Zach! This is Dominic, I added this line so I could turn occupancies off after they pass the block
-            print("Current block: ", self.blockID[self.i])
-            self.block_change.emit(self.blockID[self.i])
+            print('Block changed')
+            if(self.i>0):
+                self.block_change.emit(self.blockID[self.i - 1])
+                print("Moving off of " + str(self.blockID[self.i - 1]))
             self.milestoneDistance += self.blockLength[self.i]
+            self.block_change.emit(self.blockID[self.i])
+            print("Moving onto " + str(self.blockID[self.i]))
             self.i += 1
 
     #incomplete, but exists for future use
