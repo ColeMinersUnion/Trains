@@ -45,6 +45,7 @@ class GreenPLC:
         crossing19, crossing108 = self.update_crossing(occupancy)
         authority=self.update_authority(occupancy)
         return authority, switch77, switch85, switch28, switch13, signal77, signal85, signal28, signal13, crossing19, crossing108
+    
 
     #takes in list of occupancies from ctc, updates with current occupancy list from the shell
     def maintenance_mode(self, suggested_maintenance, occupancy):
@@ -71,6 +72,7 @@ class GreenPLC:
                         break
                 if maint_safety == True:
                     self.maintenance_occ[i] = True
+        return self.maintenance_occ, maint_safety
     
     #confirm PLC is uploaded
     def say_hi(self):

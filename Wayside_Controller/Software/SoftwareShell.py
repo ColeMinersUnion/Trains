@@ -30,6 +30,8 @@ class WaysideShell(QMainWindow):
     wss_tm_crossing_19 = pyqtSignal(bool)
     wss_tm_crossing_108 = pyqtSignal(bool)
 
+    wss_ctc_safetyCheck = pyqtSignal(bool)
+
     def __init__(self):
         super().__init__()
        # self.app = app
@@ -98,8 +100,10 @@ class WaysideShell(QMainWindow):
     def receive_maintenance(self, suggested_maintenance:list):
         #maintenance_mode function will determine if it is safe to put a zone into maint mode
         #if so, it will implement maint mode
-        self.plc.maintenance_mode(suggested_maintenance, self.occupancy)
+        self.occupancy,safetyCheck=self.plc.maintenance_mode(suggested_maintenance, self.occupancy)
         self.update_ui()
+        self.wss_ctc_safetyCheck.emit(safetyCheck)
+
     
     #slot to receive dispatch info from ctc to slow down the train
     '''@pyqtSlot(tuple)
