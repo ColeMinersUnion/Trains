@@ -18,6 +18,7 @@ tm_window = Map()
 tm_signals = tm_window.signals
 
 ctc.emitMaintenance.connect(wss_window.receive_maintenance)
+ctc.emitMaintenanceSwitch.connect(wss_window.receive_maint_switch)
 wss_window.wss_ctc_safetyCheck.connect(ctc.MaintenanceResponse)
 #Emit Connect Slot
 wss_window.wss_ctc_occupancy.connect(ctc.updateOccupancy)
