@@ -67,6 +67,8 @@ class WaysideShell(QMainWindow):
     #then send out updated authority, switches, signals, crossings 
     @pyqtSlot(list)
     def update_occupancy(self, new_occupancy: list):
+        for i in range(151):
+            print(f"Green Line Occupancy Block {i}: {new_occupancy[i]} ")
         #only pass to ctc the sections within software wayside control 
         self.occupancy[1:41]=new_occupancy[1:41]
         self.occupancy[69:151]=new_occupancy[69:151]
@@ -93,12 +95,13 @@ class WaysideShell(QMainWindow):
     
     #slot to receive maintenance occupancies from ctc
     @pyqtSlot(list)
-    def receive_maintenance(self, suggested_maintenance):
+    def receive_maintenance(self, suggested_maintenance:list):
         #maintenance_mode function will determine if it is safe to put a zone into maint mode
         #if so, it will implement maint mode
         self.plc.maintenance_mode(suggested_maintenance, self.occupancy)
+        self.update_ui()
     
-    #slot to receive dispatch info from ctc
+    #slot to receive dispatch info from ctc to slow down the train
     '''@pyqtSlot(tuple)
     def send_dispatch(self, dispatch):
         #sending dispatch info signal (to track model):
@@ -169,7 +172,7 @@ class WaysideShell(QMainWindow):
         self.manual_cr108_button.clicked.connect(self.toggle_crossing_108)
     
     def update_ui(self):
-        #update block table state and authority from Track Model
+        #update block table state and authority from Track Model 
         '''for i in range(len(self.occupancy)):
             self.wayside_block_table.setItem(i,0, QTableWidgetItem(str(self.occupancy[i])))
 
