@@ -187,7 +187,15 @@ class CTCApplication(QMainWindow):
             self.updateBlocks()
         else:
             self.breakBlok.setText("The Wayside Office deemed maintenance operation irresponsible.")
-        
+    
+    @pyqtSlot(bool)
+    def MaintenanceSwitchResponse(self, success: bool):
+        if(success):
+            self.updateBlocks()
+        else:
+            self.breakBlok.setText("The Wayside Office deemed maintenance operation irresponsible.")
+
+    
     def onFix(self):
         txt = self.fixBlock.text()
         if(self.Office.fixTrack("Green", int(txt))):
