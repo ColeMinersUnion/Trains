@@ -135,32 +135,37 @@ class TrainModel(QObject):
     """ Change cabin temperature """
     @Slot(float)
     def setTemperature(self, temperature: float):
-        self.temperature = temperature
-        self.temperature_updated.emit(self.temperature)
+        if(not self.signalFailureStatus):
+            self.temperature = temperature
+            self.temperature_updated.emit(self.temperature)
 
     """ Toggle for cabin (interior) lights """
     @Slot()
     def toggleInteriorLights(self):
-        self.intLightStatus = not self.intLightStatus
-        self.intLights_updated.emit(self.intLightStatus)
+        if(not self.signalFailureStatus):
+            self.intLightStatus = not self.intLightStatus
+            self.intLights_updated.emit(self.intLightStatus)
 
     """ Toggle for headlights of train """
     @Slot()
     def toggleExteriorLights(self):
-        self.extLightStatus = not self.extLightStatus
-        self.extLights_updated.emit(self.extLightStatus)
+        if(not self.signalFailureStatus):
+            self.extLightStatus = not self.extLightStatus
+            self.extLights_updated.emit(self.extLightStatus)
 
-    """ For toggling the left doors (True = Open)"""
+    """ For toggling the left doors (True = Open) """
     @Slot()
     def toggleLeftDoors(self):
-        self.leftDoorStatus = not self.leftDoorStatus
-        self.left_door_updated.emit(self.leftDoorStatus)
+        if(not self.signalFailureStatus):
+            self.leftDoorStatus = not self.leftDoorStatus
+            self.left_door_updated.emit(self.leftDoorStatus)
 
-    """ For toggling the right doors (True = Open)"""
+    """ For toggling the right doors (True = Open) """
     @Slot()
     def toggleRightDoors(self):
-        self.rightDoorStatus = not self.rightDoorStatus
-        self.right_door_updated.emit(self.rightDoorStatus)
+        if(not self.signalFailureStatus):
+            self.rightDoorStatus = not self.rightDoorStatus
+            self.right_door_updated.emit(self.rightDoorStatus)
 
     """ For toggling the service brake (True = On)"""
     @Slot()
