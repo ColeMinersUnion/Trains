@@ -65,6 +65,7 @@ class Block:
 
     def onOccChange(self):
         global occflag
+        print("Occupancy change detected! " + str(self.number) + " is " + str(self.occupied))
         occflag = True    
 
     def toString(self):
@@ -282,6 +283,7 @@ class SignalHandler(QObject):
     @pyqtSlot(int)
     def toggleOcc(self,message):
         lines[0].blocks[message].switchOccupancy()
+        print("Block occupancy toggled " + str(message) + " " + str(lines[0].blocks[message].occupied))
 
     @pyqtSlot(list)
     def getHardwareAuthority(self,message):
@@ -563,8 +565,9 @@ class BlockIcon(QWidget):
     def setFailure(self,event):
         global failmode
         objfail = lines[self.obj.linenum].blocks[self.obj.number].failure
-        lines[self.obj.linenum].blocks[self.obj.number].failure = failmode
-        lines[self.obj.linenum].blocks[self.obj.number].occupied = (failmode in [1,3])      
+        if(objfail != failmode): #only accept changes to failure mode
+            lines[self.obj.linenum].blocks[self.obj.number].failure = failmode
+            lines[self.obj.linenum].blocks[self.obj.number].occupied = (failmode in [1,3])      
 
 class SwitchIcon(QWidget):
     def __init__(self,obj,window):
@@ -715,7 +718,7 @@ class Map(QWidget):
                 for t in l.trains:
                     t.tenBaudMessage()
     
-    def update(self): 
+    def update(self):
         global occflag
         for a in active:
             a.update() #update every active component
