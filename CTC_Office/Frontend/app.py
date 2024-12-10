@@ -7,11 +7,13 @@ try:
     from Components.NewTrainWidget import NewTrainWidget
     from Components.OccupancyWidget import OccupancyWidget
     from Components.MaintenanceBlocks import MaintenanceWidget
+    from Components.SwitchWidget import SwitchWidget
 except:
     from CTC_Office.Frontend.Components.SchedulePreviewer import SchedulePreviewer
     from CTC_Office.Frontend.Components.OccupancyWidget import OccupancyWidget
     from CTC_Office.Frontend.Components.NewTrainWidget import NewTrainWidget
     from CTC_Office.Frontend.Components.MaintenanceBlocks import MaintenanceWidget
+    from CTC_Office.Frontend.Components.SwitchWidget import SwitchWidget
     sys.path.insert(1, os.path.join(os.getcwd(), 'CTC_Office', 'Backend'))
     print(os.getcwd())
     from CTC import CTC_Office    
@@ -33,6 +35,7 @@ class CTCApplication(QMainWindow):
     emitTrain = pyqtSignal(list, str)
     emitSwitch = pyqtSignal(int)
     emitMaintenance = pyqtSignal(list)
+    emitMaintenanceSwitch = pyqtSignal(int)
     def __init__(self, Office = CTC_Office()):
         super().__init__()
         self.Office = Office
@@ -58,6 +61,8 @@ class CTCApplication(QMainWindow):
         self.GreenBlocks = MaintenanceWidget()
 
         self.maintenance_layout = QVBoxLayout()
+        self.GreenSwitchs = SwitchWidget()
+        self.GreenSwitchs.emitSwitch.connect(self.handleMaintenanceSwitch)
         
         self.Title = QLabel()
         self.Title.setText("Manual Mode")
@@ -121,7 +126,8 @@ class CTCApplication(QMainWindow):
         self.Manual_layout.addWidget(self.fixBlock)
         self.Manual_layout.addWidget(self.submitFix)
         
-
+        self.Manual_layout.addWidget(QLabel("Switches"))
+        self.Manual_layout.addWidget(self.GreenSwitchs)
         #Test bench stuff
         self.Manual_layout.addWidget(lbl)
         self.Manual_layout.addWidget(self.speed)
@@ -136,6 +142,10 @@ class CTCApplication(QMainWindow):
         self.ManualColumn = QWidget()
         self.ManualColumn.setLayout(self.Manual_layout)
         self.wrapperLayout.addWidget(self.ManualColumn)
+
+        self.MaintenaceColumn = QWidget()
+        self.MaintenaceColumn.setLayout(self.maintenance_layout)
+        self.wrapperLayout.addWidget(self.MaintenaceColumn)
 
         #self.AutoColumn = QWidget()
         #self.AutoColumn.setLayout(self.Auto_layout)
@@ -186,7 +196,6 @@ class CTCApplication(QMainWindow):
             self.fixBlock.setText("That block does not exist or was not broken, try again.")
         blockState = [x.maintenance for x in self.Office.line["Green"].graph]
         self.emitMaintenance.emit(blockState)
-    
         
     def onAuto(self):
         fn = self.Automatic.text()
@@ -261,6 +270,18 @@ class CTCApplication(QMainWindow):
         self.emitSwitch.emit(switch)
         #print(f"Switching to {switch}")
         return True
+
+    @pyqtSlot(tuple)
+    def handleMaintenanceSwitch(self, switches: tuple):
+        for block in switches:
+            if(self.Office.breakTrack("Green", block)):
+                self.breakBlok.setText(f'Block {block} is now broken. ')
+            else:
+                self.breakBlok.setText("That block does not exist, try again.")
+        blockState = [x.maintenance for x in self.Office.line["Green"].graph]
+        self.emitMaintenance.emit(blockState)
+        self.emitMaintenanceSwitch.emit(switches[0])
+        
 
 
 
