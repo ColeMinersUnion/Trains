@@ -31,7 +31,7 @@ def trainFactory(routeInfo: list, authority: str):
         trains[-1].train_model_view.show()
         trains[-1].train_controller_view.show()
         trains[-1].train_model.block_change.connect(tm_signals.toggleOcc)
-        # sends authorities as list of 151 booleans
+        # sends authorities as list of booleans
         #tm_signals.sendAuthorities.connect(trains[-1].)
         # sends list as station block number and passengers boarding
         #tm_signals.sendPassengers.connect(trains[-1].)
