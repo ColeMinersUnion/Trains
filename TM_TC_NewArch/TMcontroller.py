@@ -9,6 +9,9 @@ class TrainModelController(QObject):
 
         # Connect view inputs to model
         self.view.eBrake_toggle.connect(self.model.toggleEmergencyBrake)
+        self.view.eFailure_toggle.connect(self.model.toggleEngineFailure)
+        self.view.sFailure_toggle.connect(self.model.toggleSignalFailure)
+        self.view.bFailure_toggle.connect(self.model.toggleBrakeFailure)
 
         # Connect the model's signal to the view's update methods
         self.model.velocity_updated.connect(self.view.update_velocity)
@@ -23,3 +26,6 @@ class TrainModelController(QObject):
         self.model.service_brake_updated.connect(self.view.update_service_brake_status)
         self.model.emergency_brake_updated.connect(self.view.update_eBrake_label)
         self.model.station_name_updated.connect(self.view.update_station_name)
+        self.model.engine_failure.connect(self.view.update_eFailure_label)
+        self.model.signal_failure.connect(self.view.update_sFailure_label)
+        self.model.brake_failure.connect(self.view.update_bFailure_label)

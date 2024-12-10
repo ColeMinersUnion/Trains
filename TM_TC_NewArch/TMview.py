@@ -7,6 +7,9 @@ from PyQt6.QtWidgets import QSlider, QButtonGroup, QLineEdit, QGroupBox, QFormLa
 class TrainModelView(QWidget):
     
     eBrake_toggle = Signal()
+    eFailure_toggle = Signal()
+    bFailure_toggle = Signal()
+    sFailure_toggle = Signal()
     
     def __init__(self):
 
@@ -28,6 +31,15 @@ class TrainModelView(QWidget):
         self.emergencyBrakeButton = QPushButton("Emergency Brake: OFF")
         self.emergencyBrakeButton.clicked.connect(self.update_emergency_brake_status)
 
+        self.engineFailureButton = QPushButton("Engine Failure: OFF")
+        self.engineFailureButton.clicked.connect(self.update_engine_failure_status)
+
+        self.signalFailureButton = QPushButton("Signal Failure: OFF")
+        self.signalFailureButton.clicked.connect(self.update_signal_failure_status)
+
+        self.brakeFailureButton = QPushButton("Brake Failure: OFF")
+        self.brakeFailureButton.clicked.connect(self.update_brake_failure_status)
+
         # Create a single layout
         layout = QVBoxLayout(self)
         layout.addWidget(self.v_label)         # Add velocity label
@@ -42,6 +54,9 @@ class TrainModelView(QWidget):
         layout.addWidget(self.service_brake_label)
         layout.addWidget(self.station_label)
         layout.addWidget(self.emergencyBrakeButton)
+        layout.addWidget(self.engineFailureButton)
+        layout.addWidget(self.signalFailureButton)
+        layout.addWidget(self.brakeFailureButton)
 
         # Set the layout and window title
         self.setLayout(layout)
@@ -104,3 +119,33 @@ class TrainModelView(QWidget):
     @Slot(bool)
     def update_eBrake_label(self, eBrake_status: bool):
         self.emergencyBrakeButton.setText("Emergency Brake: ON" if eBrake_status else "Emergency Brake: OFF")
+
+    @Slot()
+    def update_engine_failure_status(self):
+        """ Update the failure status """
+        self.eFailure_toggle.emit()
+
+    @Slot()
+    def update_signal_failure_status(self):
+        """ Update the failure status """
+        self.sFailure_toggle.emit()
+    
+    @Slot()
+    def update_brake_failure_status(self):
+        """ Update the failure status """
+        self.bFailure_toggle.emit()
+
+    @Slot(bool)
+    def update_eFailure_label(self, input: bool):
+        """ Update button text """
+        self.engineFailureButton.setText("Engine Failure: ON" if input else "Engine Failure: OFF")
+
+    @Slot(bool)
+    def update_sFailure_label(self, input: bool):
+        """ Update button text """
+        self.signalFailureButton.setText("Signal Failure: ON" if input else "Signal Failure: OFF")
+
+    @Slot(bool)
+    def update_bFailure_label(self, input: bool):
+        """ Update button text """
+        self.brakeFailureButton.setText("Brake Failure: ON" if input else "Brake Failure: OFF")

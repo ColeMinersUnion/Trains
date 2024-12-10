@@ -66,7 +66,7 @@ class TrainModel(QObject):
 
         self.calcTotalMass()
         
-        if self.serviceBrakeStatus and (not self.brakeFailureStatus):
+        if self.serviceBrakeStatus and (not self.brakeFailureStatus): # if the service brake is activated
             self.vn_1 = self.vn
             if(self.vn > 0):
                 self.an = (-1.2 / 8)
@@ -74,7 +74,8 @@ class TrainModel(QObject):
             else:
                 self.an = 0
                 self.vn = 0.0
-        elif self.emergencyBrakeStatus:
+
+        elif self.emergencyBrakeStatus: # if the emergency brake is active
 
             if(self.vn > 0):
                 self.an = (-2.73 / 8)
@@ -82,7 +83,16 @@ class TrainModel(QObject):
             else:
                 self.an = 0
                 self.vn = 0.0
-        else:
+
+        elif self.engineFailureStatus:  # if the engine failure is active
+
+            if(self.vn > 0):
+                self.an = ((-9.8) * 0.2 / 8)
+                self.vn += self.an
+            else:
+                self.an = 0
+                self.vn = 0.0
+        else:   # if nothing is active keep chugging
             """ Simulate the train's response to power. """
             if power <= 0:
                 self.an = 0
@@ -183,6 +193,7 @@ class TrainModel(QObject):
         #print("odometer: ", self.totalDistanceTravelled, "currentVel: ", self.vn, "prevVel ", self.vn_1)
         if(self.milestoneDistance <= self.totalDistanceTravelled):
             #self.block_change.emit(self.blockID[self.i]) #Hi Zach! This is Dominic, I added this line so I could turn occupancies off after they pass the block
+            print("Current block: ", self.blockID[self.i])
             self.block_change.emit(self.blockID[self.i])
             self.milestoneDistance += self.blockLength[self.i]
             self.i += 1
