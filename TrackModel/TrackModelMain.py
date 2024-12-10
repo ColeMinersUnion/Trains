@@ -281,13 +281,8 @@ class SignalHandler(QObject):
             self.sendBeacon.emit([data,message])
 
     @pyqtSlot(int)
-    def removeOcc(self,message):
-        lines[0].blocks[message].occupied = False
-        print("Block occupancy toggled " + str(message) + " " + str(lines[0].blocks[message].occupied))
-
-    @pyqtSlot(int)
-    def addOcc(self,message):
-        lines[0].blocks[message].occupied = True
+    def toggleOcc(self,message):
+        lines[0].blocks[message].switchOccupancy()
         print("Block occupancy toggled " + str(message) + " " + str(lines[0].blocks[message].occupied))
 
     @pyqtSlot(list)

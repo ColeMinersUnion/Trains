@@ -30,8 +30,7 @@ def trainFactory(routeInfo: list, authority: str):
         trains.append(Train(routeInfo, authority))
         trains[-1].train_model_view.show()
         trains[-1].train_controller_view.show()
-        trains[-1].train_model.block_remove.connect(tm_signals.removeOcc)
-        trains[-1].train_model.block_add.connect(tm_signals.addOcc)
+        trains[-1].train_model.block_change.connect(tm_signals.toggleOcc)
     except TypeError:
         print('Oops')
     except IndexError:

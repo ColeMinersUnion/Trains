@@ -8,8 +8,6 @@ class TrainModel(QObject):
 
     """ This signal is to indicate block change """
     block_change = Signal(int) #changes block
-    block_add = Signal(int) #add occupancy
-    block_remove = Signal(int) #remove occupancy
 
     """ These signals are for Train Model backend to Train Model View """
     acceleration_updated = Signal(float) # Signal to send acceleration
@@ -187,13 +185,13 @@ class TrainModel(QObject):
         #print("odometer: ", self.totalDistanceTravelled, "currentVel: ", self.vn, "prevVel ", self.vn_1)
         if(self.milestoneDistance <= self.totalDistanceTravelled):
             print('Block changed')
-            self.block_remove.emit(self.blockID[self.i])
-            print("Moving off of " + str(self.blockID[self.i]))
-            self.i += 1
+            if(self.i>0):
+                self.block_change.emit(self.blockID[self.i - 1])
+                print("Moving off of " + str(self.blockID[self.i - 1]))
             self.milestoneDistance += self.blockLength[self.i]
-            self.block_add.emit(self.blockID[self.i])
             self.block_change.emit(self.blockID[self.i])
             print("Moving onto " + str(self.blockID[self.i]))
+            self.i += 1
 
     #@Slot(str)
     #def beaconIntake(self, beacon: str):
