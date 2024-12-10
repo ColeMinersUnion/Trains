@@ -6,10 +6,12 @@ try:
     from Components.SchedulePreviewer import SchedulePreviewer
     from Components.NewTrainWidget import NewTrainWidget
     from Components.OccupancyWidget import OccupancyWidget
+    from Components.MaintenanceBlocks import MaintenanceWidget
 except:
     from CTC_Office.Frontend.Components.SchedulePreviewer import SchedulePreviewer
     from CTC_Office.Frontend.Components.OccupancyWidget import OccupancyWidget
     from CTC_Office.Frontend.Components.NewTrainWidget import NewTrainWidget
+    from CTC_Office.Frontend.Components.MaintenanceBlocks import MaintenanceWidget
     sys.path.insert(1, os.path.join(os.getcwd(), 'CTC_Office', 'Backend'))
     print(os.getcwd())
     from CTC import CTC_Office    
@@ -68,8 +70,9 @@ class CTCApplication(QMainWindow):
         self.fixBlock = QLineEdit(parent=self)
         self.submitFix =QPushButton("Fix Block")
         self.fix_state = True
+        self.GreenBlocks = MaintenanceWidget()
 
-
+        
         self.Title = QLabel()
         self.Title.setText("Manual Mode")
         self.Title.styleSheet = "font-size: 60px; font-weight: bold;"
@@ -110,6 +113,8 @@ class CTCApplication(QMainWindow):
         lbl1.setText("Green Line Occupancy")
         self.Manual_layout.addWidget(lbl1)
         self.Manual_layout.addWidget(self.GreenOcc.widget)
+        self.Manual_layout.addWidget(QLabel("Green Line Block Status"))
+        self.Manual_layout.addWidget(self.GreenBlocks.widget)
 
         self.lbl10 = QLabel()
         self.lbl10.setWordWrap(True)
@@ -142,7 +147,13 @@ class CTCApplication(QMainWindow):
         #setting signals
         self.newTrainWidget.emitTrain.connect(self.handleNewGreenTrain)
 
+        self.wrapperLayout = QHBoxLayout()
+        self.ManualColumn = QWidget()
+        self.ManualColumn.setLayout(self.Manual_layout)
+        self.wrapperLayout.addWidget(self.ManualColumn)
 
+        #self.AutoColumn = QWidget()
+        #self.AutoColumn.setLayout(self.Auto_layout)
         
         self.main.setLayout(self.Manual_layout)
 
@@ -225,10 +236,22 @@ class CTCApplication(QMainWindow):
         print(f'Trains: {trains}')
         if(line == "Green"):
             self.GreenOcc.update(trains)
+            self.updateBlocks()
         else:
             self.RedOcc.update(trains)
         return True
         
+    def updateBlocks(self):
+        blockList = []
+        for block in self.Office.line["Green"].graph:
+            if block.closed:
+                blockList.append((block.index, "Closed"))
+            elif block.maintenance:
+                blockList.append((block.index, "Maintenance"))
+        self.GreenBlocks.update(blockList)
+            
+
+
     #handles the emitted signals from the NewTrainWidget
     @pyqtSlot(dict)
     def handleNewGreenTrain(self, train: dict):

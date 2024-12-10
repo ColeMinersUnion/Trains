@@ -24,7 +24,7 @@ class TrainModel(QObject):
     engine_failure = Signal(bool)   # Signal for engine failure
     brake_failure = Signal(bool)    # Signal for brake failure
     speed_limits = Signal(list)     # speed limits for train controller
-    station_name = Signal(str)      # name of station being arrived at
+    station_name_updated = Signal(str)      # name of station being arrived at
     
     def __init__(self, routeInfo):
         super().__init__()
@@ -57,7 +57,6 @@ class TrainModel(QObject):
         self.i = 0
         self.milestoneDistance = 0
         self.currentBeaconInfo = "null"
-        self.parseRouteInfo()
         self.calcTotalMass()
         self.stationName = "N/A"
 
@@ -68,7 +67,7 @@ class TrainModel(QObject):
 
         self.calcTotalMass()
         
-        if self.serviceBrakeStatus and (not self.brakeFailureStatus):
+        if self.serviceBrakeStatus and (not self.brakeFailureStatus): # if the service brake is activated
             self.vn_1 = self.vn
             if(self.vn > 0):
                 self.an = (-1.2 / 8)
@@ -76,7 +75,8 @@ class TrainModel(QObject):
             else:
                 self.an = 0
                 self.vn = 0.0
-        elif self.emergencyBrakeStatus:
+
+        elif self.emergencyBrakeStatus: # if the emergency brake is active
 
             if(self.vn > 0):
                 self.an = (-2.73 / 8)
@@ -84,7 +84,16 @@ class TrainModel(QObject):
             else:
                 self.an = 0
                 self.vn = 0.0
-        else:
+
+        elif self.engineFailureStatus:  # if the engine failure is active
+
+            if(self.vn > 0):
+                self.an = ((-9.8) * 0.2 / 8)
+                self.vn += self.an
+            else:
+                self.an = 0
+                self.vn = 0.0
+        else:   # if nothing is active keep chugging
             """ Simulate the train's response to power. """
             if power <= 0:
                 self.an = 0
@@ -193,10 +202,12 @@ class TrainModel(QObject):
             print("Moving onto " + str(self.blockID[self.i]))
             self.i += 1
 
-    #@Slot(str)
-    #def beaconIntake(self, beacon: str):
+    #incomplete, but exists for future use
+    @Slot(str)
+    def beaconIntake(self, beacon: str):
+        self.stationName = beacon
+        self.station_name_updated.emit(self.stationName)
         
-
     """ Failure (Murphy) toggles are the next three slot functions here """
     @Slot()
     def toggleBrakeFailure(self):
