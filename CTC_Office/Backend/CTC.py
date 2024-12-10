@@ -67,7 +67,7 @@ class CTC_Office:
 
     def breakTrack(cls, line: str, block_index : int = 0) -> bool:
         if(block_index == 0):
-            #raise Exception("Cannot break the yard")
+            print("Cannot break the yard")
             return True
         elif(block_index >= len(cls.line[line].graph) or block_index < 0):
             #raise Exception(f'Block {block_index} does not exist')

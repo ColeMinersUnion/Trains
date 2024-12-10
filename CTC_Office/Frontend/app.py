@@ -1,4 +1,4 @@
-#from PyQt6.QtCore import QSize, Qt
+from numpy import array
 from PyQt6.QtWidgets import QMainWindow, QPushButton, QScrollArea, QVBoxLayout, QHBoxLayout, QWidget, QLineEdit, QLabel
 from PyQt6.QtCore import pyqtSlot, pyqtSignal
 import sys, os
@@ -94,7 +94,8 @@ class CTCApplication(QMainWindow):
         self.submitFix.released.connect(self.onFix)
         self.submitFix.setChecked(self.fix_state)
 
-        
+        self.mostRecentBreak = 0
+        self.mostRecentSwitch = ()
 
         lbl = QLabel()
         lbl.setText("Testbench Information")
@@ -174,11 +175,13 @@ class CTCApplication(QMainWindow):
     def onBreak(self):
         
         txt = self.breakBlok.text()
+        self.mostRecentBreak = int(txt)
         if(self.Office.breakTrack("Green", int(txt))):
             self.breakBlok.setText(f'Block {int(txt)} is now broken. ')
         else:
             self.breakBlok.setText("That block does not exist, try again.")
         blockState = [x.maintenance for x in self.Office.line["Green"].graph]
+        print(array(blockState))
         self.emitMaintenance.emit(blockState)
     
     @pyqtSlot(bool)
@@ -187,14 +190,18 @@ class CTCApplication(QMainWindow):
             self.updateBlocks()
         else:
             self.breakBlok.setText("The Wayside Office deemed maintenance operation irresponsible.")
-    
+            self.Office.fixTrack("Green", self.mostRecentBreak)
+            self.updateBlocks()
+        
     @pyqtSlot(bool)
     def MaintenanceSwitchResponse(self, success: bool):
         if(success):
             self.updateBlocks()
         else:
             self.breakBlok.setText("The Wayside Office deemed maintenance operation irresponsible.")
-
+            for block in self.mostRecentSwitch:
+                self.Office.fixTrack("Green", block)
+            self.updateBlocks()
     
     def onFix(self):
         txt = self.fixBlock.text()
@@ -281,6 +288,7 @@ class CTCApplication(QMainWindow):
 
     @pyqtSlot(tuple)
     def handleMaintenanceSwitch(self, switches: tuple):
+        self.mostRecentSwitch = switches
         for block in switches:
             if(self.Office.breakTrack("Green", block)):
                 self.breakBlok.setText(f'Block {block} is now broken. ')
