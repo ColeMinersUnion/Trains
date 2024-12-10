@@ -36,7 +36,7 @@ class WaysideWindow(QMainWindow):
 
 
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server_ip = '127.0.0.1'
+        self.server_ip = '192.168.2.2'
         self.server_port = 9000
 
         
