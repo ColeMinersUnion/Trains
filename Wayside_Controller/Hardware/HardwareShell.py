@@ -36,10 +36,10 @@ class WaysideWindow(QMainWindow):
 
 
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    
         self.server_ip = '192.168.2.2'
         self.server_port = 9000
-
-        
+  
 
         for i in range(41, 77):
             
@@ -73,6 +73,8 @@ class WaysideWindow(QMainWindow):
             self.update_ui()
             self.wsh_tm_authority.emit(self.authority)
         except socket.error as e:
+            self.server_ip = '127.0.0.1'
+            self.connect()
             print(f"socket error: {e}")
             self.client_socket.close()
             print("socket closed")
