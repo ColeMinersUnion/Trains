@@ -37,7 +37,7 @@ class TrainModel(QObject):
         self.maxSpeed = 700000.0/3600.0
         self.extLightStatus = False
         self.intLightStatus = False
-        self.passengerCount = 0
+        self.passengerCount = 3 # to represent the intial crew
         self.avgHumanMass = (150 * 4.44822 / 9.8) #in kg
         self.totalMass = 0.0
         self.temperature = 65.0

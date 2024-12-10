@@ -16,9 +16,12 @@ class TrainModelView(QWidget):
         super().__init__()
 
         # Create labels
-        self.v_label = QLabel("Train Velocity: 0.0 m/s")
+        self.v_label = QLabel("Train Velocity: 0.0 mph")
         self.a_label = QLabel("Train Acceleration: 0.0 m/s^2")
-        self.passengers_label = QLabel("Passengers: 0 people")
+        self.length_label = QLabel("Train length: 105.6 ft")
+        self.width_label = QLabel("Train width: 8.7 ft")
+        self.height_label = QLabel("Train height: 11.2 ft")
+        self.passengers_label = QLabel("Passengers/Crew: 3 people")
         self.trainMass_label = QLabel("Current Mass: 0 lbs")
         self.temperature_label = QLabel("Cabin Temperature: 65.0 °F")
         self.intLight_label = QLabel("Interior Lights: OFF")
@@ -40,35 +43,59 @@ class TrainModelView(QWidget):
         self.brakeFailureButton = QPushButton("Brake Failure: OFF")
         self.brakeFailureButton.clicked.connect(self.update_brake_failure_status)
 
-        # Create a single layout
-        layout = QVBoxLayout(self)
-        layout.addWidget(self.v_label)         # Add velocity label
-        layout.addWidget(self.a_label)        # Add acceleration label
-        layout.addWidget(self.passengers_label) # Add passenger label
-        layout.addWidget(self.trainMass_label) # Add mass of train label
-        layout.addWidget(self.temperature_label) # Add label for temperature
-        layout.addWidget(self.intLight_label) # Add label for interior lights
-        layout.addWidget(self.extLight_label) # Add exterior light status label
-        layout.addWidget(self.left_door_label)
-        layout.addWidget(self.right_door_label)
-        layout.addWidget(self.service_brake_label)
-        layout.addWidget(self.station_label)
-        layout.addWidget(self.emergencyBrakeButton)
-        layout.addWidget(self.engineFailureButton)
-        layout.addWidget(self.signalFailureButton)
-        layout.addWidget(self.brakeFailureButton)
+        main_layout = QVBoxLayout(self)
+
+        # Section 1: Metrics View
+        metrics_group = QGroupBox("Train Metrics")
+        metrics_layout = QVBoxLayout()
+        metrics_layout.addWidget(self.v_label)
+        metrics_layout.addWidget(self.a_label)
+        metrics_layout.addWidget(self.length_label)
+        metrics_layout.addWidget(self.width_label)
+        metrics_layout.addWidget(self.height_label)
+        metrics_layout.addWidget(self.passengers_label)
+        metrics_layout.addWidget(self.trainMass_label)
+        metrics_layout.addWidget(self.temperature_label)
+        metrics_layout.addWidget(self.intLight_label)
+        metrics_layout.addWidget(self.extLight_label)
+        metrics_layout.addWidget(self.left_door_label)
+        metrics_layout.addWidget(self.right_door_label)
+        metrics_layout.addWidget(self.service_brake_label)
+        metrics_group.setLayout(metrics_layout)
+
+        # Section 2: Passenger View
+        passenger_group = QGroupBox("Passenger Controls")
+        passenger_layout = QVBoxLayout()
+        passenger_layout.addWidget(self.station_label)
+        passenger_layout.addWidget(self.emergencyBrakeButton)
+        passenger_group.setLayout(passenger_layout)
+
+        # Section 3: Murphy's View
+        murphy_group = QGroupBox("System Failures")
+        murphy_layout = QVBoxLayout()
+        murphy_layout.addWidget(self.engineFailureButton)
+        murphy_layout.addWidget(self.signalFailureButton)
+        murphy_layout.addWidget(self.brakeFailureButton)
+        murphy_group.setLayout(murphy_layout)
+
+        # Add sections to the main layout
+        main_layout.addWidget(metrics_group)
+        main_layout.addWidget(passenger_group)
+        main_layout.addWidget(murphy_group)
 
         # Set the layout and window title
-        self.setLayout(layout)
+        self.setLayout(main_layout)
         self.setWindowTitle("Train Model View")
 
     def update_velocity(self, velocity: float):
         """ Update the velocity display. """
-        self.v_label.setText(f"Train Velocity: {velocity:.2f} m/s")
+        velocity = 2.23694 * velocity
+        self.v_label.setText(f"Train Velocity: {velocity:.2f} mph")
 
     def update_acceleration(self, acceleration: float):
         """ Update the acceleration display """
-        self.a_label.setText(f"Train Acceleration: {acceleration:.2f} m/s^2")
+        acceleration = 2.23694 * acceleration
+        self.a_label.setText(f"Train Acceleration: {acceleration:.2f} mi/hr^2")
 
     def update_passenger_label(self, passengers: int):
         """" Upadate display of passengers on board """
