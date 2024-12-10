@@ -51,6 +51,8 @@ wss_window.wss_tm_switch_85.connect(tm_signals.getSwitch85)
 wsh_window.wsh_tm_switch_58.connect(tm_signals.getSwitch58)
 wsh_window.wsh_tm_switch_62.connect(tm_signals.getSwitch62)
 wsh_window.wsh_tm_authority.connect(tm_signals.getHardwareAuthority)
+#tk passes authority to tm
+#tm_signals.sendAuthorities.connect()
 
 ctc.emitTrain.connect(trainFactory)
 
