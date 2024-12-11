@@ -42,13 +42,13 @@ def trainFactory(routeInfo: list, authority: str):
         # sends authorities as list of booleans
         tm_signals.sendAuthorities.connect(trains[-1].train_model.boolean_authority)
         # sends list as station block number and passengers boarding
-        #tm_signals.sendPassengers.connect(trains[-1].)
+        tm_signals.sendPassengers.connect(trains[-1].train_model.updatePassengerCount)
         # sends list as station block number and passengers unboarding
-        #trains[-1].train_model.###.connect(tm_signals.getPassengers)
+        trains[-1].train_model.unboarding_list_signal.connect(tm_signals.getPassengers)
         # sends request for beacon data as block number
-        trains[-1].train_model.sendBlockID.connect(tm_signals.getBeacon)
+        trains[-1].train_model.requestBeaconInformation.connect(tm_signals.getBeacon)
         # sends beacon data as list with block number and beacon data
-        tm_signals.sendBeacon.connect(trains[-1].train_model.beaconIntake)
+        tm_signals.sendBeacon.connect(trains[-1].train_model.beaconInformation)
     except TypeError:
         print('Oops')
     except IndexError:
