@@ -17,7 +17,7 @@ class WaysideWindow(QMainWindow):
     wsh_tm_sig62 = pyqtSignal(bool)
     ws_tm_maintenance = pyqtSignal(list)
     wsh_ctc_occupancy = pyqtSignal(list)
-    wsh_ctc_maintenance = pyqtSignal(list)
+    wsh_ctc_safetyCheck = pyqtSignal(bool)
 
     #view
     def __init__(self):
@@ -287,6 +287,7 @@ class WaysideWindow(QMainWindow):
 
     @pyqtSlot(list)
     def update_maintenance(self, maint_prop):
+        print(maint_prop)
         data = {
             "input" : "ctc_maintenance",
             "maint": maint_prop
@@ -295,7 +296,7 @@ class WaysideWindow(QMainWindow):
         decoded_json = self.receive()
         self.maintenance = decoded_json["maint"]
         self.ws_tm_maintenance.emit(self.maintenance)
-        self.wsh_ctc_maintenance.emit(self.maintenance)
+        self.wsh_ctc_safetyCheck.emit(maint_prop == self.maintenance)
         self.wsh_ctc_occupancy.emit(self.occupancy)
         self.update_ui()
 
