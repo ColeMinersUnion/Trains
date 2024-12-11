@@ -12,6 +12,8 @@ Reconfiguring track:
 Option 1: Directly editing "Green Line.xlsx" and "Red Line.xlsx"
 - Open file in Microsoft Excel
 - Edit parameters
+- Higher x values are to the right of the screen, and higher y values are on the bottom of the screen
+- The amount that fits on the screen depends on the scale and x- and y-offsets in the main
 - All changed parameters will appear
 - Only default values are integrated with other modules
 - Start TrackModelMain.py
@@ -23,7 +25,7 @@ Option 2: Copying file
 - Only default values are integrated with other modules
 
 Opening Track Model:
-Option 1: Open TrackModelMain.py in preferred IDE with Python
+Option 1: Open TrackModelMain.py in preferred IDE with Python and run
 Option 2: Open terminal in folder with TrackModelMain.py and run "python TrackModelMain.py"
 
 Using Track Model:
@@ -31,3 +33,7 @@ Using Track Model:
 - Use temperature slider at top to set temperature
 - Hover over failure options to find failure type
 - Click failure type and click block arrow to appy failure type
+
+Changing the graphics layout:
+- With a file editor, open TrackModelMain.py
+- Change the SCL, XFF< and YFF constants at the beginning of the file
