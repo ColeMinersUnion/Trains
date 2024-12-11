@@ -7,15 +7,15 @@ from Wayside_Controller.Software.SoftwareShell import WaysideShell as SoftwareSh
 from Wayside_Controller.Hardware.HardwareShell import WaysideWindow as HardwareShell
 from TrackModel.TrackModelMain import Map
 
-trains = []
+trains = [] # holds trains
 
-app = QApplication(sys.argv)
+app = QApplication(sys.argv) #new application
 
-ctc = CTCApplication()
-wss_window = SoftwareShell()
-wsh_window = HardwareShell()
-tm_window = Map()   
-tm_signals = tm_window.signals
+ctc = CTCApplication() #makes CTC
+wss_window = SoftwareShell() #makes wayside software
+wsh_window = HardwareShell() #makes wayside hardware
+tm_window = Map() #makes track model map
+tm_signals = tm_window.signals #gets signals from track model
 
 ctc.emitMaintenance.connect(wss_window.receive_maintenance)
 ctc.emitMaintenanceSwitch.connect(wss_window.receive_maint_switch)
@@ -26,8 +26,8 @@ ctc.emitMaintenance.connect(wsh_window.update_maintenance)
 wsh_window.wsh_ctc_safetyCheck.connect(ctc.MaintenanceResponse)
 ctc.emitMaintenanceSwitch.connect(wsh_window.update_maint_switch)
 #Emit Connect Slot
-wss_window.wss_ctc_occupancy.connect(ctc.updateOccupancy)
-wsh_window.wsh_ctc_occupancy.connect(ctc.updateOccupancy)
+wss_window.wss_ctc_occupancy.connect(ctc.updateOccupancy) #wayside software send occupancies to CTC
+wsh_window.wsh_ctc_occupancy.connect(ctc.updateOccupancy) #wayside hardware send occupancies to CTC
 #wsh_window.ws_ctc_switch_result.connect(ctc.handleGreenOutputSwitch)
 
 
@@ -51,36 +51,35 @@ def trainFactory(routeInfo: list, authority: str):
         tm_signals.sendBeacon.connect(trains[-1].train_model.beaconInformation)
     except TypeError:
         print('Oops')
-    except IndexError:
+    except IndexError: #send train back to station if done route
         print('Train reach end of line. Went back to the yard')
 
 
 # Show both windows
 
-#tk sending occupancies to wss
+#track model sends occupancies to wayside software...
 tm_signals.sendOccupancies.connect(wss_window.update_occupancy)
+#... and hardware
 tm_signals.sendOccupancies.connect(wsh_window.update_occupancy)
-#wss sending updated authority to tk:
-wss_window.wss_tm_authority.connect(tm_signals.getSoftwareAuthority)
-wss_window.wss_tm_switch_13.connect(tm_signals.getSwitch13)
-wss_window.wss_tm_switch_28.connect(tm_signals.getSwitch28)
-wss_window.wss_tm_switch_77.connect(tm_signals.getSwitch77)
-wss_window.wss_tm_switch_85.connect(tm_signals.getSwitch85)
-wsh_window.wsh_tm_switch_58.connect(tm_signals.getSwitch58)
-wsh_window.wsh_tm_switch_62.connect(tm_signals.getSwitch62)
-wsh_window.wsh_tm_authority.connect(tm_signals.getHardwareAuthority)
-#tk passes authority to tm
+#wayside messages to track model
+wss_window.wss_tm_authority.connect(tm_signals.getSoftwareAuthority) #software authority (0 to 40, 77 to 151) as list of booleans
+wss_window.wss_tm_switch_13.connect(tm_signals.getSwitch13) #switch 13
+wss_window.wss_tm_switch_28.connect(tm_signals.getSwitch28) #switch 28
+wss_window.wss_tm_switch_77.connect(tm_signals.getSwitch77) #switch 77
+wss_window.wss_tm_switch_85.connect(tm_signals.getSwitch85) #switch 85
+wsh_window.wsh_tm_switch_58.connect(tm_signals.getSwitch58) #switch 58
+wsh_window.wsh_tm_switch_62.connect(tm_signals.getSwitch62) #switch 62
+wsh_window.wsh_tm_authority.connect(tm_signals.getHardwareAuthority) #hardware authority (41 to 76) as list of booleans
 
-
+#connects CTC to train command
 ctc.emitTrain.connect(trainFactory)
 
 
-wss_window.show()
-tm_window.show()
-wsh_window.show()
-ctc.show()
+wss_window.show() #show wayside software
+tm_window.show() #show track model
+wsh_window.show() #show wayside ahrdware
+ctc.show() #show CTC
 
-
-#Emit Connect Slot
+#allow exit
 sys.exit(app.exec())
 
