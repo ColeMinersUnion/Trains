@@ -8,7 +8,13 @@ P_MAX = 120000  # Maximum power output
 class TCmodel(QObject):
     power_command = Signal(float)  # Signal to send power command
     ebrake_change = Signal(bool)  # Signal to send emergency brake change to TM
-    internal_ebrake_signal = Signal(bool)  # Signal to send emergency brake change to TC view
+    internal_ebrake_signal = Signal(bool)  
+    #meep meep check on ebrake signals, make sure it does NOT need approval
+    internal_sbrake = Signal()
+    internal_hl = Signal(bool)
+    internal_left_doors = Signal(bool)
+    internal_right_doors = Signal(bool)
+    internal_lights = Signal(bool)
     headlights_change = Signal(bool)
     lights_signal = Signal(bool)
     left_doors_signal = Signal(bool)
@@ -70,8 +76,8 @@ class TCmodel(QObject):
         #self.calculate_current_authority()
         self.curr_authority = float(self.full_authority.split(';')[0])
         self.curr_dist = self.curr_authority
-        #print(f"Full authority: {self.full_authority}")
-        #print(f"Current authority: {self.curr_authority}")
+        print(f"Full authority: {self.full_authority}")
+        print(f"Current authority: {self.curr_authority}")
         self.authority_display.emit(self.curr_authority)
 
     @Slot(float)
@@ -177,14 +183,14 @@ class TCmodel(QObject):
         authority_list.pop(0)
         self.full_authority = ';'.join(authority_list)
         self.curr_authority = float(self.full_authority.split(';')[0])
-        #print(f"new authority value : {self.curr_authority}")
+        print(f"new authority value : {self.curr_authority}")
 
     @Slot (list)
     def set_speed_limits(self, sl):
         #take in speed limits
         #define current speed limit value
         self.speedlimits = sl
-        #print(f"speed limits: {self.speedlimits}")
+        print(f"speed limits: {self.speedlimits}")
         self.current_speed_limit = self.speedlimits[0]
 
     def stopping_dist(self):
@@ -217,9 +223,10 @@ class TCmodel(QObject):
     def distance_traveled(self):
         delta_d = self.currentSpeed*T + (0.5*self.acceleration*T*T)
         return delta_d
+    @Slot ()
+    def sbrake_slot(self):
+        self.sbrake = not self.sbrake
     
-    def toggle_sbrake(self, sp):
-        self.sbrake = sp
 
     def dist_from_station(self):
         """ Calculate the distance from the station based on current speed and deceleration. """
@@ -318,15 +325,43 @@ class TCmodel(QObject):
 
     def toggle_left_doors(self):
         """ Toggle the state of the left doors. """
-        self.left_doors = not self.left_doors
+        #self.left_doors = not self.left_doors
         self.left_doors_signal.emit(self.left_doors)
 
     def toggle_right_doors(self):
         """ Toggle the state of the right doors. """
-        self.right_doors = not self.right_doors
+        #self.right_doors = not self.right_doors
         self.right_doors_signal.emit(self.right_doors)
 
     def toggle_lights(self):
         """ Toggle the state of the lights. """
-        self.lights = not self.lights
+        #self.lights = not self.lights
         self.lights_signal.emit(self.lights) 
+    
+    def toggle_sbrake(self): 
+        """ Toggle the state of the service brake. """
+        #self.sbrake = not self.sbrake
+        self.sbrake_change.emit()
+
+    @Slot (bool)
+    def left_doors_slot(self, ld):
+        self.left_doors = ld
+        self.internal_left_doors.emit(self.left_doors)
+    @Slot (bool)
+    def right_doors_slot(self, rd):
+        self.right_doors = rd
+        self.internal_right_doors.emit(self.right_doors)
+    @Slot (bool)
+    def lights_slot(self, lights):
+        self.lights = lights
+        self.internal_lights.emit(self.lights)
+    @Slot (bool)
+    def headlights_slot(self, hl):
+        self.headlights = hl
+        self.internal_hl.emit(self.headlights)
+
+#meep meep 
+    @Slot (bool)
+    def sbrake_slot(self, sb):
+        self.sbrake = sb
+        self.internal_sbrake.emit()

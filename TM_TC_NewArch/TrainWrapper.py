@@ -50,5 +50,22 @@ class Train(QWidget):
         #parse route info 
         self.train_model.parseRouteInfo()
 
+        #all new connects for lights/doors/sbrake
+        self.train_controller_view.manual_left_doors.connect(self.train_model.toggleLeftDoors) #connect driver left doors to tm toggle function to ask for value change
+        self.train_controller_view.manual_right_doors.connect(self.train_model.toggleRightDoors) #connect driver right doors
+        self.train_controller_view.manual_lights.connect(self.train_model.toggleInteriorLights) #connect driver lights
+        self.train_controller_view.manual_hl.connect(self.train_model.toggleExteriorLights) #connect driver headlights
+        self.train_controller_view.sbrake_signal.connect(self.train_model.toggleServiceBrake) #connect driver sbrake
+        self.train_controller_view.manual_temperature.connect(self.train_model.setTemperature) #connect driver temp
+
+        #if train model approves, then these are sent 
+        self.train_model.left_door_updated.connect(self.train_controller_model.left_doors_slot)
+        self.train_model.right_door_updated.connect(self.train_controller_model.right_doors_slot)
+        self.train_model.intLights_updated.connect(self.train_controller_model.lights_slot)
+        self.train_model.extLights_updated.connect(self.train_controller_model.headlights_slot)
+        #no brake connection yet, coming soon
+
         # Connect the train controller to the train model for brake inputs and outputs
         self.train_controller_model.ebrake_change.connect(self.train_model.toggleEmergencyBrake)
+        self.train_model.emergency_brake_updated.connect(self.train_controller_model.set_ebrake)
+

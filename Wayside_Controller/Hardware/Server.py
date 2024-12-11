@@ -4,10 +4,21 @@ import json
 from GreenYardPLC import PLC
 #import RPi.GPIO as GPIO
 
+# 62 yard: GPIO 12
+# 62-63 : GPIO 6
+# 62 red: GPIO 25
+# 62 green: GPIO 24
+
+# 58 green: GPIO 23
+# 58 red: GPIO 22
+# 58-57: GPIO 27
+# 58 yard: GPIO 17
+
+
 def main():
     plc = PLC()
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind(('127.0.0.1', 9000))
+    server_socket.bind(('192.168.2.2', 9000))
     server_socket.listen(5)
     print("Server is listening")
 
@@ -134,11 +145,15 @@ def main():
                         }
 
                     case "say_hi":
-                        response = {"response": "server connect"}
-                        
+                        plc.update_authority(decoded_json["occ"])
+                        response = {"response": "server connect",
+                                    "auth": plc.authority
+                                    }
+                
+                print(response)
                 json_data = json.dumps(response)
                 length_prefix = f"{len(json_data):<10}" # Fixed 10-byte length prefix
-                print(length_prefix)
+                print(int(length_prefix))
                 client_socket.sendall(length_prefix.encode('utf-8') + json_data.encode('utf-8'))
 
             except json.JSONDecodeError:

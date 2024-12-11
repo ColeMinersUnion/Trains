@@ -1,4 +1,4 @@
-#from PyQt6.QtCore import QSize, Qt
+from numpy import array
 from PyQt6.QtWidgets import QMainWindow, QPushButton, QScrollArea, QVBoxLayout, QHBoxLayout, QWidget, QLineEdit, QLabel
 from PyQt6.QtCore import pyqtSlot, pyqtSignal
 import sys, os
@@ -7,11 +7,13 @@ try:
     from Components.NewTrainWidget import NewTrainWidget
     from Components.OccupancyWidget import OccupancyWidget
     from Components.MaintenanceBlocks import MaintenanceWidget
+    from Components.SwitchWidget import SwitchWidget
 except:
     from CTC_Office.Frontend.Components.SchedulePreviewer import SchedulePreviewer
     from CTC_Office.Frontend.Components.OccupancyWidget import OccupancyWidget
     from CTC_Office.Frontend.Components.NewTrainWidget import NewTrainWidget
     from CTC_Office.Frontend.Components.MaintenanceBlocks import MaintenanceWidget
+    from CTC_Office.Frontend.Components.SwitchWidget import SwitchWidget
     sys.path.insert(1, os.path.join(os.getcwd(), 'CTC_Office', 'Backend'))
     print(os.getcwd())
     from CTC import CTC_Office    
@@ -32,27 +34,12 @@ Green = ['Pioneer', 'Edgebrook', 'Station D',
 class CTCApplication(QMainWindow):
     emitTrain = pyqtSignal(list, str)
     emitSwitch = pyqtSignal(int)
+    emitMaintenance = pyqtSignal(list)
+    emitMaintenanceSwitch = pyqtSignal(int)
     def __init__(self, Office = CTC_Office()):
         super().__init__()
         self.Office = Office
         self.Office.addGreenLine()
-
-        #Navbar widgets
-        self.navbar = QWidget()
-        self.navbar_layout = QHBoxLayout()
-
-        self.manual = QPushButton("Manual")
-        self.manstate = True
-        self.manual.released.connect(self.onManualMode)
-        self.auto_page = QPushButton("Automatic")
-        self.autostate = False
-        self.auto_page.released.connect(self.onAutoMode)
-
-        self.navbar_layout.addWidget(self.manual)
-        self.navbar_layout.addWidget(self.auto_page)
-        self.navbar_layout.setSpacing(10)
-        self.navbar_layout.setContentsMargins(0, 0, 0, 0)
-        self.navbar.setLayout(self.navbar_layout)
 
 
         #Manual widgets
@@ -61,6 +48,7 @@ class CTCApplication(QMainWindow):
         self.newTrainWidget = NewTrainWidget(Green)
         self.hlayout = QHBoxLayout()
         self.Manual_layout = QVBoxLayout()
+        self.Auto_layout = QVBoxLayout()
         self.main = QWidget()
         self.clear = QPushButton("Clear")
         self.clear_state = True
@@ -72,12 +60,14 @@ class CTCApplication(QMainWindow):
         self.fix_state = True
         self.GreenBlocks = MaintenanceWidget()
 
+        self.maintenance_layout = QVBoxLayout()
+        self.GreenSwitchs = SwitchWidget()
+        self.GreenSwitchs.emitSwitch.connect(self.handleMaintenanceSwitch)
         
         self.Title = QLabel()
         self.Title.setText("Manual Mode")
         self.Title.styleSheet = "font-size: 60px; font-weight: bold;"
         self.Manual_layout.addWidget(self.Title)
-        self.Manual_layout.addWidget(self.navbar)
 
 
         self.hlayout.addWidget(self.newTrainWidget)
@@ -104,7 +94,8 @@ class CTCApplication(QMainWindow):
         self.submitFix.released.connect(self.onFix)
         self.submitFix.setChecked(self.fix_state)
 
-        
+        self.mostRecentBreak = 0
+        self.mostRecentSwitch = ()
 
         lbl = QLabel()
         lbl.setText("Testbench Information")
@@ -136,7 +127,8 @@ class CTCApplication(QMainWindow):
         self.Manual_layout.addWidget(self.fixBlock)
         self.Manual_layout.addWidget(self.submitFix)
         
-
+        self.Manual_layout.addWidget(QLabel("Switches"))
+        self.Manual_layout.addWidget(self.GreenSwitchs)
         #Test bench stuff
         self.Manual_layout.addWidget(lbl)
         self.Manual_layout.addWidget(self.speed)
@@ -151,6 +143,10 @@ class CTCApplication(QMainWindow):
         self.ManualColumn = QWidget()
         self.ManualColumn.setLayout(self.Manual_layout)
         self.wrapperLayout.addWidget(self.ManualColumn)
+
+        self.MaintenaceColumn = QWidget()
+        self.MaintenaceColumn.setLayout(self.maintenance_layout)
+        self.wrapperLayout.addWidget(self.MaintenaceColumn)
 
         #self.AutoColumn = QWidget()
         #self.AutoColumn.setLayout(self.Auto_layout)
@@ -179,19 +175,42 @@ class CTCApplication(QMainWindow):
     def onBreak(self):
         
         txt = self.breakBlok.text()
-        if(self.Office.breakTrack(int(txt))):
+        self.mostRecentBreak = int(txt)
+        if(self.Office.breakTrack("Green", int(txt))):
             self.breakBlok.setText(f'Block {int(txt)} is now broken. ')
         else:
             self.breakBlok.setText("That block does not exist, try again.")
-        self.break_state = self.submitBreak.isChecked()
+        blockState = [x.maintenance for x in self.Office.line["Green"].graph]
+        print(array(blockState))
+        self.emitMaintenance.emit(blockState)
+    
+    @pyqtSlot(bool)
+    def MaintenanceResponse(self, success: bool):
+        if(success):
+            self.updateBlocks()
+        else:
+            self.breakBlok.setText("The Wayside Office deemed maintenance operation irresponsible.")
+            self.Office.fixTrack("Green", self.mostRecentBreak)
+            self.updateBlocks()
+        
+    @pyqtSlot(bool)
+    def MaintenanceSwitchResponse(self, success: bool):
+        if(success):
+            self.updateBlocks()
+        else:
+            self.breakBlok.setText("The Wayside Office deemed maintenance operation irresponsible.")
+            for block in self.mostRecentSwitch:
+                self.Office.fixTrack("Green", block)
+            self.updateBlocks()
     
     def onFix(self):
         txt = self.fixBlock.text()
-        if(self.Office.fixTrack(int(txt))):
+        if(self.Office.fixTrack("Green", int(txt))):
             self.fixBlock.setText(f'Block {int(txt)} is now fixed. ')
         else:
             self.fixBlock.setText("That block does not exist or was not broken, try again.")
-        self.fix_state = self.submitBreak.isChecked()
+        blockState = [x.maintenance for x in self.Office.line["Green"].graph]
+        self.emitMaintenance.emit(blockState)
         
     def onAuto(self):
         fn = self.Automatic.text()
@@ -244,10 +263,10 @@ class CTCApplication(QMainWindow):
     def updateBlocks(self):
         blockList = []
         for block in self.Office.line["Green"].graph:
-            if block.closed:
-                blockList.append((block.index, "Closed"))
-            elif block.maintenance:
+            if block.maintenance:
                 blockList.append((block.index, "Maintenance"))
+            elif block.closed:
+                blockList.append((block.index, "Closed"))
         self.GreenBlocks.update(blockList)
             
 
@@ -266,6 +285,19 @@ class CTCApplication(QMainWindow):
         self.emitSwitch.emit(switch)
         #print(f"Switching to {switch}")
         return True
+
+    @pyqtSlot(tuple)
+    def handleMaintenanceSwitch(self, switches: tuple):
+        self.mostRecentSwitch = switches
+        for block in switches:
+            if(self.Office.breakTrack("Green", block)):
+                self.breakBlok.setText(f'Block {block} is now broken. ')
+            else:
+                self.breakBlok.setText("That block does not exist, try again.")
+        blockState = [x.maintenance for x in self.Office.line["Green"].graph]
+        self.emitMaintenance.emit(blockState)
+        self.emitMaintenanceSwitch.emit(switches[0])
+        
 
 
 

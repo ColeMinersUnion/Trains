@@ -111,24 +111,63 @@ class PLC:
 
     def update_authority(self, occ):
         self.occupancy = occ
-        auth = [True for i in range(151)]
 
-        for i in range(41, 47):
-            if any(occ[47:58]):
-                auth[i] = False
+        self.authority[41] = not any(occ[47:58]) and not any(occ[42:47])
+        self.authority[42] = not any(occ[47:58]) and not any(occ[43:47])
+        self.authority[43] = not any(occ[47:58]) and not any(occ[44:47])
+        self.authority[44] = not any(occ[47:58]) and not any(occ[45:47])
+        self.authority[45] = not any(occ[47:58]) and not any(occ[46:47])
+        self.authority[46] = not any(occ[47:58])
+        
+
+        self.authority[47] = (not any(occ[58:63]) or self.sw58 == False) and not any(occ[48:58])
+        self.authority[48] = (not any(occ[58:63]) or self.sw58 == False) and not any(occ[49:58])
+        self.authority[49] = (not any(occ[58:63]) or self.sw58 == False) and not any(occ[50:58])
+        self.authority[50] = (not any(occ[58:63]) or self.sw58 == False) and not any(occ[51:58])
+        self.authority[51] = (not any(occ[58:63]) or self.sw58 == False) and not any(occ[52:58])
+        self.authority[52] = (not any(occ[58:63]) or self.sw58 == False) and not any(occ[53:58])
+        self.authority[53] = (not any(occ[58:63]) or self.sw58 == False) and not any(occ[54:58])
+        self.authority[54] = (not any(occ[58:63]) or self.sw58 == False) and not any(occ[55:58])
+        self.authority[55] = (not any(occ[58:63]) or self.sw58 == False) and not any(occ[56:58])
+        self.authority[56] = (not any(occ[58:63]) or self.sw58 == False) and not any(occ[57:58])
+        self.authority[57] = (not any(occ[58:63]) or self.sw58 == False) and not any(occ[58:59])
+        
+        self.authority[58] = (not any(occ[63:69]) and self.sw62 == True) and not any(occ[59:63])
+        self.authority[59] = (not any(occ[63:69]) and self.sw62 == True) and not any(occ[60:63])
+        self.authority[60] = (not any(occ[63:69]) and self.sw62 == True) and not any(occ[61:63])
+        self.authority[61] = (not any(occ[63:69]) and self.sw62 == True) and not any(occ[62:63])
+        self.authority[62] = (not any(occ[63:69]) and self.sw62 == True) and not any(occ[63:64])
+        
+
+        self.authority[63] = not any(occ[69:77]) and not any(occ[64:69])
+        self.authority[64] = not any(occ[69:77]) and not any(occ[65:69])
+        self.authority[65] = not any(occ[69:77]) and not any(occ[66:69])
+        self.authority[66] = not any(occ[69:77]) and not any(occ[67:69])
+        self.authority[67] = not any(occ[69:77]) and not any(occ[68:69])
+        self.authority[68] = not any(occ[69:77]) and not any(occ[69:70])
+        
+        
+
+
+        # auth = [True for i in range(151)]
+
+        # for i in range(41, 47):
+        #     if any(occ[47:58]):
+        #         auth[i] = False
            
-        for i in range(47, 58):
-            if any(occ[58:63]) and self.sw58 == True:
-                auth[i] = False
+        # for i in range(47, 58):
+        #     if any(occ[58:63]) and self.sw58 == True:
+        #         auth[i] = False
 
-        for i in range(58, 63):
-            if any(occ[63:69]) or self.sw62 == False:
-                auth[i] = False
+        # for i in range(58, 63):
+        #     if any(occ[63:69]) or self.sw62 == False:
+        #         auth[i] = False
 
-        for i in range(63, 69):
-            if any(occ[69:77]):
-                auth[i] = False
-        self.authority = auth
+        # for i in range(63, 69):
+        #     if any(occ[69:77]):
+        #         auth[i] = False
+        # self.authority = auth
+
         self.update_signals()
         return self.authority
     

@@ -14,7 +14,7 @@ class TrainModel(QObject):
     passengerCount_updated = Signal(int) # Signal to send passengers onboard
     total_mass_updated = Signal(float)   # Signal to send current mass of train
     temperature_updated = Signal(float)  # Signal to send current temperature
-    intLights_updated = Signal(float)    # Signal to update cabin lights
+    intLights_updated = Signal(bool)    # Signal to update cabin lights
     extLights_updated = Signal(bool)  # Signal to update the headlights
     left_door_updated = Signal(bool) #Signal to toggle left doors
     right_door_updated = Signal(bool) #Signal to toggle right doors
@@ -25,6 +25,7 @@ class TrainModel(QObject):
     brake_failure = Signal(bool)    # Signal for brake failure
     speed_limits = Signal(list)     # speed limits for train controller
     station_name_updated = Signal(str)      # name of station being arrived at
+    boolean_authority_signal = Signal(list)
     
     def __init__(self, routeInfo):
         super().__init__()
@@ -37,7 +38,7 @@ class TrainModel(QObject):
         self.maxSpeed = 700000.0/3600.0
         self.extLightStatus = False
         self.intLightStatus = False
-        self.passengerCount = 0
+        self.passengerCount = 3 # to represent the intial crew
         self.avgHumanMass = (150 * 4.44822 / 9.8) #in kg
         self.totalMass = 0.0
         self.temperature = 65.0
@@ -136,32 +137,37 @@ class TrainModel(QObject):
     """ Change cabin temperature """
     @Slot(float)
     def setTemperature(self, temperature: float):
-        self.temperature = temperature
-        self.temperature_updated.emit(self.temperature)
+        if(not self.signalFailureStatus):
+            self.temperature = temperature
+            self.temperature_updated.emit(self.temperature)
 
     """ Toggle for cabin (interior) lights """
     @Slot()
     def toggleInteriorLights(self):
-        self.intLightStatus = not self.intLightStatus
-        self.intLights_updated.emit(self.intLightStatus)
+        if(not self.signalFailureStatus):
+            self.intLightStatus = not self.intLightStatus
+            self.intLights_updated.emit(self.intLightStatus)
 
     """ Toggle for headlights of train """
     @Slot()
     def toggleExteriorLights(self):
-        self.extLightStatus = not self.extLightStatus
-        self.extLights_updated.emit(self.extLightStatus)
+        if(not self.signalFailureStatus):
+            self.extLightStatus = not self.extLightStatus
+            self.extLights_updated.emit(self.extLightStatus)
 
-    """ For toggling the left doors (True = Open)"""
+    """ For toggling the left doors (True = Open) """
     @Slot()
     def toggleLeftDoors(self):
-        self.leftDoorStatus = not self.leftDoorStatus
-        self.left_door_updated.emit(self.leftDoorStatus)
+        if(not self.signalFailureStatus):
+            self.leftDoorStatus = not self.leftDoorStatus
+            self.left_door_updated.emit(self.leftDoorStatus)
 
-    """ For toggling the right doors (True = Open)"""
+    """ For toggling the right doors (True = Open) """
     @Slot()
     def toggleRightDoors(self):
-        self.rightDoorStatus = not self.rightDoorStatus
-        self.right_door_updated.emit(self.rightDoorStatus)
+        if(not self.signalFailureStatus):
+            self.rightDoorStatus = not self.rightDoorStatus
+            self.right_door_updated.emit(self.rightDoorStatus)
 
     """ For toggling the service brake (True = On)"""
     @Slot()
@@ -223,3 +229,11 @@ class TrainModel(QObject):
     def toggleSignalFailure(self):
         self.signalFailureStatus = not self.signalFailureStatus
         self.signal_failure.emit(self.signalFailureStatus)
+
+    @Slot(list)
+    def boolean_authority(self, input: list):
+        self.boolean_authority_signal.emit(input)
+
+    @Slot()
+    def sendBlockID(self):
+        self.block_change.emit(self.blockID[self.i - 1])

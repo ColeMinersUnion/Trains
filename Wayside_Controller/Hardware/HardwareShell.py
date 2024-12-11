@@ -17,7 +17,7 @@ class WaysideWindow(QMainWindow):
     wsh_tm_sig62 = pyqtSignal(bool)
     ws_tm_maintenance = pyqtSignal(list)
     wsh_ctc_occupancy = pyqtSignal(list)
-    wsh_ctc_maintenance = pyqtSignal(list)
+    wsh_ctc_safetyCheck = pyqtSignal(bool)
 
     #view
     def __init__(self):
@@ -36,10 +36,10 @@ class WaysideWindow(QMainWindow):
 
 
         self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server_ip = '127.0.0.1'
+    
+        self.server_ip = '192.168.2.2'
         self.server_port = 9000
-
-        
+  
 
         for i in range(41, 77):
             
@@ -63,15 +63,18 @@ class WaysideWindow(QMainWindow):
             end = time()    
             print(f"Connected to server {end - start} seconds") 
             data = {
-                "input" : "say_hi"
+                "input" : "say_hi",
+                "occ" : self.occupancy
             }
             self.send(data)
             decoded_json = self.receive()
             self.connected = True
-            self.authority[41:69] = [True] * (69 - 41)
+            self.authority = decoded_json["auth"]
             self.update_ui()
             self.wsh_tm_authority.emit(self.authority)
         except socket.error as e:
+            self.server_ip = '127.0.0.1'
+            self.connect()
             print(f"socket error: {e}")
             self.client_socket.close()
             print("socket closed")
@@ -96,15 +99,28 @@ class WaysideWindow(QMainWindow):
     def receive(self):
         length_prefix = self.client_socket.recv(10).decode('utf-8').strip()
         message_length = int(length_prefix)
+        print(message_length)
         message_data = self.client_socket.recv(message_length).decode('utf-8')
         decoded_json = ""
 
         try:
             decoded_json = json.loads(message_data)
-            return decoded_json
 
         except json.JSONDecodeError:
-            print("failed to decode Json", message_data)
+            remaining_length = message_length - len(message_data.encode('utf-8'))
+            if remaining_length > 0:
+                print(f"Receiving the remaining {remaining_length} bytes...")
+                remaining_data = self.client_socket.recv(remaining_length).decode('utf-8')
+                message_data += remaining_data  # Append the remaining data
+                try:
+                    decoded_json = json.loads(message_data)  # Try decoding again
+                    print("Decoded JSON after receiving more data:", decoded_json)
+                except json.JSONDecodeError as e:
+                    print("Failed to decode JSON even after receiving more data:", e)
+                    return None
+
+        return decoded_json
+
     
 
     #view
@@ -213,7 +229,7 @@ class WaysideWindow(QMainWindow):
             self.send(data)
             decoded_json = self.receive()
             self.switch_58 = decoded_json["sw58"]
-
+            self.authority = decoded_json["auth"]
         else:
             self.switch_58 = not self.switch_58
         
@@ -231,7 +247,7 @@ class WaysideWindow(QMainWindow):
             self.send(data)
             decoded_json = self.receive()
             self.switch_62 = decoded_json["sw62"]
-
+            self.authority = decoded_json["auth"]
         else:
             self.switch_62 = not self.switch_62
         self.ws_ctc_switch_result.emit({"result": True, "switch_58": self.switch_58, "switch_62": self.switch_62, "signal_58": self.signal_58, "signal_62": self.signal_62})
@@ -271,6 +287,7 @@ class WaysideWindow(QMainWindow):
 
     @pyqtSlot(list)
     def update_maintenance(self, maint_prop):
+        print(maint_prop)
         data = {
             "input" : "ctc_maintenance",
             "maint": maint_prop
@@ -279,8 +296,8 @@ class WaysideWindow(QMainWindow):
         decoded_json = self.receive()
         self.maintenance = decoded_json["maint"]
         self.ws_tm_maintenance.emit(self.maintenance)
-        self.ws_ctc_maintenance.emit(self.maintenance)
-        self.ws_ctc_occupancy.emit(self.occupancy)
+        self.wsh_ctc_safetyCheck.emit(maint_prop == self.maintenance)
+        self.wsh_ctc_occupancy.emit(self.occupancy)
         self.update_ui()
 
 

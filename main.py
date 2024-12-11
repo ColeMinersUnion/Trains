@@ -17,6 +17,14 @@ wsh_window = HardwareShell() #makes wayside hardware
 tm_window = Map() #makes track model map
 tm_signals = tm_window.signals #gets signals from track model
 
+ctc.emitMaintenance.connect(wss_window.receive_maintenance)
+ctc.emitMaintenanceSwitch.connect(wss_window.receive_maint_switch)
+wss_window.wss_ctc_safetyCheck.connect(ctc.MaintenanceResponse)
+wss_window.wss_ctc_safetySwitch.connect(ctc.MaintenanceSwitchResponse)
+
+ctc.emitMaintenance.connect(wsh_window.update_maintenance)
+wsh_window.wsh_ctc_safetyCheck.connect(ctc.MaintenanceResponse)
+ctc.emitMaintenanceSwitch.connect(wsh_window.update_maint_switch)
 #Emit Connect Slot
 wss_window.wss_ctc_occupancy.connect(ctc.updateOccupancy) #wayside software send occupancies to CTC
 wsh_window.wsh_ctc_occupancy.connect(ctc.updateOccupancy) #wayside hardware send occupancies to CTC
@@ -32,16 +40,16 @@ def trainFactory(routeInfo: list, authority: str):
         trains[-1].train_controller_view.show()
         trains[-1].train_model.block_change.connect(tm_signals.toggleOcc)
         # sends authorities as list of booleans
-        #tm_signals.sendAuthorities.connect(trains[-1].)
+        tm_signals.sendAuthorities.connect(trains[-1].train_model.boolean_authority)
         # sends list as station block number and passengers boarding
         #tm_signals.sendPassengers.connect(trains[-1].)
         # sends list as station block number and passengers unboarding
         #trains[-1].train_model.###.connect(tm_signals.getPassengers)
         # sends request for beacon data as block number
-        #trains[-1].train_model.###.connect(tm_signals.getBeacon)
+        trains[-1].train_model.sendBlockID.connect(tm_signals.getBeacon)
         # sends beacon data as list with block number and beacon data
-        #tm_signals.sendBeacon.connect(trains[-1].beaconIntake)
-    except TypeError: #throw error without crashing if train is messed up
+        tm_signals.sendBeacon.connect(trains[-1].train_model.beaconIntake)
+    except TypeError:
         print('Oops')
     except IndexError: #send train back to station if done route
         print('Train reach end of line. Went back to the yard')

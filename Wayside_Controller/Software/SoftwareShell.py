@@ -30,6 +30,9 @@ class WaysideShell(QMainWindow):
     wss_tm_crossing_19 = pyqtSignal(bool)
     wss_tm_crossing_108 = pyqtSignal(bool)
 
+    wss_ctc_safetyCheck = pyqtSignal(bool)
+    wss_ctc_safetySwitch = pyqtSignal(bool)
+
     def __init__(self):
         super().__init__()
        # self.app = app
@@ -37,8 +40,8 @@ class WaysideShell(QMainWindow):
 
         self.plc = GreenPLC()
         
-        self.occupancy = [False for i in range(1,151)]
-        self.authority = [False for i in range(1,151)]
+        self.occupancy = [False for i in range(151)]
+        self.authority = [False for i in range(151)]
         #switches
         self.switch_13 = True
         self.switch_28 = False
@@ -67,6 +70,8 @@ class WaysideShell(QMainWindow):
     #then send out updated authority, switches, signals, crossings 
     @pyqtSlot(list)
     def update_occupancy(self, new_occupancy: list):
+        '''for i in range(151):
+            print(f"Green Line Occupancy Block {i}: {new_occupancy[i]} ")''' #checks that occupancy list is being passed
         #only pass to ctc the sections within software wayside control 
         self.occupancy[1:41]=new_occupancy[1:41]
         self.occupancy[69:151]=new_occupancy[69:151]
@@ -75,35 +80,54 @@ class WaysideShell(QMainWindow):
         #emitting updated authority and switch, signal, crossing states:
         self.wss_tm_authority.emit(self.authority) #sending updated authority to track model
         self.wss_ctc_occupancy.emit(self.occupancy) #sending occupancy to ctc
-        
+        #sending updated switch states to track model
         self.wss_tm_switch_77.emit(self.switch_77)
         self.wss_tm_switch_85.emit(self.switch_85)
         self.wss_tm_switch_28.emit(self.switch_28)
         self.wss_tm_switch_13.emit(self.switch_13)
-
+        #sending updated signal states to track model
         self.wss_tm_signal_77.emit(self.signal_77)
         self.wss_tm_signal_85.emit(self.signal_85)
         self.wss_tm_signal_28.emit(self.signal_28)
         self.wss_tm_signal_13.emit(self.signal_13)
-
+        #sending updated crossing states to track model
         self.wss_tm_crossing_19.emit(self.crossing_19)
         self.wss_tm_crossing_108.emit(self.crossing_108)
-
+        #update the wayside UI according to updates from the plc
         self.update_ui()
     
     #slot to receive maintenance occupancies from ctc
     @pyqtSlot(list)
-    def receive_maintenance(self, suggested_maintenance):
+    def receive_maintenance(self, suggested_maintenance:list):
         #maintenance_mode function will determine if it is safe to put a zone into maint mode
         #if so, it will implement maint mode
-        self.plc.maintenance_mode(suggested_maintenance, self.occupancy)
+        self.occupancy,safetyCheck=self.plc.maintenance_mode(suggested_maintenance, self.occupancy)
+        self.update_ui()
+        self.wss_ctc_safetyCheck.emit(safetyCheck) #emit safety confirmation to ctc
     
-    #slot to receive dispatch info from ctc
+    #slot to receive switch changes from ctc maintenance mode
+    @pyqtSlot(int)
+    def receive_maint_switch(self, suggested_switch:int):
+        safetySwitch,self.switch_77,self.switch_85,self.switch_28,self.switch_13=self.plc.ctc_update_switch(suggested_switch, self.occupancy)
+        #safetySwitch=self.plc.ctc_update_switch(suggested_switch, self.occupancy)
+        self.wss_ctc_safetySwitch.emit(safetySwitch) #emit safety confirmation to ctc
+        #update state element table according to which switch ctc wants to change in maintenance mode
+        if suggested_switch==13 and safetySwitch==True:
+            self.toggle_switch_13()
+        if suggested_switch==28 and safetySwitch==True:
+            self.toggle_switch_28()
+        if suggested_switch==77 and safetySwitch==True:
+            self.toggle_switch_77()
+        if suggested_switch==85 and safetySwitch==True:
+            self.toggle_switch_85()
+        
+
+    #slot to receive dispatch info from ctc to slow down the train
     '''@pyqtSlot(tuple)
     def send_dispatch(self, dispatch):
         #sending dispatch info signal (to track model):
         self.ws_tm_dispatch.emit(dispatch)'''
-
+    
     def toggle_switch_13(self):
         self.switch_13 = not self.switch_13
         self.wss_tm_switch_13.emit(self.switch_13)
@@ -169,17 +193,17 @@ class WaysideShell(QMainWindow):
         self.manual_cr108_button.clicked.connect(self.toggle_crossing_108)
     
     def update_ui(self):
-        #update block table state and authority from Track Model
+        #update block table state and authority from Track Model 
         '''for i in range(len(self.occupancy)):
             self.wayside_block_table.setItem(i,0, QTableWidgetItem(str(self.occupancy[i])))
 
         for i in range(len(self.authority)):
             self.wayside_block_table.setItem(i,1, QTableWidgetItem(str(self.authority[i])))'''
         #update block table state and authority from Track Model
-        for i in range(46):
+        for i in range(47):
             self.wayside_block_table.setItem(i-0,0, QTableWidgetItem(str(self.occupancy[i])))
 
-        for i in range(46):
+        for i in range(41):
             self.wayside_block_table.setItem(i-0,1, QTableWidgetItem(str(self.authority[i])))
         
         for i in range(68, 150):
