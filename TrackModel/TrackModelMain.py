@@ -287,14 +287,16 @@ class SignalHandler(QObject):
 
     @pyqtSlot(list)
     def getHardwareAuthority(self,message):
+        print(message)
         for i in range(len(lines[0].blocks)):
-            if(i<41 or i>68):
+            if(i<41 or i>76):
                 lines[0].blocks[i].authority = message[i]
 
     @pyqtSlot(list)
     def getSoftwareAuthority(self,message):
+        print(message)
         for i in range(len(lines[0].blocks)):
-            if(i>40 and i<69):
+            if(i>40 and i<77):
                 lines[0].blocks[i].authority = message[i]
 
     @pyqtSlot(bool)
@@ -511,6 +513,7 @@ class FileButton(QWidget):
 
     def selectFile(self, message):
         global fileselected
+        global lines
         filename, _ = QFileDialog.getOpenFileName(self, "Open File", "", "Excel Files (*.xlsx)")
         if filename:
             read(filename)
