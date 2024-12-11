@@ -25,6 +25,7 @@ class TrainModel(QObject):
     brake_failure = Signal(bool)    # Signal for brake failure
     speed_limits = Signal(list)     # speed limits for train controller
     station_name_updated = Signal(str)      # name of station being arrived at
+    boolean_authority_signal = Signal(list)
     
     def __init__(self, routeInfo):
         super().__init__()
@@ -228,3 +229,11 @@ class TrainModel(QObject):
     def toggleSignalFailure(self):
         self.signalFailureStatus = not self.signalFailureStatus
         self.signal_failure.emit(self.signalFailureStatus)
+
+    @Slot(list)
+    def boolean_authority(self, input: list):
+        self.boolean_authority_signal.emit(input)
+
+    @Slot()
+    def sendBlockID(self):
+        self.block_change.emit(self.blockID[self.i - 1])
