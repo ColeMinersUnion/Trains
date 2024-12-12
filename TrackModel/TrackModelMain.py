@@ -315,7 +315,6 @@ class SignalHandler(QObject): #handles signals from other modules
     @pyqtSlot(int)
     def toggleOcc(self,message): #toggle occupancy of block
         lines[0].blocks[message].switchOccupancy()
-        print("Block occupancy toggled " + str(message) + " " + str(lines[0].blocks[message].occupied))
 
     @pyqtSlot(list)
     def getHardwareAuthority(self,message): #get authorities from hardware track controller
