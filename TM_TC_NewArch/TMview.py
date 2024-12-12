@@ -45,7 +45,6 @@ class TrainModelView(QWidget):
                 padding: 0 10px;
             }
         """)
-        self.update_ebrake_ui()
 
         # Get the current script's directory
         current_directory = os.path.dirname(os.path.realpath(__file__))
