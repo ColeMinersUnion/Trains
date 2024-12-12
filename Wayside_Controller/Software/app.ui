@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1197</width>
-    <height>1081</height>
+    <width>700</width>
+    <height>1085</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -31,6 +31,40 @@
         <string>Green Line</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="1">
+         <layout class="QVBoxLayout" name="verticalLayout">
+          <item>
+           <layout class="QGridLayout" name="formLayout">
+            <item row="0" column="1">
+             <widget class="QPushButton" name="manual_plc_button">
+              <property name="font">
+               <font>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>Upload PLC</string>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>16</width>
+                <height>16</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QLineEdit" name="manual_plc_button">
+              <property name="text">
+               <string>Enter filename</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
         <item row="1" column="1">
          <layout class="QVBoxLayout" name="verticalLayout">
           <item>
@@ -238,81 +272,6 @@
              </widget>
             </item>
            </layout>
-          </item>
-         </layout>
-        </item>
-        <item row="2" column="1">
-         <layout class="QVBoxLayout" name="track_state_3">
-          <item>
-           <widget class="QLabel" name="label_21">
-            <property name="font">
-             <font>
-              <pointsize>11</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>Track Element States</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QTableWidget" name="wayside_elements_table">
-            <row>
-             <property name="text">
-              <string>Switch 13</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Switch 28</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Switch 77</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Switch 85</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Signal 13</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Signal 28</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Signal 77</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Signal 85</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Crossing 19</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Crossing 108</string>
-             </property>
-            </row>
-            <column>
-             <property name="text">
-              <string>State</string>
-             </property>
-            </column>
-           </widget>
           </item>
          </layout>
         </item>
@@ -1144,56 +1103,78 @@
           </item>
          </layout>
         </item>
-        <item row="0" column="1">
-         <layout class="QVBoxLayout" name="verticalLayout">
+        <item row="2" column="1">
+         <layout class="QVBoxLayout" name="track_state_3">
           <item>
-           <layout class="QGridLayout" name="formLayout">
-            <item row="0" column="1">
-             <widget class="QPushButton" name="manual_plc_button">
-              <property name="font">
-               <font>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>Upload PLC</string>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>16</width>
-                <height>16</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="0">
-             <widget class="QLineEdit" name="manual_plc_button">
-              <property name="text">
-               <string>Enter filename</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </item>
-        <item row="1" column="2" rowspan="2">
-         <layout class="QVBoxLayout" name="wayside_log_2">
-          <item>
-           <widget class="QLabel" name="label_13">
+           <widget class="QLabel" name="label_21">
             <property name="font">
              <font>
               <pointsize>11</pointsize>
              </font>
             </property>
             <property name="text">
-             <string>Wayside Log</string>
+             <string>Track Element States</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QTextBrowser" name="wayside_log"/>
+           <widget class="QTableWidget" name="wayside_elements_table">
+            <row>
+             <property name="text">
+              <string>Switch 13</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Switch 28</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Switch 77</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Switch 85</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Signal 13</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Signal 28</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Signal 77</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Signal 85</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Crossing 19</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Crossing 108</string>
+             </property>
+            </row>
+            <column>
+             <property name="text">
+              <string>State</string>
+             </property>
+            </column>
+           </widget>
           </item>
          </layout>
         </item>
@@ -1204,6 +1185,101 @@
         <string>Red Line</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_3">
+        <item row="0" column="1">
+         <layout class="QGridLayout" name="formLayout_4">
+          <item row="0" column="1">
+           <widget class="QPushButton" name="manual_plc_button_2">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Upload PLC</string>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>16</width>
+              <height>16</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLineEdit" name="manual_plc_button_3">
+            <property name="text">
+             <string>Enter filename</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="2" column="1">
+         <layout class="QVBoxLayout" name="track_state_4">
+          <item>
+           <widget class="QLabel" name="label_32">
+            <property name="font">
+             <font>
+              <pointsize>11</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>Track Element States</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTableWidget" name="wayside_elements_table_2">
+            <row>
+             <property name="text">
+              <string>Switch 27</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Switch 33</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Switch 38</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Switch 44</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Signal 27</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Signal 33</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Signal 38</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Signal 44</string>
+             </property>
+            </row>
+            <column>
+             <property name="text">
+              <string>State</string>
+             </property>
+            </column>
+           </widget>
+          </item>
+         </layout>
+        </item>
         <item row="1" column="0" rowspan="2">
          <layout class="QVBoxLayout" name="block_occ_4">
           <item>
@@ -1563,71 +1639,6 @@
           </item>
          </layout>
         </item>
-        <item row="2" column="1">
-         <layout class="QVBoxLayout" name="track_state_4">
-          <item>
-           <widget class="QLabel" name="label_32">
-            <property name="font">
-             <font>
-              <pointsize>11</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>Track Element States</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QTableWidget" name="wayside_elements_table_2">
-            <row>
-             <property name="text">
-              <string>Switch 27</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Switch 33</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Switch 38</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Switch 44</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Signal 27</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Signal 33</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Signal 38</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Signal 44</string>
-             </property>
-            </row>
-            <column>
-             <property name="text">
-              <string>State</string>
-             </property>
-            </column>
-           </widget>
-          </item>
-         </layout>
-        </item>
         <item row="1" column="1">
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
@@ -1800,55 +1811,6 @@
           </item>
          </layout>
         </item>
-        <item row="0" column="1">
-         <layout class="QGridLayout" name="formLayout_4">
-          <item row="0" column="1">
-           <widget class="QPushButton" name="manual_plc_button_2">
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Upload PLC</string>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>16</width>
-              <height>16</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLineEdit" name="manual_plc_button_3">
-            <property name="text">
-             <string>Enter filename</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item row="1" column="2" rowspan="2">
-         <layout class="QVBoxLayout" name="wayside_log_3">
-          <item>
-           <widget class="QLabel" name="label_31">
-            <property name="font">
-             <font>
-              <pointsize>11</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>Wayside Log</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QTextBrowser" name="wayside_log_4"/>
-          </item>
-         </layout>
-        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="Red_Line2">
@@ -1856,46 +1818,6 @@
         <string>Page</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_4">
-        <item row="3" column="1">
-         <layout class="QVBoxLayout" name="track_state_5">
-          <item>
-           <widget class="QLabel" name="label_33">
-            <property name="font">
-             <font>
-              <pointsize>11</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>Track Element States</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QTableWidget" name="wayside_elements_table_3">
-            <row>
-             <property name="text">
-              <string>Switch 52</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Signal 52</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Crossing 47</string>
-             </property>
-            </row>
-            <column>
-             <property name="text">
-              <string>State</string>
-             </property>
-            </column>
-           </widget>
-          </item>
-         </layout>
-        </item>
         <item row="1" column="1" rowspan="2">
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
@@ -1970,6 +1892,80 @@
              </widget>
             </item>
            </layout>
+          </item>
+         </layout>
+        </item>
+        <item row="0" column="1">
+         <layout class="QVBoxLayout" name="verticalLayout_5">
+          <item>
+           <layout class="QGridLayout" name="formLayout_5">
+            <item row="0" column="1">
+             <widget class="QPushButton" name="manual_plc_button_4">
+              <property name="font">
+               <font>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>Upload PLC</string>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>16</width>
+                <height>16</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QLineEdit" name="manual_plc_button_5">
+              <property name="text">
+               <string>Enter filename</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+        <item row="3" column="1">
+         <layout class="QVBoxLayout" name="track_state_5">
+          <item>
+           <widget class="QLabel" name="label_33">
+            <property name="font">
+             <font>
+              <pointsize>11</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>Track Element States</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTableWidget" name="wayside_elements_table_3">
+            <row>
+             <property name="text">
+              <string>Switch 52</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Signal 52</string>
+             </property>
+            </row>
+            <row>
+             <property name="text">
+              <string>Crossing 47</string>
+             </property>
+            </row>
+            <column>
+             <property name="text">
+              <string>State</string>
+             </property>
+            </column>
+           </widget>
           </item>
          </layout>
         </item>
@@ -2202,59 +2198,6 @@
           </item>
          </layout>
         </item>
-        <item row="0" column="1">
-         <layout class="QVBoxLayout" name="verticalLayout_5">
-          <item>
-           <layout class="QGridLayout" name="formLayout_5">
-            <item row="0" column="1">
-             <widget class="QPushButton" name="manual_plc_button_4">
-              <property name="font">
-               <font>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>Upload PLC</string>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>16</width>
-                <height>16</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="0">
-             <widget class="QLineEdit" name="manual_plc_button_5">
-              <property name="text">
-               <string>Enter filename</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </item>
-        <item row="1" column="2" rowspan="3">
-         <layout class="QVBoxLayout" name="wayside_log_5">
-          <item>
-           <widget class="QLabel" name="label_35">
-            <property name="font">
-             <font>
-              <pointsize>11</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>Wayside Log</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QTextBrowser" name="wayside_log_6"/>
-          </item>
-         </layout>
-        </item>
        </layout>
       </widget>
      </widget>
@@ -2266,7 +2209,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1197</width>
+     <width>700</width>
      <height>26</height>
     </rect>
    </property>
