@@ -307,7 +307,7 @@ class WaysideShell(QMainWindow):
             self.wayside_block_table.setItem(i-0,1, QTableWidgetItem(str(self.authority[i])))'''
         
         #update occupancy in table to have colors
-        for i in range(47):
+        for i in range(1,47):
             block=self.wayside_block_table.item(i-0, 0)
             if self.occupancy[i]:
                 block.setBackground(QtGui.QColor(0, 0, 255))
@@ -324,7 +324,7 @@ class WaysideShell(QMainWindow):
 
 
         #update authority in table with colors
-        for i in range(41):
+        for i in range(1,41):
             block = self.wayside_block_table.item(i-0, 1)
             if self.authority[i]:
                 block.setBackground(QtGui.QColor(0, 255, 0))
