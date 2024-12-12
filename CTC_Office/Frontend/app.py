@@ -195,10 +195,11 @@ class CTCApplication(QMainWindow):
     def changeMode(self, mode: int):
         self.ActiveMode = Modes[mode]
         self.Title.setText(f"{self.ActiveMode} Mode")
+        return f"{self.ActiveMode} Mode"
 
     def onBreak(self):
         self.changeMode(2)
-        txt = self.breakBlok.text()
+        txt = self.breakBlok.text() #I know it's misspelled, but it's funny and I don't want to waste time changing it
         self.mostRecentBreak = int(txt)
         if(self.Office.breakTrack("Green", int(txt))):
             self.breakBlok.setText(f'Block {int(txt)} is now broken. ')
@@ -208,6 +209,7 @@ class CTCApplication(QMainWindow):
         self.lbl10.setText(f"Block State: {array(blockState)}")
         print(array(blockState))
         self.emitMaintenance.emit(blockState)
+        return blockState
     
     @pyqtSlot(bool)
     def MaintenanceResponse(self, success: bool):
@@ -237,6 +239,7 @@ class CTCApplication(QMainWindow):
             self.fixBlock.setText("That block does not exist or was not broken, try again.")
         blockState = [x.maintenance for x in self.Office.line["Green"].graph]
         self.emitMaintenance.emit(blockState)
+        return blockState
 
     
     @pyqtSlot(list)
@@ -293,7 +296,7 @@ class CTCApplication(QMainWindow):
         print(f"Seconds: {seconds}")
         timeWaster.delayed = seconds
         self.emitTrainLater(auth)
-        return
+        return auth
     
     @timeWaster.delay()
     def emitTrainLater(self, auth):
@@ -302,7 +305,7 @@ class CTCApplication(QMainWindow):
                             ,auth)
         self.lbl10.setText(f"Latest Authority: {auth}\nRoute Info: {array([(63, 100, 70), (64, 100, 70), (65, 200, 70), (66, 200, 70), (67, 100, 40), (68, 100, 40), (69, 100, 40), (70, 100, 40), (71, 100, 40), (72, 100, 40), (73, 100, 40), (74, 100, 40), (75, 100, 40), (76, 100, 40), (77, 300, 70), (78, 300, 70), (79, 300, 70), (80, 300, 70), (81, 300, 70), (82, 300, 70), (83, 300, 70), (84, 300, 70), (85, 300, 70), (86, 100, 25), (87, 86.6, 25), (88, 100, 25), (89, 75, 25), (90, 75, 25), (91, 75, 25), (92, 75, 25), (93, 75, 25), (94, 75, 25), (95, 75, 25), (96, 75, 25), (97, 75, 25), (98, 75, 25), (99, 75, 25), (100, 75, 25), (85, 300, 70), (84, 300, 70), (83, 300, 70), (82, 300, 70), (81, 300, 70), (80, 300, 70), (79, 300, 70), (78, 300, 70), (77, 300, 70), (101, 35, 26), (102, 100, 28), (103, 100, 28), (104, 80, 28), (105, 100, 28), (106, 100, 28), (107, 90, 28), (108, 100, 28), (109, 100, 28), (110, 100, 30), (111, 100, 30), (112, 100, 30), (113, 100, 30), (114, 162, 30), (115, 100, 30), (116, 100, 30), (117, 50, 15), (118, 50, 15), (119, 50, 15), (120, 50, 15), (121, 50, 15), (122, 50, 20), (123, 50, 20), (124, 50, 20), (125, 50, 20), (126, 50, 20), (127, 50, 20), (128, 50, 20), (129, 50, 20), (130, 50, 20), (131, 50, 20), (132, 50, 20), (133, 50, 20), (134, 50, 20), (135, 50, 20), (136, 50, 20), (137, 50, 20), (138, 50, 20), (139, 50, 20), (140, 50, 20), (141, 50, 20), (142, 50, 20), (143, 50, 20), (144, 50, 20), (145, 50, 20), (146, 50, 20), (147, 50, 20), (148, 184, 20), (149, 40, 20), (150, 35, 20), (28, 50, 30), (27, 50, 30), (26, 100, 70), (25, 200, 70), (24, 300, 70), (23, 300, 70), (22, 300, 70), (21, 300, 70), (20, 150, 60), (19, 150, 60), (18, 150, 60), (17, 150, 60), (16, 150, 70), (15, 150, 70), (14, 150, 70), (13, 150, 45), (12, 100, 45), (11, 100, 45), (10, 100, 45), (9, 100, 45), (8, 100, 45), (7, 100, 45), (6, 100, 45), (5, 100, 45), (4, 100, 45), (3, 100, 45), (2, 100, 45), (1, 100, 45), (13, 150, 45), (14, 150, 70), (15, 150, 70), (16, 150, 70), (17, 150, 60), (18, 150, 60), (19, 150, 60), (20, 150, 60), (21, 300, 70), (22, 300, 70), (23, 300, 70), (24, 300, 70), (25, 200, 70), (26, 100, 70), (27, 50, 30), (28, 50, 30), (29, 50, 30), (30, 50, 30), (31, 50, 30), (32, 50, 30), (33, 50, 30), (34, 50, 30), (35, 50, 30), (36, 50, 30), (37, 50, 30), (38, 50, 30), (39, 50, 30), (40, 50, 30), (41, 50, 30), (42, 50, 30), (43, 50, 30), (44, 50, 30), (45, 50, 30), (46, 50, 30), (47, 50, 30), (48, 50, 30), (49, 50, 30), (50, 50, 30), (51, 50, 30), (52, 50, 30), (53, 50, 30), (54, 50, 30), (55, 50, 30), (56, 50, 30), (57, 50, 30)])}")
         self.switchState.setText(f"Switching to {0}") #Trains always go back to the yard
-        return
+        return auth
 
 
     @pyqtSlot(int)
@@ -324,6 +327,7 @@ class CTCApplication(QMainWindow):
         self.lbl10.setText(f"Block States: {array(blockState)}")
         self.emitMaintenance.emit(blockState)
         self.emitMaintenanceSwitch.emit(switches[0])
+        return blockState, switches[0]
         
 
     @pyqtSlot(str)
@@ -336,9 +340,10 @@ class CTCApplication(QMainWindow):
                 trainDict[int(l[0])] = [int(l[1]), int(l[2]), int(l[3])]
                 print(trainDict)
         
-        self.delayedTrainStart(trainDict)
+        auth = self.delayedTrainStart(trainDict)
         self.fileWindow.update(f"File Read Successfully\nFile Contents: {trainDict}")
         self.changeMode(1)
+        return trainDict, auth
                 
     def throughputMetrics(self):
         numTrains = len(self.Office.Schedule["Green"].trains)
@@ -347,7 +352,7 @@ class CTCApplication(QMainWindow):
             numStations += len(train.schedule.routes)
         maint = sum([x.maintenance for x in self.Office.line["Green"].graph])
         closed = sum([x.closed for x in self.Office.line["Green"].graph])
-        self.throughput.setText(f"Trains: {numTrains}\nStations Serviced: {numStations-1}\nBlocks in Maintenance: {maint}\nBlocks Closed: {closed}")
-
+        self.throughput.setText(f"Trains: {numTrains}\nStations Serviced: {numStations}\nBlocks in Maintenance: {maint}\nBlocks Closed: {closed}")
+        return numTrains, numStations, maint, closed
 
 
