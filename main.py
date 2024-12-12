@@ -50,7 +50,7 @@ def trainFactory(routeInfo: list, authority: str):
         # sends list as station block number and passengers unboarding
         trains[-1].train_model.unboarding_list_signal.connect(tm_signals.getPassengers)
         # sends request for beacon data as block number
-        trains[-1].train_model.current_block_ID.connect(tm_signals.getBeacon)
+        #trains[-1].train_model.current_block_ID.connect(tm_signals.getBeacon)
         # sends beacon data as list with block number and beacon data
         tm_signals.sendBeacon.connect(trains[-1].train_model.beaconInformation)
     except TypeError:
