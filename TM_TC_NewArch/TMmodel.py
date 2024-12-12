@@ -209,10 +209,11 @@ class TrainModel(QObject):
             self.i += 1
 
     #incomplete, but exists for future use
-    @Slot(str)
-    def beaconIntake(self, beacon: str):
-        self.stationName = beacon
-        self.station_name_updated.emit(self.stationName)
+    @Slot(list)
+    def beaconIntake(self, message):
+        if(self.blockID[self.i]==message[0]):
+            self.stationName = message[1]
+            self.station_name_updated.emit(self.stationName)
         
     """ Failure (Murphy) toggles are the next three slot functions here """
     @Slot()

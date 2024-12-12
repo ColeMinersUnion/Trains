@@ -42,11 +42,11 @@ def trainFactory(routeInfo: list, authority: str):
         # sends authorities as list of booleans
         tm_signals.sendAuthorities.connect(trains[-1].train_model.boolean_authority)
         # sends list as station block number and passengers boarding
-        #tm_signals.sendPassengers.connect(trains[-1].)
+        #tm_signals.sendPassengers.connect(trains[-1].FUNCTION)
         # sends list as station block number and passengers unboarding
-        #trains[-1].train_model.###.connect(tm_signals.getPassengers)
+        #trains[-1].train_model.PYQTSIGNAL.connect(tm_signals.getPassengers)
         # sends request for beacon data as block number
-        trains[-1].train_model.sendBlockID.connect(tm_signals.getBeacon)
+        #trains[-1].train_model.PYQTSIGNAL.connect(tm_signals.getBeacon)
         # sends beacon data as list with block number and beacon data
         tm_signals.sendBeacon.connect(trains[-1].train_model.beaconIntake)
     except TypeError:
@@ -63,12 +63,21 @@ tm_signals.sendOccupancies.connect(wss_window.update_occupancy)
 tm_signals.sendOccupancies.connect(wsh_window.update_occupancy)
 #wayside messages to track model
 wss_window.wss_tm_authority.connect(tm_signals.getSoftwareAuthority) #software authority (0 to 40, 77 to 151) as list of booleans
+
 wss_window.wss_tm_switch_13.connect(tm_signals.getSwitch13) #switch 13
 wss_window.wss_tm_switch_28.connect(tm_signals.getSwitch28) #switch 28
 wss_window.wss_tm_switch_77.connect(tm_signals.getSwitch77) #switch 77
 wss_window.wss_tm_switch_85.connect(tm_signals.getSwitch85) #switch 85
 wsh_window.wsh_tm_switch_58.connect(tm_signals.getSwitch58) #switch 58
 wsh_window.wsh_tm_switch_62.connect(tm_signals.getSwitch62) #switch 62
+
+wss_window.wss_tm_signal_13.connect(tm_signals.getSignal13) #signal 13
+wss_window.wss_tm_signal_28.connect(tm_signals.getSignal28) #signal 28
+wss_window.wss_tm_signal_77.connect(tm_signals.getSignal77) #signal 77
+wss_window.wss_tm_signal_85.connect(tm_signals.getSignal85) #signal 85
+wsh_window.wsh_tm_sig58.connect(tm_signals.getSignal58) #signal 58
+wsh_window.wsh_tm_sig62.connect(tm_signals.getSignal62) #signal 62
+
 wsh_window.wsh_tm_authority.connect(tm_signals.getHardwareAuthority) #hardware authority (41 to 76) as list of booleans
 
 #connects CTC to train command
