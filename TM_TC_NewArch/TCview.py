@@ -26,7 +26,7 @@ class TCView(QWidget):
         self.temp = 0
         self.lights = False
         self.headlights = False
-        self.speed_limit = 50
+        self.speed_limit = 0
 
         self.setStyleSheet("""
         QWidget {
@@ -61,15 +61,17 @@ class TCView(QWidget):
         #setpoint speed controls
         setpoint_layout = QVBoxLayout()
         self.setpoint_label = QLabel("Setpoint Speed: 50")
+        self.sl_label = QLabel(f"Speed Limit: 70 mph")
         try:
             self.setpoint_slider = QSlider(Qt.Horizontal)
         except:
             self.setpoint_slider = QSlider(Qt.Orientation.Horizontal)
-        self.setpoint_slider.setRange(0, 100)
-        self.setpoint_slider.setValue(50)
+        self.setpoint_slider.setRange(0, 50)
+        self.setpoint_slider.setValue(10)
         self.setpoint_slider.valueChanged.connect(self.emit_setpoint_command)
-        self.setpoint_slider.setToolTip("Adjust the target speed (0-100)")
-        
+        self.setpoint_slider.setToolTip("Adjust the target speed (0-50)")
+
+        setpoint_layout.addWidget(self.sl_label)
         setpoint_layout.addWidget(self.setpoint_label)
         setpoint_layout.addWidget(self.setpoint_slider)
         setpoint_group = QGroupBox("Setpoint Controls")
@@ -311,11 +313,12 @@ class TCView(QWidget):
     def emit_setpoint_command(self, value):
         """ Emit power command when the slider value changes. """
         if (value > self.speed_limit):
-            value = self.speed_limit
+            value = int(self.speed_limit)
             self.setpoint_label.setText(f"Setpoint Speed: MAX ({self.speed_limit})")
             self.setpoint_slider.setValue(value)
-        self.setpoint_label.setText(f"Setpoint Speed: {value}")
-        self.setpoint_command_signal.emit(value)
+        self.setpoint_label.setText(f"Setpoint Speed: {value} mph")
+        speed_in_mps = value/2.237 #convert to m/s
+        self.setpoint_command_signal.emit(speed_in_mps)
 
     def tick(self):
         """ Emit a PID tick signal. """
@@ -354,7 +357,8 @@ class TCView(QWidget):
 
     @Slot (float)
     def current_speed_updated(self, c):
-        self.current_speed_label.setText(f"Current Speed: {c:.2f} m/s")
+        mph_speed = c*2.23694
+        self.current_speed_label.setText(f"Current Speed: {mph_speed:.2f} mph")
     @Slot (float)
     def pwr_updated(self, p):
         self.pwr_label.setText(f"Power: {p:.2f}W")
@@ -380,5 +384,5 @@ class TCView(QWidget):
 
     @Slot (float)
     def curr_speed_limit(self, sl):
-        #self.speed_limit_label.setText(f"Speed Limit: {sl} m/s")
-        self.curr_speed_limit = sl
+        self.speed_limit = sl #now in mph
+        self.sl_label.setText(f"Speed Limit: {self.speed_limit} mph")
