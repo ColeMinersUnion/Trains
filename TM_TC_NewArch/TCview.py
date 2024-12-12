@@ -55,6 +55,7 @@ class TCView(QWidget):
         }
         """)
         self.init_ui()
+        self.update_ebrake_ui()
 
     def init_ui(self):
 
@@ -136,7 +137,7 @@ class TCView(QWidget):
         # Status Section
         status_layout = QVBoxLayout()
         self.a_label = QLabel("Acceleration: 0.00 m/s²")
-        self.current_speed_label = QLabel("Current Speed: 0.00 m/s")
+        self.current_speed_label = QLabel("Current Speed: 0.00 mph")
         self.pwr_label = QLabel("Power: 0.00 W")
         self.auth_label = QLabel("Authority: 0")
         self.gonogo_label = QLabel("Wayside Stop: ")
@@ -317,9 +318,9 @@ class TCView(QWidget):
         """ Emit power command when the slider value changes. """
         if (value > self.speed_limit):
             value = int(self.speed_limit)
-            self.setpoint_label.setText(f"Setpoint Speed: MAX ({self.speed_limit})")
+            self.setpoint_label.setText(f"Setpoint Speed: MAX ({self.speed_limit:.2f})")
             self.setpoint_slider.setValue(value)
-        self.setpoint_label.setText(f"Setpoint Speed: {value} mph")
+        self.setpoint_label.setText(f"Setpoint Speed: {value:.2f} mph")
         speed_in_mps = value/2.237 #convert to m/s
         self.setpoint_command_signal.emit(speed_in_mps)
 
@@ -347,8 +348,12 @@ class TCView(QWidget):
         self.manual_temperature.emit(self.temp)
         
     def update_ebrake_ui(self):
-        self.ebrake_button.setText("Emergency Brake: ON" if self.ebrake else "Emergency Brake: OFF")
-
+        if self.ebrake:
+            self.ebrake_button.setText("Emergency Brake: ON")
+            self.ebrake_button.setStyleSheet("background-color: red; color: white;")
+        else:
+            self.ebrake_button.setText("Emergency Brake: OFF")
+            self.ebrake_button.setStyleSheet("background-color: lightcoral; color: black;")
     @Slot(bool)
     def ebrake_changed(self, e):
         self.ebrake = e
@@ -388,4 +393,4 @@ class TCView(QWidget):
     @Slot (float)
     def curr_speed_limit(self, sl):
         self.speed_limit = sl #now in mph
-        self.sl_label.setText(f"Speed Limit: {self.speed_limit} mph")
+        self.sl_label.setText(f"Speed Limit: {self.speed_limit:.2f} mph")
