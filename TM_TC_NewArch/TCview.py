@@ -95,9 +95,6 @@ class TCView(QWidget):
         sbrake_group = QGroupBox("Service Controls")
         sbrake_group.setLayout(sbrake_layout)
 
-
-        self.auth_label = QLabel("Authority: 0")
-
         # PID Controls Section
         pid_layout = QFormLayout()
         self.kp_input = QLineEdit()
@@ -142,10 +139,12 @@ class TCView(QWidget):
         self.current_speed_label = QLabel("Current Speed: 0.00 m/s")
         self.pwr_label = QLabel("Power: 0.00 W")
         self.auth_label = QLabel("Authority: 0")
+        self.gonogo_label = QLabel("Wayside Stop: ")
         status_layout.addWidget(self.a_label)
         status_layout.addWidget(self.current_speed_label)
         status_layout.addWidget(self.pwr_label)
         status_layout.addWidget(self.auth_label)
+        status_layout.addWidget(self.gonogo_label)
         status_group = QGroupBox("Status Information")
         status_group.setLayout(status_layout)
 
@@ -266,6 +265,10 @@ class TCView(QWidget):
         self.manual_lights.emit()
         #change label
         #
+    @Slot (bool)
+    def gonogo_update(self, value):
+        self.gonogo_label.setText(f"Wayside Value: {'STOP' if value else 'GO'}")
+
     @Slot ()
     def update_lights_label(self):
         self.lights = not self.lights
