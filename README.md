@@ -9,9 +9,13 @@ Then Download the repository.
 Right click on the downloaded folder and hit "Open in terminal."
 
 ### Run the program
-Enter the following command into your terminal. 
+Enter the following commands into your terminal. 
 ```bash
-./Train_Controller_Simulation.sh
+python3 -m venv env
+env/Scripts/Activate
+python3 -m pip install --upgrade pip
+python3 -m pip install -r requirements.txt
+python3 main.py
 ```
 ### Hardware
 Plug in the wayside hardware via ethernet. Press connect on the Hardware Wasyside Controller. 
