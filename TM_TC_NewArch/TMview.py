@@ -4,7 +4,9 @@ from PyQt6.QtWidgets import (QWidget, QLabel, QVBoxLayout, QPushButton, QSlider,
                              QDoubleSpinBox, QCheckBox, QRadioButton, QHBoxLayout)
 from PyQt6.QtCore import pyqtSignal as Signal
 from PyQt6.QtCore import pyqtSlot as Slot
-from PyQt6.QtGui import QFont, QColor, QPalette
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QFont, QColor, QPalette, QPixmap
+import os
 
 class TrainModelView(QWidget):
     eBrake_toggle = Signal()
@@ -12,7 +14,7 @@ class TrainModelView(QWidget):
     bFailure_toggle = Signal()
     sFailure_toggle = Signal()
 
-    def __init__(self):
+    def __init__(self, ad_file_path: str = None):
         super().__init__()
 
         # Set global styling
@@ -44,6 +46,13 @@ class TrainModelView(QWidget):
             }
         """)
 
+        # Get the current script's directory
+        current_directory = os.path.dirname(os.path.realpath(__file__))
+
+        # Define the relative path to the 'images' folder
+        ad_file_path = os.path.join(current_directory, 'images', 'dunkin_ad.jpg')
+        self.ad_file_path = ad_file_path
+
         # Create labels with improved fonts
         self.v_label = QLabel("Train Velocity: 0.0 mph")
         self.a_label = QLabel("Train Acceleration: 0.0 m/s^2")
@@ -74,10 +83,13 @@ class TrainModelView(QWidget):
         self.brakeFailureButton.clicked.connect(self.update_brake_failure_status)
 
         # Main layout
-        main_layout = QVBoxLayout(self)
+        main_layout = QHBoxLayout(self)
+
+        sections_layout = QVBoxLayout()
 
         # Section 1: Metrics View
         metrics_group = QGroupBox("Train Metrics")
+        metrics_group.setMinimumWidth(400)
         metrics_layout = QVBoxLayout()
         metrics_labels = [self.v_label, self.a_label, self.length_label, self.width_label,
                           self.height_label, self.passengers_label, self.trainMass_label,
@@ -89,6 +101,7 @@ class TrainModelView(QWidget):
 
         # Section 2: Passenger View
         passenger_group = QGroupBox("Passenger Controls")
+        passenger_group.setMinimumWidth(400)
         passenger_layout = QVBoxLayout()
         passenger_layout.addWidget(self.station_label)
         passenger_layout.addWidget(self.emergencyBrakeButton)
@@ -96,16 +109,35 @@ class TrainModelView(QWidget):
 
         # Section 3: Murphy's View
         murphy_group = QGroupBox("System Failures")
+        murphy_group.setMinimumWidth(400)
         murphy_layout = QVBoxLayout()
         murphy_layout.addWidget(self.engineFailureButton)
         murphy_layout.addWidget(self.signalFailureButton)
         murphy_layout.addWidget(self.brakeFailureButton)
         murphy_group.setLayout(murphy_layout)
 
+        ad_group = QGroupBox("Advertisement")
+        ad_layout = QVBoxLayout()
+
+        self.ad_label = QLabel()
+        self.ad_label.setAlignment(Qt.AlignmentFlag.AlignCenter)  # Center align the ad content
+        ad_layout.addWidget(self.ad_label)
+        ad_group.setLayout(ad_layout)
+
+        # Check and load the advertisement if the path is provided
+        if self.ad_file_path:
+            self.update_advertisement(self.ad_file_path)
+
         # Add sections to the main layout
-        main_layout.addWidget(metrics_group)
-        main_layout.addWidget(passenger_group)
-        main_layout.addWidget(murphy_group)
+        sections_layout.addWidget(metrics_group)
+        sections_layout.addWidget(passenger_group)
+        sections_layout.addWidget(murphy_group)
+
+        # Add the sections layout to the left of the main layout
+        main_layout.addLayout(sections_layout)
+
+        # Add the ad section to the right of the main layout
+        main_layout.addWidget(ad_group)
 
         # Set the layout and window title
         self.setLayout(main_layout)
@@ -211,3 +243,13 @@ class TrainModelView(QWidget):
         """ Update button text """
         self.brakeFailureButton.setText("Brake Failure: ON" if input else "Brake Failure: OFF")
         self.set_button_style(self.brakeFailureButton, input)
+
+    def update_advertisement(self, ad_file_path: str):
+        """Load and display advertisement from a file path."""
+        self.ad_file_path = ad_file_path
+        pixmap = QPixmap(ad_file_path)
+        if not pixmap.isNull():
+            self.ad_label.setPixmap(pixmap.scaled(600, 400, aspectRatioMode=Qt.AspectRatioMode.KeepAspectRatio))
+        else:
+            self.ad_label.setText("Advertisement content not found!")
+            self.ad_label.setStyleSheet("font-size: 14px; color: black;")

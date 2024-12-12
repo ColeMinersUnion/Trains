@@ -25,6 +25,7 @@ class TCmodel(QObject):
     speed_limit = Signal(float)
     train_at_yard = Signal()
     gonogo_display = Signal(bool)
+    station_name_display = Signal()
 
 
     def __init__(self):
@@ -296,6 +297,7 @@ class TCmodel(QObject):
         #at a station
         #print(f"station value: {self.atStation}")
         if (self.atStation == 1):
+            self.station_name_display.emit()
             if (self.currentSpeed > 0):
                 self.pwr = 0
                 self.sbrake_ask(True)

@@ -86,16 +86,11 @@ class WaysideShell(QMainWindow):
         for i in range(69,151):
             self.wayside_block_table.setItem(i-0,1, QTableWidgetItem(""))
         
-
-
         self.wayside_block_table.setSelectionMode(QTableWidget.SelectionMode.NoSelection) 
         #lets user toggle buttons manually
         self.manual_inputs()
-
-
-        '''self.timer = QtCore.QTimer()
-        self.timer.timeout.connect(self.update_ui) 
-        self.timer.start(15)''' 
+        self.update_occupancy(self.occupancy)
+        
 
     
     #slot to update occupancy which then updates the plc authority, switches, signals, and crossings
@@ -108,6 +103,7 @@ class WaysideShell(QMainWindow):
         self.occupancy[1:41]=new_occupancy[1:41]
         self.occupancy[69:151]=new_occupancy[69:151]
         #self.authority,self.switch_77,self.switch_85,self.switch_28,self.switch_13 = self.plc.update_values(new_occupancy) 
+        
         self.authority,self.switch_77,self.switch_85,self.switch_28,self.switch_13,self.signal_77, self.signal_85, self.signal_28, self.signal_13, self.crossing_19, self.crossing_108 = self.plc.update_values(new_occupancy)
         #emitting updated authority and switch, signal, crossing states:
         self.wss_tm_authority.emit(self.authority) #sending updated authority to track model
@@ -319,9 +315,6 @@ class WaysideShell(QMainWindow):
                 block.setBackground(QtGui.QColor(0, 0, 255))
             else:
                 block.setBackground(QtGui.QColor(16, 16, 16))
-
-        
-
 
         #update authority in table with colors
         for i in range(1,41):

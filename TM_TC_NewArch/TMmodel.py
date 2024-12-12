@@ -63,6 +63,7 @@ class TrainModel(QObject):
         self.currentBeaconInfo = "null"
         self.calcTotalMass()
         self.stationName = "N/A"
+        self.beaconData = []
 
 
     """ velocity calculation """
@@ -190,7 +191,7 @@ class TrainModel(QObject):
         self.speedLimit = groupedRouteInfo[2]
 
         #send speed limits to train controller here
-        self.speed_limits.emit(self.speedLimit)
+        self.speed_limits.emit(list(self.speedLimit))
 
     """ built in odometer, uses the distance travelled to calculate if the block changes """
     def odometer(self):
@@ -208,17 +209,16 @@ class TrainModel(QObject):
             #print("Moving onto " + str(self.blockID[self.i]))
             self.i += 1
 
-    @Slot(int)
-    def requestBeaconInformation(self):
-        self.current_block_ID.emit(self.blockID[self.i - 1])
+    @Slot()
+    def updateStationName(self):
+        self.stationName = self.beaconData[1]
+        self.station_name_updated.emit(self.stationName)
 
     @Slot(list)
     def beaconInformation(self, beacon: list):
         if(not self.signalFailureStatus):
             if(self.blockID[self.i - 1] == beacon[0]):
-                self.stationName = beacon[1]
-                self.station_name_updated.emit(self.stationName)
-                self.TC_beacon_info_signal.emit(beacon)
+                self.beaconData = beacon
         
     """ Failure (Murphy) toggles are the next three slot functions here """
     @Slot()
