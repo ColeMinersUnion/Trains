@@ -55,56 +55,30 @@ class PLC:
         for i in range(47, 58):
             if maint_prop[i] == False and self.maintenance[i] == True:
                 self.maintenance[i] = False
-            elif maint_prop[i] == True and self.maintenance[i] == False:
 
-                maint_safety = True
-                for j in range(41, 58):
-                    if self.occupancy[j] == True and self.maintenance[j] == False:
-                        maint_safety = False
-                        break
-                if maint_safety == True:
-                    self.maintenance[i] = True
-        
-        for i in range(58, 62):
+            elif maint_prop[i] == True and self.maintenance[i] == False and not any(self.occupancy[41:77]):
+                self.maintenance[i] = True
+
+        for i in range(58, 63):
             if maint_prop[i] == False and self.maintenance[i] == True:
                 self.maintenance[i] = False
-            elif maint_prop[i] == True and self.maintenance[i] == False:
 
-                maint_safety = True
-                for j in range(47, 63):
-                    if self.occupancy[j] == True and self.maintenance[j] == False:
-                        maint_safety = False
-                        break
-                if maint_safety == True:
-                    self.maintenance[i] = True
+            elif maint_prop[i] == True and self.maintenance[i] == False and not any(self.occupancy[47, 58]):
+                self.maintenance[i] = True
 
         for i in range(63, 69):
             if maint_prop[i] == False and self.maintenance[i] == True:
                 self.maintenance[i] = False
-            elif maint_prop[i] == True and self.maintenance[i] == False:
 
-                maint_safety = True
-                for j in range(58, 69):
-                    if self.occupancy[j] == True and self.maintenance[j] == False:
-                        maint_safety = False
-                        break
-                if maint_safety == True:
-                    self.maintenance[i] = True
+            elif maint_prop[i] == True and self.maintenance[i] == False and not any(self.occupancy[58, 63]):
+                self.maintenance[i] = True
 
         for i in range(69, 77):
             if maint_prop[i] == False and self.maintenance[i] == True:
                 self.maintenance[i] = False
-                self.occupancy[i] = False
-            elif maint_prop[i] == True and self.maintenance[i] == False:
 
-                maint_safety = True
-                for j in range(63, 77):
-                    if self.occupancy[j] == True and self.maintenance[j] == False:
-                        maint_safety = False
-                        break
-                if maint_safety == True:
-                    self.maintenance[i] = True
-
+            elif maint_prop[i] == True and self.maintenance[i] == False and not any(self.occupancy[63, 69]):
+                self.maintenance[i] = True
         
         
 

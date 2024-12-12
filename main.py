@@ -23,13 +23,15 @@ wss_window.wss_ctc_safetyCheck.connect(ctc.MaintenanceResponse)
 wss_window.wss_ctc_safetySwitch.connect(ctc.MaintenanceSwitchResponse)
 
 #!Commented out by Cole. Can't break track while WSH is not connected to hardware
-#ctc.emitMaintenance.connect(wsh_window.update_maintenance)
-#wsh_window.wsh_ctc_safetyCheck.connect(ctc.MaintenanceResponse)
-#ctc.emitMaintenanceSwitch.connect(wsh_window.update_maint_switch)
+ctc.emitMaintenance.connect(wsh_window.update_maintenance)
+wsh_window.wsh_ctc_safetyCheck.connect(ctc.MaintenanceResponse)
+ctc.emitMaintenanceSwitch.connect(wsh_window.update_maint_switch)
 #Emit Connect Slot
 wss_window.wss_ctc_occupancy.connect(ctc.updateOccupancy) #wayside software send occupancies to CTC
 wsh_window.wsh_ctc_occupancy.connect(ctc.updateOccupancy) #wayside hardware send occupancies to CTC
 #wsh_window.ws_ctc_switch_result.connect(ctc.handleGreenOutputSwitch)
+
+
 
 
 
@@ -89,6 +91,7 @@ wss_window.wss_tm_signal_77.connect(tm_signals.getSignal77) #signal 77
 wss_window.wss_tm_signal_85.connect(tm_signals.getSignal85) #signal 85
 wsh_window.wsh_tm_sig58.connect(tm_signals.getSignal58) #signal 58
 wsh_window.wsh_tm_sig62.connect(tm_signals.getSignal62) #signal 62
+wsh_window.wsh_tm_maint.connect(tm_signals.toggleOcc) 
 
 wsh_window.wsh_tm_authority.connect(tm_signals.getHardwareAuthority) #hardware authority (41 to 76) as list of booleans
 

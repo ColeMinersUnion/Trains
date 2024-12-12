@@ -10,7 +10,7 @@ from time import time
 
 class WaysideWindow(QMainWindow):
     wsh_tm_authority = pyqtSignal(list)
-    ws_ctc_switch_result = pyqtSignal(dict)
+    ws_ctc_switch_result = pyqtSignal(bool)
     wsh_tm_switch_58 = pyqtSignal(bool)
     wsh_tm_switch_62 = pyqtSignal(bool)
     wsh_tm_sig58 = pyqtSignal(bool)
@@ -18,6 +18,7 @@ class WaysideWindow(QMainWindow):
     ws_tm_maintenance = pyqtSignal(list)
     wsh_ctc_occupancy = pyqtSignal(list)
     wsh_ctc_safetyCheck = pyqtSignal(bool)
+    wsh_tm_maint = pyqtSignal(int)
 
     #view
     def __init__(self):
@@ -177,10 +178,12 @@ class WaysideWindow(QMainWindow):
 
     @pyqtSlot(int)
     def update_maint_switch(self, switch):
+        
         if switch == 58:
             input = "ctc_sw58"
         elif switch == 62:
             input = "ctc_sw62"
+
         
         data = {
             "input" : input
@@ -191,9 +194,11 @@ class WaysideWindow(QMainWindow):
         self.switch_62 = decoded_json["sw62"]
         self.signal_58 = decoded_json["sig58"]
         self.signal_62 = decoded_json["sig62"]
-        self.ws_ctc_switch_result.emit({"result": True, "switch_58": self.switch_58, "switch_62": self.switch_62, "signal_58": self.signal_58, "signal_62": self.signal_62})
+        result = decoded_json["result"]
         self.wsh_tm_switch_58.emit(self.switch_58)
+        self.wsh_tm_switch_62.emit(self.switch_62)
         self.wsh_tm_authority.emit(self.authority)
+        self.wsh_ctc_safetyCheck.emit(result)
         self.update_ui()
 
     @pyqtSlot(list)
@@ -297,7 +302,11 @@ class WaysideWindow(QMainWindow):
         self.maintenance = decoded_json["maint"]
         self.ws_tm_maintenance.emit(self.maintenance)
         self.wsh_ctc_safetyCheck.emit(maint_prop == self.maintenance)
+        print("Maintenance64: ", self.maintenance[64])
         self.wsh_ctc_occupancy.emit(self.occupancy)
+        for i in range(41, 77):
+            if self.maintenance[i]:
+                self.wsh_tm_maint.emit(i)
         self.update_ui()
 
 
