@@ -143,7 +143,7 @@ class Signal:
     def __init__(self,linenum,block):
         self.linenum = linenum #index in lines of Line object it belongs to
         self.block = block
-        self.on = False
+        self.on = True
         self.signalid = signalid[linenum] #gives id in line
         signalid[linenum] = signalid[linenum]+1 #gets next id
         self.msg = "Signal (" + linenames[linenum] + " Line, Block " + str(block) + ")\nGo: "
