@@ -753,6 +753,7 @@ class SignalIcon(QWidget):
             self.label.setPixmap(self.pixmap)
             self.label.setToolTip(obj.toString())
             self.label.show()
+
 class TransponderIcon(QWidget):
     def __init__(self,obj,window):
         super().__init__()
@@ -823,17 +824,24 @@ class Map(QWidget): #displays map
         self.tenBaud.start(1) #set clock speed of timer
 
         self.renderGraphics(["TrackModel/Red Line.xlsx","TrackModel/Green Line.xlsx"]) #read red and green lines
+        self.renderGraphics(["TrackModel/Red Line.xlsx","TrackModel/Green Line.xlsx"]) #read red and green lines
+        print("done")
 
     def renderGraphics(self,filenames):
         print("signal received")
         global lines, active
-        active.clear() #remove active components
         oldstuff = self.children()[9:] #all these widgets are made with the file select
         for o in oldstuff:
+            o.setParent(None)
             o.deleteLater()
+        active.clear() #remove active components
 
         readFiles(filenames)
         for line in lines: #adds components tied to every line object
+            for transponder in line.transponders: #adds all beacons
+                active.append(TransponderIcon(transponder,self))  
+            for station in line.stations: #adds all stations
+                active.append(StationIcon(station,self))
             for block in line.blocks: #adds all blocks
                 active.append(BlockIcon(block,self)) #updates for view
             for switch in line.switches: #biggest components to smallest so all can be hovered
@@ -842,13 +850,7 @@ class Map(QWidget): #displays map
                 active.append(CrossingIcon(crossing,self))
             for signal in line.signals: #adds all signals
                 active.append(SignalIcon(signal,self))
-            print("these arent shown???")
-            for transponder in line.transponders: #adds all beacons
-                active.append(TransponderIcon(transponder,self))  
-            for station in line.stations: #adds all stations
-                active.append(StationIcon(station,self))
         print("graphics rendered")
-        print(len(active))
         self.update()
         self.show()
 
