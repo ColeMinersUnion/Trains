@@ -13,5 +13,5 @@ class OccupancyWidget(QWidget):
     def display(self):
         self.widget.clear()
         for t in self.trains:
-            self.widget.addItems([f'Block: {t[0]}\t {t[1]}'])
+            self.widget.addItems([f'Train: {t[0]}\t {t[1]}'])
             print(f'Block: {t[0]}\Reason for Occupancy: {t[1]}')

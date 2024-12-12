@@ -26,6 +26,9 @@ class TrainModel(QObject):
     speed_limits = Signal(list)     # speed limits for train controller
     station_name_updated = Signal(str)      # name of station being arrived at
     boolean_authority_signal = Signal(list)
+    unboarding_list_signal = Signal(list)
+    TC_beacon_info_signal = Signal(list)
+    current_block_ID = Signal(int)
     
     def __init__(self, routeInfo):
         super().__init__()
@@ -122,13 +125,6 @@ class TrainModel(QObject):
         self.velocity_updated.emit(self.vn)
         self.acceleration_updated.emit(self.an)
 
-    """ Update for passengers of train """
-    @Slot()
-    def updatePassengerCount(self):
-        self.passengerCount += 8
-        self.passengerCount_updated.emit(self.passengerCount)
-        self.calcTotalMass()
-
     """ Update current mass of train """
     def calcTotalMass(self):
         self.totalMass = self.trainMass + (self.passengerCount * self.avgHumanMass)
@@ -162,12 +158,16 @@ class TrainModel(QObject):
             self.leftDoorStatus = not self.leftDoorStatus
             self.left_door_updated.emit(self.leftDoorStatus)
 
+        self.checkDoorsOpen()
+
     """ For toggling the right doors (True = Open) """
     @Slot()
     def toggleRightDoors(self):
         if(not self.signalFailureStatus):
             self.rightDoorStatus = not self.rightDoorStatus
             self.right_door_updated.emit(self.rightDoorStatus)
+
+        self.checkDoorsOpen()
 
     """ For toggling the service brake (True = On)"""
     @Slot()
@@ -208,12 +208,18 @@ class TrainModel(QObject):
             print("Moving onto " + str(self.blockID[self.i]))
             self.i += 1
 
+    @Slot(int)
+    def requestBeaconInformation(self):
+        self.current_block_ID.emit(self.blockID[self.i - 1])
+
     #incomplete, but exists for future use
     @Slot(list)
-    def beaconIntake(self, message):
-        if(self.blockID[self.i]==message[0]):
-            self.stationName = message[1]
-            self.station_name_updated.emit(self.stationName)
+    def beaconInformation(self, beacon: list):
+        if(not self.signalFailureStatus):
+            if(self.blockID[self.i - 1] == beacon[0]):
+                # logic will go here once the format is known
+                self.station_name_updated.emit(self.stationName)
+                self.TC_beacon_info_signal.emit(beacon)
         
     """ Failure (Murphy) toggles are the next three slot functions here """
     @Slot()
@@ -235,6 +241,24 @@ class TrainModel(QObject):
     def boolean_authority(self, input: list):
         self.boolean_authority_signal.emit(input)
 
-    @Slot()
-    def sendBlockID(self):
-        self.block_change.emit(self.blockID[self.i - 1])
+    @Slot(list)
+    def checkDoorsOpen(self):
+        if(self.rightDoorStatus):
+            passengersGettingOff = random.randint(1, 6)
+            self.passengerCount -= passengersGettingOff
+            gettingOffList = [self.blockID[self.i - 1], passengersGettingOff]
+
+            self.unboarding_list_signal.emit(gettingOffList)
+
+        if((not self.rightDoorStatus) and self.leftDoorStatus):
+            passengersGettingOff = random.randint(1, 6)
+            self.passengerCount -= passengersGettingOff
+            gettingOffList = [self.blockID[self.i - 1], passengersGettingOff]
+            
+            self.unboarding_list_signal.emit(gettingOffList)
+
+    @Slot(list)
+    def addPassengersToTrain(self, input: list):
+        # add new passengers to the train car
+        self.passengerCount += input[1]
+        self.passengerCount_updated.emit(self.passengerCount)

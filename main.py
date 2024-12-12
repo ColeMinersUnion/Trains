@@ -22,9 +22,9 @@ ctc.emitMaintenanceSwitch.connect(wss_window.receive_maint_switch)
 wss_window.wss_ctc_safetyCheck.connect(ctc.MaintenanceResponse)
 wss_window.wss_ctc_safetySwitch.connect(ctc.MaintenanceSwitchResponse)
 
-ctc.emitMaintenance.connect(wsh_window.update_maintenance)
-wsh_window.wsh_ctc_safetyCheck.connect(ctc.MaintenanceResponse)
-ctc.emitMaintenanceSwitch.connect(wsh_window.update_maint_switch)
+#ctc.emitMaintenance.connect(wsh_window.update_maintenance)
+#wsh_window.wsh_ctc_safetyCheck.connect(ctc.MaintenanceResponse)
+#ctc.emitMaintenanceSwitch.connect(wsh_window.update_maint_switch)
 #Emit Connect Slot
 wss_window.wss_ctc_occupancy.connect(ctc.updateOccupancy) #wayside software send occupancies to CTC
 wsh_window.wsh_ctc_occupancy.connect(ctc.updateOccupancy) #wayside hardware send occupancies to CTC
@@ -42,17 +42,19 @@ def trainFactory(routeInfo: list, authority: str):
         # sends authorities as list of booleans
         tm_signals.sendAuthorities.connect(trains[-1].train_model.boolean_authority)
         # sends list as station block number and passengers boarding
-        #tm_signals.sendPassengers.connect(trains[-1].FUNCTION)
+        #!Commented out by Cole. UpdatePassengerCount is not implemented in TrainModel
+        #tm_signals.sendPassengers.connect(trains[-1].train_model.updatePassengerCount)
         # sends list as station block number and passengers unboarding
-        #trains[-1].train_model.PYQTSIGNAL.connect(tm_signals.getPassengers)
+        trains[-1].train_model.unboarding_list_signal.connect(tm_signals.getPassengers)
         # sends request for beacon data as block number
-        #trains[-1].train_model.PYQTSIGNAL.connect(tm_signals.getBeacon)
+        #!Commented out by Cole. requestBeaconInformation is a slot, not a signal. 
+        #trains[-1].train_model.requestBeaconInformation.connect(tm_signals.getBeacon)
         # sends beacon data as list with block number and beacon data
-        tm_signals.sendBeacon.connect(trains[-1].train_model.beaconIntake)
+        tm_signals.sendBeacon.connect(trains[-1].train_model.beaconInformation)
     except TypeError:
         print('Oops')
-    except IndexError: #send train back to station if done route
-        print('Train reach end of line. Went back to the yard')
+    
+    
 
 
 # Show both windows
