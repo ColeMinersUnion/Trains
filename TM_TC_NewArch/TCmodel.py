@@ -227,7 +227,7 @@ class TCmodel(QObject):
         go_nogo = input[self.blocks]
         self.gonogo_display.emit(go_nogo)
         #check if wayside stop is enabled
-        if (go_nogo == True):
+        if (go_nogo == False):
             self.cut_power_and_enable_brake()
             self.stopped_by_wayside = 1
         else:
