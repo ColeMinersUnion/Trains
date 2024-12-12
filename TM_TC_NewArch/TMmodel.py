@@ -191,7 +191,7 @@ class TrainModel(QObject):
         self.speedLimit = groupedRouteInfo[2]
 
         #send speed limits to train controller here
-        self.speed_limits.emit(self.speedLimit)
+        self.speed_limits.emit(list(self.speedLimit))
 
     """ built in odometer, uses the distance travelled to calculate if the block changes """
     def odometer(self):
