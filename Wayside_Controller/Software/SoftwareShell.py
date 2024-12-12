@@ -39,15 +39,18 @@ class WaysideShell(QMainWindow):
         uic.loadUi('Wayside_Controller/Software/app.ui', self)
 
         self.plc = GreenPLC()
-        
+        #self.maintenance = [False for i in range(1,150)]
+        #occupancies and authority for greenline
         self.occupancy = [False for i in range(151)]
         self.authority = [False for i in range(151)]
-        #switches
+        #occupancies and authority for red line
+        self.occ_red = [False for i in range(77)]
+        self.auth_red = [True for i in range(77)]
+        #green line switches, signals and crossings
         self.switch_13 = True
         self.switch_28 = False
         self.switch_77 = False
-        self.switch_85 = True
-        #self.maintenance = [False for i in range(1,150)]   
+        self.switch_85 = True  
         #signals
         self.signal_13 = False
         self.signal_28 = False
@@ -56,6 +59,21 @@ class WaysideShell(QMainWindow):
         #crossings
         self.crossing_19 = False
         self.crossing_108 = False
+
+        #red line switches, signals and crossings
+        self.switch_27=True
+        self.switch_33=True
+        self.switch_38=True
+        self.switch_44=True
+
+        self.signal_27=True
+        self.signal_33=True
+        self.signal_38=True
+        self.signal_44=True
+
+        self.switch_52=True
+        self.signal_52=True
+        self.crossing_47=False
 
         #lets user toggle buttons manually
         self.manual_inputs()
@@ -66,7 +84,7 @@ class WaysideShell(QMainWindow):
         self.timer.start(15)''' 
 
     
-    #slot to update occupancy which then updates the plc authority
+    #slot to update occupancy which then updates the plc authority, switches, signals, and crossings
     #then send out updated authority, switches, signals, crossings 
     @pyqtSlot(list)
     def update_occupancy(self, new_occupancy: list):
@@ -177,6 +195,51 @@ class WaysideShell(QMainWindow):
         self.crossing_108 =  not self.crossing_108
         self.wss_tm_crossing_108.emit(self.crossing_108)
         self.update_ui()
+    
+    #red line toggles:
+    def toggle_switch_27(self):
+        self.switch_27 = not self.switch_27
+        self.update_ui()
+    
+    def toggle_switch_33(self):
+        self.switch_33 = not self.switch_33
+        self.update_ui()
+    
+    def toggle_switch_38(self):
+        self.switch_38 = not self.switch_38
+        self.update_ui()
+
+    def toggle_switch_44(self):
+        self.switch_44 = not self.switch_44
+        self.update_ui()
+    
+    def toggle_switch_52(self):
+        self.switch_52 = not self.switch_52
+        self.update_ui()
+    
+    def toggle_signal_27(self):
+        self.signal_27 = not self.signal_27
+        self.update_ui()
+    
+    def toggle_signal_33(self):
+        self.signal_33 = not self.signal_33
+        self.update_ui()
+
+    def toggle_signal_38(self):
+        self.signal_38 = not self.signal_38
+        self.update_ui()
+    
+    def toggle_signal_44(self):
+        self.signal_44 = not self.signal_44
+        self.update_ui()
+
+    def toggle_signal_52(self):
+        self.signal_52 = not self.signal_52
+        self.update_ui()
+
+    def toggle_crossing_47(self):
+        self.crossing_47 =  not self.crossing_47
+        self.update_ui()
 
     def manual_inputs(self):
         self.manual_sw13_button.clicked.connect(self.toggle_switch_13)
@@ -191,6 +254,23 @@ class WaysideShell(QMainWindow):
 
         self.manual_cr19_button.clicked.connect(self.toggle_crossing_19)
         self.manual_cr108_button.clicked.connect(self.toggle_crossing_108)
+        #red line connect statements
+        #red line switches
+        self.manual_sw27_button.clicked.connect(self.toggle_switch_27)
+        self.manual_sw33_button.clicked.connect(self.toggle_switch_33)
+        self.manual_sw38_button.clicked.connect(self.toggle_switch_38)
+        self.manual_sw44_button.clicked.connect(self.toggle_switch_44)
+
+        self.manual_sw52_button.clicked.connect(self.toggle_switch_52)
+        #red line signals
+        self.manual_sig27_button.clicked.connect(self.toggle_signal_27)
+        self.manual_sig33_button.clicked.connect(self.toggle_signal_33)
+        self.manual_sig38_button.clicked.connect(self.toggle_signal_38)
+        self.manual_sig44_button.clicked.connect(self.toggle_signal_44)
+
+        self.manual_sig52_button.clicked.connect(self.toggle_signal_52)
+        #red line crossings
+        self.manual_cr47_button.clicked.connect(self.toggle_crossing_47)
     
     def update_ui(self):
         #update block table state and authority from Track Model 
@@ -199,21 +279,35 @@ class WaysideShell(QMainWindow):
 
         for i in range(len(self.authority)):
             self.wayside_block_table.setItem(i,1, QTableWidgetItem(str(self.authority[i])))'''
-        #update block table state and authority from Track Model
+        #update green line block table state and authority from Track Model
         for i in range(47):
             self.wayside_block_table.setItem(i-0,0, QTableWidgetItem(str(self.occupancy[i])))
 
         for i in range(41):
             self.wayside_block_table.setItem(i-0,1, QTableWidgetItem(str(self.authority[i])))
         
-        for i in range(68, 150):
+        for i in range(69, 150):
             self.wayside_block_table.setItem(i-0,0, QTableWidgetItem(str(self.occupancy[i])))
         
-        for i in range(68, 150):
+        for i in range(69, 150):
             self.wayside_block_table.setItem(i-0,1, QTableWidgetItem(str(self.authority[i])))
         
+        #update red line wayside 1 block table state and authority
+        for i in range(21,46):
+            self.wayside_block_table_2.setItem(i-21,0, QTableWidgetItem(str(self.occ_red[i])))
+        for i in range(67,77):
+            self.wayside_block_table_2.setItem(i-21,0, QTableWidgetItem(str(self.occ_red[i])))
+        for i in range(21,46):
+            self.wayside_block_table_2.setItem(i-21,1, QTableWidgetItem(str(self.auth_red[i])))
+        for i in range(67,77):
+            self.wayside_block_table_2.setItem(i-21,1, QTableWidgetItem(str(self.auth_red[i])))
+        #update red line wayside 2 block table state and authority
+        for i in range(46,67):
+            self.wayside_block_table_3.setItem(i-46,0, QTableWidgetItem(str(self.occ_red[i])))
+        for i in range(46,67):
+            self.wayside_block_table_3.setItem(i-46,1, QTableWidgetItem(str(self.auth_red[i])))
         
-        #update switches 
+        #update green line switches 
         if(self.switch_13):
             self.wayside_elements_table.setItem(0,0, QTableWidgetItem("True"))
         else:
@@ -230,7 +324,7 @@ class WaysideShell(QMainWindow):
             self.wayside_elements_table.setItem(3,0, QTableWidgetItem("True"))
         else:
             self.wayside_elements_table.setItem(3,0, QTableWidgetItem("False"))
-        #update signals
+        #update green line signals
         if(self.signal_13):
             self.wayside_elements_table.setItem(4,0, QTableWidgetItem("Green"))
         else:
@@ -247,7 +341,7 @@ class WaysideShell(QMainWindow):
             self.wayside_elements_table.setItem(7,0, QTableWidgetItem("Green"))
         else:
             self.wayside_elements_table.setItem(7,0, QTableWidgetItem("Red"))
-        #update crossings
+        #update green line crossings
         if(self.crossing_19):
             self.wayside_elements_table.setItem(8,0, QTableWidgetItem("Down"))
         else:
@@ -256,6 +350,85 @@ class WaysideShell(QMainWindow):
             self.wayside_elements_table.setItem(9,0, QTableWidgetItem("Down"))
         else:
             self.wayside_elements_table.setItem(9,0, QTableWidgetItem("Up"))
+        #update red line switches
+        if(self.switch_27):
+            self.wayside_elements_table_2.setItem(0,0, QTableWidgetItem("True"))
+        else:
+            self.wayside_elements_table_2.setItem(0,0, QTableWidgetItem("False"))
+        if(self.switch_33):
+            self.wayside_elements_table_2.setItem(1,0, QTableWidgetItem("True"))
+        else:
+            self.wayside_elements_table_2.setItem(1,0, QTableWidgetItem("False"))
+        if(self.switch_38):
+            self.wayside_elements_table_2.setItem(2,0, QTableWidgetItem("True"))
+        else:
+            self.wayside_elements_table_2.setItem(2,0, QTableWidgetItem("False"))
+        if(self.switch_44):
+            self.wayside_elements_table_2.setItem(3,0, QTableWidgetItem("True"))
+        else:
+            self.wayside_elements_table_2.setItem(3,0, QTableWidgetItem("False"))
+
+        if(self.switch_52):
+            self.wayside_elements_table_3.setItem(0,0, QTableWidgetItem("True"))
+        else:
+            self.wayside_elements_table_3.setItem(0,0, QTableWidgetItem("False"))
+        #update red line signals
+        if(self.signal_27):
+            self.wayside_elements_table_2.setItem(4,0, QTableWidgetItem("Green"))
+        else:
+            self.wayside_elements_table_2.setItem(4,0, QTableWidgetItem("Red"))
+        if(self.signal_33):
+            self.wayside_elements_table_2.setItem(5,0, QTableWidgetItem("Green"))
+        else:
+            self.wayside_elements_table_2.setItem(5,0, QTableWidgetItem("Red"))
+        if(self.signal_38):
+            self.wayside_elements_table_2.setItem(6,0, QTableWidgetItem("Green"))
+        else:
+            self.wayside_elements_table_2.setItem(6,0, QTableWidgetItem("Red"))
+        if(self.signal_44):
+            self.wayside_elements_table_2.setItem(7,0, QTableWidgetItem("Green"))
+        else:
+            self.wayside_elements_table_2.setItem(7,0, QTableWidgetItem("Red"))
+        
+        if(self.signal_52):
+            self.wayside_elements_table_3.setItem(1,0, QTableWidgetItem("Green"))
+        else:
+            self.wayside_elements_table_3.setItem(1,0, QTableWidgetItem("Red"))
+        #update red line crossings
+        if(self.crossing_47):
+            self.wayside_elements_table_3.setItem(2,0, QTableWidgetItem("Down"))
+        else:
+            self.wayside_elements_table_3.setItem(2,0, QTableWidgetItem("Up"))
+
+        #Manual mode not permitted unless track is unoccupied (safety critical)
+        if(any(self.occupancy[1:41]) or any(self.occupancy[69:151])):
+            #disable green line switches, signals and crossings if track is occuppied
+            self.manual_sw13_button.setEnabled(False)
+            self.manual_sw28_button.setEnabled(False)
+            self.manual_sw77_button.setEnabled(False)
+            self.manual_sw85_button.setEnabled(False)
+
+            self.manual_sig13_button.setEnabled(False)
+            self.manual_sig28_button.setEnabled(False)
+            self.manual_sig77_button.setEnabled(False)
+            self.manual_sig85_button.setEnabled(False)
+
+            self.manual_cr19_button.setEnabled(False)
+            self.manual_cr108_button.setEnabled(False)
+
+        else:
+            self.manual_sw13_button.setEnabled(True)
+            self.manual_sw28_button.setEnabled(True)
+            self.manual_sw77_button.setEnabled(True)
+            self.manual_sw85_button.setEnabled(True)
+
+            self.manual_sig13_button.setEnabled(True)
+            self.manual_sig28_button.setEnabled(True)
+            self.manual_sig77_button.setEnabled(True)
+            self.manual_sig85_button.setEnabled(True)
+
+            self.manual_cr19_button.setEnabled(True)
+            self.manual_cr108_button.setEnabled(True)
 
 if __name__ == '__main__':
     import sys

@@ -3,6 +3,7 @@
 
 #class to hardcode green line        
 class GreenPLC:
+
     def __init__(self):
         #to hold maintenance occupancies
         self.maintenance_occ=[False for i in range(151)]
@@ -49,32 +50,36 @@ class GreenPLC:
         authority=self.update_authority(occupancy)
         return authority, switch77, switch85, switch28, switch13, signal77, signal85, signal28, signal13, crossing19, crossing108
     
-    def update_switch(self, sw:int, occupancy):
+    def ctc_update_switch(self, sw:int, occupancy:list):
         if sw==13:
             if any(occupancy[1:29])==True:
                 self.sw_safety=False
             else:
                 self.sw_safety=True
                 self.switch_13=not self.switch_13
+                #self.shell_sw13.emit(self.switch_13)
         if sw==28:
             if any(occupancy[1:29]) or any(occupancy[144:150])==True:
                 self.sw_safety=False
             else:
                 self.sw_safety=True
                 self.switch_28=not self.switch_28
+                #self.shell_sw28.emit(self.switch_28)
         if sw==77:
             if any(occupancy[74:100])==True:
                 self.sw_safety=False
             else:
                 self.sw_safety=True
                 self.switch_77=not self.switch_77
+                #self.shell_sw77.emit(self.shell_sw77)
         if sw==85:
             if any(occupancy[82:100])==True:
                 self.sw_safety=False
             else:
                 self.sw_safety=True
                 self.switch_85=not self.switch_85
-        return self.sw_safety
+                #self.shell_sw85.emit(self.shell_sw85)
+        return self.sw_safety,self.switch_77,self.switch_85,self.switch_28,self.switch_13
             
     #takes in list of occupancies from ctc, updates with current occupancy list from the shell
     def maintenance_mode(self, suggested_maintenance, occupancy):
