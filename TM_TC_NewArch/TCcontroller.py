@@ -33,7 +33,5 @@ class TCcontroller (QObject):
         self.model.internal_sbrake.connect(self.view.update_sbrake_label)
 
         #meep meep check on emergency brake signal connect
-        self.model.gonogo_display.connect(self.view.gonogo_update)
-
 
         

@@ -22,7 +22,6 @@ ctc.emitMaintenanceSwitch.connect(wss_window.receive_maint_switch)
 wss_window.wss_ctc_safetyCheck.connect(ctc.MaintenanceResponse)
 wss_window.wss_ctc_safetySwitch.connect(ctc.MaintenanceSwitchResponse)
 
-#!Commented out by Cole. Can't break track while WSH is not connected to hardware
 #ctc.emitMaintenance.connect(wsh_window.update_maintenance)
 #wsh_window.wsh_ctc_safetyCheck.connect(ctc.MaintenanceResponse)
 #ctc.emitMaintenanceSwitch.connect(wsh_window.update_maint_switch)
@@ -39,32 +38,19 @@ def trainFactory(routeInfo: list, authority: str):
         trains.append(Train(routeInfo, authority))
         trains[-1].train_model_view.show()
         trains[-1].train_controller_view.show()
-        trains[-1].train_controller_model.train_at_yard.connect(deleteTrain)
         trains[-1].train_model.block_change.connect(tm_signals.toggleOcc)
         # sends authorities as list of booleans
         tm_signals.sendAuthorities.connect(trains[-1].train_model.boolean_authority)
         # sends list as station block number and passengers boarding
-        #!Commented out by Cole. UpdatePassengerCount is not implemented in TrainModel
         tm_signals.sendPassengers.connect(trains[-1].train_model.addPassengersToTrain)
         # sends list as station block number and passengers unboarding
         trains[-1].train_model.unboarding_list_signal.connect(tm_signals.getPassengers)
         # sends request for beacon data as block number
-        #!Commented out by Cole. requestBeaconInformation is a slot, not a signal. 
         trains[-1].train_model.current_block_ID.connect(tm_signals.getBeacon)
         # sends beacon data as list with block number and beacon data
         tm_signals.sendBeacon.connect(trains[-1].train_model.beaconInformation)
     except TypeError:
         print('Oops')
-
-
-@pyqtSlot()
-def deleteTrain():
-    try:
-        trains[-1].train_model_view.close()
-        trains[-1].train_controller_view.close()
-        del trains[-1]
-    except IndexError:
-        print('No trains to delete')
     
     
 

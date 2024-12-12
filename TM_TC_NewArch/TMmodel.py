@@ -208,7 +208,6 @@ class TrainModel(QObject):
             print("Moving onto " + str(self.blockID[self.i]))
             self.i += 1
 
-    @Slot(int)
     def requestBeaconInformation(self):
         self.current_block_ID.emit(self.blockID[self.i - 1])
 
@@ -260,6 +259,6 @@ class TrainModel(QObject):
     @Slot(list)
     def addPassengersToTrain(self, input: list):
         # add new passengers to the train car
-        self.passengerCount += input[1]
-        self.passengerCount_updated.emit(self.passengerCount)
-        self.calcTotalMass()
+        if(self.blockID[self.i - 1] == input[0]): #if right car
+            self.passengerCount += input[1]
+            self.passengerCount_updated.emit(self.passengerCount)
