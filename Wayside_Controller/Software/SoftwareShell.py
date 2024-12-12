@@ -429,6 +429,47 @@ class WaysideShell(QMainWindow):
 
             self.manual_cr19_button.setEnabled(True)
             self.manual_cr108_button.setEnabled(True)
+        #Manual Mode disabled for red line wayside 2
+        if(any(self.occ_red[21:45])==True or any(self.occ_red[67:76])==True):
+        #disable red line switches, signals and crossings if track is occuppied
+            self.manual_sw27_button.setEnabled(False)
+            self.manual_sw33_button.setEnabled(False)
+            self.manual_sw38_button.setEnabled(False)
+            self.manual_sw44_button.setEnabled(False)
+            #self.manual_sw52_button.setEnabled(False)
+
+            self.manual_sig27_button.setEnabled(False)
+            self.manual_sig33_button.setEnabled(False)
+            self.manual_sig38_button.setEnabled(False)
+            self.manual_sig44_button.setEnabled(False)
+            #self.manual_sig52_button.setEnabled(False)
+
+            #self.manual_cr47_button.setEnabled(False)
+
+        else:
+            self.manual_sw27_button.setEnabled(True)
+            self.manual_sw33_button.setEnabled(True)
+            self.manual_sw38_button.setEnabled(True)
+            self.manual_sw44_button.setEnabled(True)
+            #self.manual_sw52_button.setEnabled(True)
+
+            self.manual_sig27_button.setEnabled(True)
+            self.manual_sig33_button.setEnabled(True)
+            self.manual_sig38_button.setEnabled(True)
+            self.manual_sig44_button.setEnabled(True)
+            #self.manual_sig52_button.setEnabled(True)
+
+            #self.manual_cr47_button.setEnabled(True)
+            
+        #Manual Mode disabled in red line wayside 3
+        if(any(self.occ_red[45:66])==True):
+            self.manual_sw52_button.setEnabled(False)
+            self.manual_sig52_button.setEnabled(False)
+            self.manual_cr47_button.setEnabled(False)
+        else:
+            self.manual_sw52_button.setEnabled(True)
+            self.manual_sig52_button.setEnabled(True)
+            self.manual_cr47_button.setEnabled(True)
 
 if __name__ == '__main__':
     import sys
