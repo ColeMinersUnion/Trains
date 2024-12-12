@@ -15,6 +15,7 @@ linenames=["Green","Red"] #default line names
 lines=[] #default lines, will be instantiated and built later
 switchid=[0,0] #track switch numbers for pinging
 crossingid=[0,0] #track crossing numbers for pinging
+signalid=[0,0] #signal numbers for pinging
 stationid=[0,0] #station numbers for pinging
 failmode = 0 #starting fail mode for setting failures; no failure
 failnames = ["No","Rail","Circuit","Power"] # failure names
@@ -33,8 +34,8 @@ class Block: #block class
         self.twoway = twoway
         self.elevation = elevation #cumulative elevation
         self.underground = underground #whether it it udnerground
-        self.x=min(x1,y2) #start x coordinate
-        self.y=min(y1,y2) #start y coordinate
+        self.x=x1 #start x coordinate
+        self.y=y1 #start y coordinate
         self._occupied = False
         self.center = [(x1+x2)/2,(y1+y2)/2] #center for front end
         self.mag = sqrt(((x2-x1)*(x2-x1))+((y2-y1)*(y2-y1))) #magnitude for front end
@@ -48,7 +49,7 @@ class Block: #block class
         r = r + "\nBlock " + str(number)
         r = r + "\n" + str(round(length*3.28084)) + " feet long\n"
         r = r + str(grade) + "% grade\n"
-        r = r + str(round(speed*0.621371)) + " mph speed limit\n"
+        r = r + str(round(speed*0.621371)) + " mph speed limit"
         r = r + "\nBidirectional: " + str(twoway)
         r = r + "\nUnderground: " + str(underground) 
         r = r + "\nOccupied: "
@@ -73,6 +74,9 @@ class Block: #block class
     
     def switchOccupancy(self): #switches occupancy
         self.occupied = not self.occupied
+
+    def setAuth(self,auth): #sets authority
+        self.authority = auth
 class Switch:
 #note, structuring switch depends on section, include that?)
     #instantiation
@@ -133,6 +137,22 @@ class Crossing:
     #change state of crossing
     def switch(self):
         self.on = not self.on
+
+class Signal:
+    #instantiation
+    def __init__(self,linenum,block):
+        self.linenum = linenum #index in lines of Line object it belongs to
+        self.block = block
+        self.on = False
+        self.signalid = signalid[linenum] #gives id in line
+        signalid[linenum] = signalid[linenum]+1 #gets next id
+        self.msg = "Signal (" + linenames[linenum] + " Line, Block " + str(block) + ")\nGo: "
+    def toString(self):
+        return self.msg + str(self.on) #message to display on hover
+
+    #change state of crossing
+    def switch(self):
+        self.on = not self.on
 class Transponder:
     #instantiation
     def __init__(self,linenum,block,data):
@@ -167,6 +187,7 @@ class Line:
         self.blocks = []
         self.switches = []
         self.crossings = []
+        self.signals = [] #signal lights, not to be confused with pyqtSignals
         self.transponders = [] #AKA beacons
         self.stations = []
         self.trains = []
@@ -187,6 +208,12 @@ class Line:
         for x in self.crossings:
             if (x.block==block):
                 return x.crossingid
+        return None
+    
+    def getSignal(self,block): #gets id of crossing at block
+        for x in self.Signal:
+            if (x.block==block):
+                return x.signalid
         return None
     
     def stationByBlock(self,block): #gets id of station at block
@@ -220,6 +247,7 @@ def read(file):
             crossingid.append(0)
             switchid.append(0)
             stationid.append(0)
+            signalid.append(0)
         while len(lines[linenum].blocks) <= data.iat[i,2]: #add values to list to fit block until right number found
             lines[linenum].blocks.append(None) 
         lines[linenum].blocks[data.iat[i,2]]=Block(linenum,
@@ -231,10 +259,10 @@ def read(file):
                                                 readX(data.iat[i,6]), #2-way
                                                 data.iat[i,7], #elevation
                                                 readX(data.iat[i,8]), #undeground
-                                                XOFFSET+data.iat[i,15], #x1-coord
-                                                YOFFSET+data.iat[i,16], #y1-coord
-                                                XOFFSET+data.iat[i,17], #x2-coord
-                                                YOFFSET+data.iat[i,18]) #y2-coord
+                                                XOFFSET+data.iat[i,16], #x1-coord
+                                                YOFFSET+data.iat[i,17], #y1-coord
+                                                XOFFSET+data.iat[i,18], #x2-coord
+                                                YOFFSET+data.iat[i,19]) #y2-coord
         if(not (pd.isnull(data.iat[i,9]) or pd.isnull(data.iat[i,10]))): #start building switch if switch vertex at block
             tempswitch.append([linenum,data.iat[i,2],data.iat[i,9],data.iat[i,10]])
         if(not pd.isnull(data.iat[i,11])): #add beacon if at block
@@ -243,6 +271,8 @@ def read(file):
             lines[linenum].stations.append(Station(linenum,data.iat[i,2],data.iat[i,12],data.iat[i,13]))
         if(readX(data.iat[i,14])): #add crosing if at block
             lines[linenum].crossings.append(Crossing(linenum,data.iat[i,2]))
+        if(readX(data.iat[i,15])): #add signal if at block
+            lines[linenum].signals.append(Signal(linenum,data.iat[i,2]))
         i=i+1 #increment
     for s in tempswitch: #add switches now, blocks should update
         lines[s[0]].switches.append(Switch(s[0],[s[1],s[2],s[3]])) #add switch to appropriate line number
@@ -287,17 +317,19 @@ class SignalHandler(QObject): #handles signals from other modules
 
     @pyqtSlot(list)
     def getHardwareAuthority(self,message): #get authorities from hardware track controller
-        print(message)
         for i in range(len(lines[0].blocks)): #make list with authorities from HW's ranges, [41,76] for green
             if(i<41 or i>76):
-                lines[0].blocks[i].authority = message[i]
+                lines[0].blocks[i].setAuth(message[i])
+        self.callAuthSend()
 
     @pyqtSlot(list)
     def getSoftwareAuthority(self,message): #get authorities from software track controller
-        print(message)
         for i in range(len(lines[0].blocks)): #make list with authorities from SW's ranges, [1,40] and [77,151] for green
             if(i>40 and i<77):
-                lines[0].blocks[i].authority = message[i]
+                lines[0].blocks[i].setAuth(message[i])
+        self.callAuthSend()
+
+    # Switch signals
 
     @pyqtSlot(bool)
     def getSwitch13(self,message): #get green line switch 13 state from track controller and implement on track model
@@ -320,8 +352,36 @@ class SignalHandler(QObject): #handles signals from other modules
         lines[0].switches[4].setToLeft(not message)
 
     @pyqtSlot(bool)
-    def getSwitch85(self,message): #get green line switch 77 state from track controller and implement on track model    
+    def getSwitch85(self,message): #get green line switch 85 state from track controller and implement on track model    
         lines[0].switches[5].setToLeft(message)
+
+    # Signal light signals
+
+    @pyqtSlot(bool)
+    def getSignal13(self,message): #get green line signals 13 state from track controller and implement on track model
+        lines[0].signals[0].on=message 
+
+    @pyqtSlot(bool)
+    def getSignal28(self,message): #get green line signals 28 state from track controller and implement on track model
+        lines[0].signals[1].on=message
+
+    @pyqtSlot(bool)
+    def getSignal58(self,message): #get green line signals 58 state from track controller and implement on track model
+        lines[0].signals[2].on=message
+
+    @pyqtSlot(bool)
+    def getSignal62(self,message): #get green line signals 62 state from track controller and implement on track model
+        lines[0].signals[3].on=message
+
+    @pyqtSlot(bool)
+    def getSignal77(self,message): #get green line signals 77 state from track controller and implement on track model
+        lines[0].signals[4].on=message
+
+    @pyqtSlot(bool)
+    def getSignal85(self,message): #get green line signals 85 state from track controller and implement on track model    
+        lines[0].signals[5].on=message
+    
+    # Crossing signals
 
     @pyqtSlot(bool)
     def getCrossing19(self,message): #get green line crossing 19 state from track controller and implement on track model
@@ -624,7 +684,7 @@ class CrossingIcon(QWidget):
         if(self.check!=obj.on): #only change if new backend value
             if (obj.on): #change icon if on now
                 self.pixmap = QPixmap('TrackModel/Icons/OnCrossing.png')
-            else: #chane icon ig off now
+            else: #chane icon if off now
                 self.pixmap = QPixmap('TrackModel/Icons/OffCrossing.png')
             self.check=obj.on #update with backend
             self.pixmap = self.pixmap.transformed(QTransform().scale(SCL/100,SCL/100))
@@ -632,6 +692,31 @@ class CrossingIcon(QWidget):
             self.label.setToolTip(obj.toString())
             self.label.show()
 
+class SignalIcon(QWidget):
+    def __init__(self,obj,window):
+        super().__init__()
+        self.linenum=obj.linenum #index of line object it belongs to
+        self.signalid=obj.signalid #id of signal
+        self.label=QLabel(window)
+        self.check=False
+        center = lines[obj.linenum].blocks[obj.block].center #get center for locating on screen
+        self.label.move(int((center[0]-0.25)*SCL),int((center[1]-0.225)*SCL))
+        self.label.setStyleSheet(labelstyle)
+        self.setStyleSheet(tooltipstyle)
+        self.update()
+
+    def update(self): #update signal icon for new backend value
+        obj = lines[self.linenum].signals[self.signalid]
+        if(self.check!=obj.on): #only change if new backend value
+            if (obj.on): #change icon if on now
+                self.pixmap = QPixmap('TrackModel/Icons/OnSignal.png')
+            else: #chane icon if off now
+                self.pixmap = QPixmap('TrackModel/Icons/OffSignal.png')
+            self.check=obj.on #update with backend
+            self.pixmap = self.pixmap.transformed(QTransform().scale(SCL/100,SCL/100))
+            self.label.setPixmap(self.pixmap)
+            self.label.setToolTip(obj.toString())
+            self.label.show()
 class TransponderIcon(QWidget):
     def __init__(self,obj,window):
         super().__init__()
@@ -695,6 +780,8 @@ class Map(QWidget): #displays map
                 active.append(SwitchIcon(switch,self)) 
             for crossing in line.crossings: #adds all crossings
                 active.append(CrossingIcon(crossing,self))
+            for signal in line.signals: #adds all signals
+                active.append(SignalIcon(signal,self))
             for transponder in line.transponders: #adds all beacons
                 passive.append(TransponderIcon(transponder,self))  
             for station in line.stations: #adds all stations
@@ -761,6 +848,11 @@ class Testbench(QWidget): #testbench window
         crossingbutton = QPushButton("Change crossing", self)
         crossingbutton.move(100,100)
         crossingbutton.clicked.connect(self.flipCrossing)
+
+        #make, move and connect change signal button
+        signalbutton = QPushButton("Change signal", self)
+        signalbutton.move(100,125)
+        signalbutton.clicked.connect(self.flipSignal)
         
         #line number input
         param1=QLabel("Line number",self)
@@ -768,7 +860,7 @@ class Testbench(QWidget): #testbench window
         self.input1 = QLineEdit(self)
         self.input1.move(100,200)
 
-        #switch/crossing id input
+        #switch/crossing/signal id input
         param2=QLabel("Component ID",self)
         param2.move(100,250)
         self.input2 = QLineEdit(self)
@@ -781,8 +873,8 @@ class Testbench(QWidget): #testbench window
         #3: No failure on all blocks
         #4: True occupancy for all blocks
         #5: False occupancy for all blocks
-        #6: Toggle crossings and switches for all blocks
-        #7: Toggle crossings and switches again for all blocks
+        #6: Toggle crossings, switches, and signals for all blocks
+        #7: Toggle crossings, switches, and signals again for all blocks
         #resets to 0 after test 7
         global lines
         if(self.cyclenum<4): #tests 0-3 for failure
@@ -795,13 +887,15 @@ class Testbench(QWidget): #testbench window
                 for b in range(len(lines[l].blocks)):
                     lines[l].blocks[b].occupied = (self.cyclenum==4)
             print(str((self.cyclenum==4)) + " Occupancy complete! Please hover over the blocks to check their status")
-        elif(self.cyclenum<8): #tests 6-7 for crossings and switches
-            for l in range(len(lines)):
-                for s in range(len(lines[l].switches)):
-                    lines[l].switches[s].switch()
-                for c in range(len(lines[l].crossings)):
-                    lines[l].crossings[c].switch()
-            print("Switches and crossings toggled! Please hover over the blocks to check their status")
+        elif(self.cyclenum<8): #tests 6-7 for crossings, switches, and signals
+            for l in range(len(lines)): #go through all lines
+                for s in range(len(lines[l].switches)): #for all switches
+                    lines[l].switches[s].switch()#flip switch
+                for c in range(len(lines[l].crossings)):#for all crossings
+                    lines[l].crossings[c].switch()#flip crossing
+                for s in range(len(lines[l].signals)):#for all signals
+                    lines[l].signals[c].switch()#flip signal
+            print("Switches, crossings, and signals toggled! Please hover over the blocks to check their status")
         self.cyclenum=self.cyclenum+1 #reset cycle
         if(self.cyclenum==8):
             self.cyclenum=0
@@ -824,7 +918,13 @@ class Testbench(QWidget): #testbench window
         line = int(self.input1.text())
         comp = int(self.input2.text())
         if(comp<len(lines[line].crossings)):
-            lines[line].crossings[comp].f()
+            lines[line].crossings[comp].switch()
+
+    def flipSignal(self): #signal flip button result
+        line = int(self.input1.text())
+        comp = int(self.input2.text())
+        if(comp<len(lines[line].signals)):
+            lines[line].signals[comp].switch()
 
 # MAIN BRANCH
 
