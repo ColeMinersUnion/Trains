@@ -262,3 +262,4 @@ class TrainModel(QObject):
         # add new passengers to the train car
         self.passengerCount += input[1]
         self.passengerCount_updated.emit(self.passengerCount)
+        self.calcTotalMass()
