@@ -45,6 +45,7 @@ class TrainModelView(QWidget):
                 padding: 0 10px;
             }
         """)
+        self.update_ebrake_ui()
 
         # Get the current script's directory
         current_directory = os.path.dirname(os.path.realpath(__file__))
@@ -143,6 +144,12 @@ class TrainModelView(QWidget):
         self.setLayout(main_layout)
         self.setWindowTitle("Train Model View")
 
+    def update_ebrake_ui(self, eBrake_status):
+        if eBrake_status:
+            self.emergencyBrakeButton.setStyleSheet("background-color: red; color: white; border: none; padding: 10px; border-radius: 5px;")
+        else:
+            self.emergencyBrakeButton.setStyleSheet("background-color: lightcoral; color: black; border: none; padding: 10px; border-radius: 5px;")
+
     def set_button_style(self, button, is_on):
         if is_on:
             button.setStyleSheet("background-color: red; color: white; border: none; padding: 10px; border-radius: 5px;")
@@ -209,7 +216,7 @@ class TrainModelView(QWidget):
     @Slot(bool)
     def update_eBrake_label(self, eBrake_status: bool):
         self.emergencyBrakeButton.setText("Emergency Brake: ON" if eBrake_status else "Emergency Brake: OFF")
-        self.set_button_style(self.emergencyBrakeButton, eBrake_status)
+        self.update_ebrake_ui(eBrake_status)
 
     @Slot()
     def update_engine_failure_status(self):
@@ -230,7 +237,7 @@ class TrainModelView(QWidget):
     def update_eFailure_label(self, input: bool):
         """ Update button text """
         self.engineFailureButton.setText("Engine Failure: ON" if input else "Engine Failure: OFF")
-        self.set_button_style(self.engineFailureButton, input)
+        self.set_button_style(input)
 
     @Slot(bool)
     def update_sFailure_label(self, input: bool):
