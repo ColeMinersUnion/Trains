@@ -143,7 +143,7 @@ class Signal:
     def __init__(self,linenum,block):
         self.linenum = linenum #index in lines of Line object it belongs to
         self.block = block
-        self.on = True
+        self.on = False
         self.signalid = signalid[linenum] #gives id in line
         signalid[linenum] = signalid[linenum]+1 #gets next id
         self.msg = "Signal (" + linenames[linenum] + " Line, Block " + str(block) + ")\nGo: "
@@ -228,10 +228,26 @@ class Line:
                 return x.stationid
         return None
 
-lines=[Line(0),Line(1)] #start of red and green lines for default instantiation
-
 def readX(string): #return true if X, used for reading booleans in Excel files
     return (string=="X")
+
+def readFiles(filenames): #read multiple files
+    global linenames, lines, switchid, crossingid, signalid, stationid, passive, active
+
+    #reset model
+    linenames=["Green","Red"] #default line names
+    lines=[Line(0),Line(1)] #default lines, will be instantiated and built later
+    switchid=[0,0] #track switch numbers for pinging
+    crossingid=[0,0] #track crossing numbers for pinging
+    signalid=[0,0] #signal numbers for pinging
+    stationid=[0,0] #station numbers for pinging
+    active = [] #taken from Excel file
+
+    for f in filenames:
+        read(f)
+    return
+
+
 def read(file):
     data=pd.read_excel(file,engine='openpyxl')       
     tempswitch=[] #instantiate switches last to make sure everything is there
@@ -314,7 +330,6 @@ class SignalHandler(QObject): #handles signals from other modules
 
     @pyqtSlot(int)
     def toggleOcc(self,message): #toggle occupancy of block
-        global lines
         lines[0].blocks[message].switchOccupancy()
         if(lines[0].blocks[message].occupied): #check if new block occupied
             self.sendBeacon.emit([message,lines[0].beaconByBlock(message)])
@@ -572,6 +587,9 @@ class FailureSelect(QWidget): #underline to show selected failure
             self.label.move(180+failmode*45,50) #move to selected failure button
             self.check=failmode #set check to backend value
 
+class FileSignal(QObject): #file button needs QObject to send signal
+    signal = pyqtSignal(list)
+
 class FileButton(QWidget): #button to select file
     def __init__(self,window):
         super().__init__()
@@ -584,14 +602,16 @@ class FileButton(QWidget): #button to select file
         self.label.setToolTip("Select File") #tells you what it does when you hover over it
 
         self.label.mousePressEvent = self.selectFile #select file when clicked
+        self.fileSignal = FileSignal()
 
     def selectFile(self, message):
         global fileselected
         global lines
-        filename, _ = QFileDialog.getOpenFileName(self, "Open File", "", "Excel Files (*.xlsx)") #open file select dialog
-        if filename: #read file if legitimate, using read() function
-            read(filename)
-        fileselected = True #let other parts know ehn file is selected
+        filenames,_ = QFileDialog.getOpenFileNames(self, "Open File", "", "Excel Files (*.xlsx)") #open file select dialog
+        if(filenames):
+            print(filenames)
+            print("emitting signal")
+            self.fileSignal.signal.emit(filenames)
 
 class FailureButton(QWidget): #button to select a failure, we make 3 of these
     def __init__(self,failnum,window): #button changes depending on what failure it represents
@@ -714,7 +734,7 @@ class SignalIcon(QWidget):
         self.linenum=obj.linenum #index of line object it belongs to
         self.signalid=obj.signalid #id of signal
         self.label=QLabel(window)
-        self.check=False
+        self.check=True
         center = lines[obj.linenum].blocks[obj.block].center #get center for locating on screen
         self.label.move(int((center[0]-0.25)*SCL),int((center[1]-0.225)*SCL))
         self.label.setStyleSheet(labelstyle)
@@ -746,6 +766,9 @@ class TransponderIcon(QWidget):
         self.label.move(int((center[0]-0.05)*SCL),int((center[1]-0.125)*SCL))
         self.label.setStyleSheet(labelstyle)
         self.setStyleSheet(tooltipstyle)
+
+    def update(self): #I do this so I can classify transponder as active so i can reset it
+        return
 
 class StationIcon(QWidget):
     def __init__(self,obj,window):
@@ -781,27 +804,15 @@ class Map(QWidget): #displays map
         self.move(0,0)
         self.setWindowTitle("Track Model Map") #window title
         self.setStyleSheet("background-color: lightyellow;") #light yellow background
-        passive.append(FileButton(self)) #add file select button
+        self.signals = SignalHandler()
+        fb = FileButton(self)
+        fb.fileSignal.signal.connect(self.renderGraphics)
+        passive.append(fb) #add file select button
         passive.append(HeaterSystem(self)) #add heater setup
         for i in range(4): #there are four failure buttons, the objects handle what they do
             passive.append(FailureButton((i),self)) #add failure buttons
         active.append(FailureSelect(self)) #this goes after the dynamic icons, we hide them behind this widget system
-        read("TrackModel/Red Line.xlsx") #read red line file
-        read("TrackModel/Green Line.xlsx") #read green line file
-
-        for line in lines: #adds components tied to every line object
-            for block in line.blocks: #adds all blocks
-                active.append(BlockIcon(block,self)) #updates for view
-            for switch in line.switches: #biggest components to smallest so all can be hovered
-                active.append(SwitchIcon(switch,self)) 
-            for crossing in line.crossings: #adds all crossings
-                active.append(CrossingIcon(crossing,self))
-            for signal in line.signals: #adds all signals
-                active.append(SignalIcon(signal,self))
-            for transponder in line.transponders: #adds all beacons
-                passive.append(TransponderIcon(transponder,self))  
-            for station in line.stations: #adds all stations
-                active.append(StationIcon(station,self))
+        
         #active.append(SpeedMeter(self)) #adds speed meter
         self.timer=QTimer() #timer for active components
         self.timer.timeout.connect(self.update) #connect timer to update method
@@ -811,9 +822,36 @@ class Map(QWidget): #displays map
         self.tenBaud.timeout.connect(self.tenBaudClock) #connect timer to update method
         self.tenBaud.start(1) #set clock speed of timer
 
-        self.signals=SignalHandler() #makes signal handler
+        self.renderGraphics(["TrackModel/Red Line.xlsx","TrackModel/Green Line.xlsx"]) #read red and green lines
+
+    def renderGraphics(self,filenames):
+        print("signal received")
+        global lines, active
+        active.clear() #remove active components
+        oldstuff = self.children()[9:] #all these widgets are made with the file select
+        for o in oldstuff:
+            o.deleteLater()
+
+        readFiles(filenames)
+        for line in lines: #adds components tied to every line object
+            for block in line.blocks: #adds all blocks
+                active.append(BlockIcon(block,self)) #updates for view
+            for switch in line.switches: #biggest components to smallest so all can be hovered
+                active.append(SwitchIcon(switch,self)) 
+            for crossing in line.crossings: #adds all crossings
+                active.append(CrossingIcon(crossing,self))
+            for signal in line.signals: #adds all signals
+                active.append(SignalIcon(signal,self))
+            print("these arent shown???")
+            for transponder in line.transponders: #adds all beacons
+                active.append(TransponderIcon(transponder,self))  
+            for station in line.stations: #adds all stations
+                active.append(StationIcon(station,self))
+        print("graphics rendered")
+        print(len(active))
+        self.update()
         self.show()
-    
+
     def tenBaudClock(self): #clock for 10 baud messages
         global lines
         global clock
