@@ -24,6 +24,7 @@ class TCmodel(QObject):
     authority_display = Signal(float)
     speed_limit = Signal(float)
     train_at_yard = Signal()
+    gonogo_display = Signal(bool)
 
 
     def __init__(self):
@@ -224,6 +225,7 @@ class TCmodel(QObject):
     @Slot (list)
     def wayside_stop(self, input):
         go_nogo = input[self.blocks]
+        self.gonogo_display.emit(go_nogo)
         #check if wayside stop is enabled
         if (go_nogo == 1):
             self.cut_power_and_enable_brake()
