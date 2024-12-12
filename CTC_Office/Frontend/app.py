@@ -48,6 +48,7 @@ class CTCApplication(QMainWindow):
         self.newTrainWidget = NewTrainWidget(Green)
         self.hlayout = QHBoxLayout()
         self.Manual_layout = QVBoxLayout()
+        self.TestBench_layout = QVBoxLayout()
         self.Auto_layout = QVBoxLayout()
         self.main = QWidget()
         self.clear = QPushButton("Clear")
@@ -117,30 +118,31 @@ class CTCApplication(QMainWindow):
 
         lbl4 = QLabel()
         lbl4.setText("Breaking the track")
-        self.Manual_layout.addWidget(lbl4)
-        self.Manual_layout.addWidget(self.breakBlok)
-        self.Manual_layout.addWidget(self.submitBreak)
+        self.maintenance_layout.addWidget(lbl4)
+        self.maintenance_layout.addWidget(self.breakBlok)
+        self.maintenance_layout.addWidget(self.submitBreak)
 
         lbl5 = QLabel()
         lbl5.setText("Fixing the track")
-        self.Manual_layout.addWidget(lbl5)
-        self.Manual_layout.addWidget(self.fixBlock)
-        self.Manual_layout.addWidget(self.submitFix)
+        self.maintenance_layout.addWidget(lbl5)
+        self.maintenance_layout.addWidget(self.fixBlock)
+        self.maintenance_layout.addWidget(self.submitFix)
         
-        self.Manual_layout.addWidget(QLabel("Switches"))
-        self.Manual_layout.addWidget(self.GreenSwitchs)
+        self.maintenance_layout.addWidget(QLabel("Switches"))
+        self.maintenance_layout.addWidget(self.GreenSwitchs)
         #Test bench stuff
-        self.Manual_layout.addWidget(lbl)
-        self.Manual_layout.addWidget(self.speed)
-        self.Manual_layout.addWidget(self.auth)
-        self.Manual_layout.addWidget(self.switchState)
-        self.Manual_layout.addWidget(scroll_area)
+        self.TestBench_layout.addWidget(lbl)
+        self.TestBench_layout.addWidget(self.speed)
+        self.TestBench_layout.addWidget(self.auth)
+        self.TestBench_layout.addWidget(self.switchState)
+        self.TestBench_layout.addWidget(scroll_area)
 
         #setting signals
         self.newTrainWidget.emitTrain.connect(self.handleNewGreenTrain)
 
         self.wrapperLayout = QHBoxLayout()
         self.ManualColumn = QWidget()
+        
         self.ManualColumn.setLayout(self.Manual_layout)
         self.wrapperLayout.addWidget(self.ManualColumn)
 
@@ -148,10 +150,15 @@ class CTCApplication(QMainWindow):
         self.MaintenaceColumn.setLayout(self.maintenance_layout)
         self.wrapperLayout.addWidget(self.MaintenaceColumn)
 
+        self.TestBenchColumn = QWidget()
+        self.TestBenchColumn.setLayout(self.TestBench_layout)
+        self.wrapperLayout.addWidget(self.TestBenchColumn)
+
+
         #self.AutoColumn = QWidget()
         #self.AutoColumn.setLayout(self.Auto_layout)
         
-        self.main.setLayout(self.Manual_layout)
+        self.main.setLayout(self.wrapperLayout)
 
         self.setCentralWidget(self.main)        
 
