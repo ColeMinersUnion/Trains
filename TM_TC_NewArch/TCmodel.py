@@ -63,6 +63,7 @@ class TCmodel(QObject):
         self.service_brake_deceleration = 1.2  # m/s^2
         self.stopped_by_wayside = 0
         self.approaching = 0
+        self.blocks = 0
 
         self.timer = QTimer()
         self.timer.setSingleShot(True)
@@ -84,14 +85,17 @@ class TCmodel(QObject):
     @Slot(float)
     def set_commanded_speed(self, commandedSpeed):
         """ Set the setpoint speed. """
-        self.commandedSpeed = commandedSpeed
+        if (self.stopped_by_wayside == 1):
+            self.commanded_speed = 0
+        else:
+            self.commandedSpeed = commandedSpeed
 
     @Slot(float)
     def set_current_speed(self, currentSpeed):
         """ Set the current velocity. """
         self.currentSpeed = currentSpeed
         self.update_current_speed_signal.emit(self.currentSpeed)
-        print(f"current speed: {self.currentSpeed} m/s")
+        #print(f"current speed: {self.currentSpeed} m/s")
 
     @Slot(bool)
     def set_ebrake(self, ebrake):
@@ -168,6 +172,7 @@ class TCmodel(QObject):
     @Slot (int)
     def block_switch(self, id):
         #set current distance to station to next value in authority string
+        self.blocks = self.blocks + 1
         self.blockID = id
         print(f" Block ID: {self.blockID}")
         if (self.blockID != self.prev_ID):
@@ -216,16 +221,17 @@ class TCmodel(QObject):
                 self.pwr = 0
                 self.sbrake_ask(True)
     
-    @Slot (bool)
-    def wayside_stop(self, go_nogo):
+    @Slot (list)
+    def wayside_stop(self, input):
+        go_nogo = input[self.blocks]
         #check if wayside stop is enabled
         if (go_nogo == 1):
             self.cut_power_and_enable_brake()
             self.stopped_by_wayside = 1
         else:
-            if (self.stopped_by_wayside == 1):
-                self.sbrake_ask(False)
-                self.commandedSpeed = self.current_speed_limit
+            self.sbrake_ask(False)
+            self.set_commanded_speed(self.current_speed_limit)
+            self.stopped_by_wayside = 0
 
     def distance_traveled(self):
         delta_d = self.currentSpeed*T + (0.5*self.acceleration*T*T)
@@ -254,9 +260,18 @@ class TCmodel(QObject):
     def cut_power_and_enable_brake(self):
         """ Cut power and enable the service brake. """
         self.pwr = 0
-        self.commandedSpeed = 0
+        self.set_commanded_speed(0)
         self.sbrake_ask(True)
         print("Power cut and service brake enabled.") 
+
+    
+    #def set_block_length(self):
+     #   """ Set the block length based on authority values. """
+      #  auth_list = self.full_authority.split(';')
+      #  if len(auth_list) < 1:
+      #      self.block_length = 10  # Default value
+      #  else:
+      #      self.block_length = int(auth_list[0]) if int(auth_list[1]) < int(auth_list[2]) else int(auth_list[0]) - int(auth_list[1])
 
     def calculate_current_authority(self):
         """ Calculate the current authority based on speed and acceleration. """
@@ -264,6 +279,7 @@ class TCmodel(QObject):
         #print(f"Current Authority: {self.curr_authority}")
         #emit signal for display
         self.authority_display.emit(self.curr_authority)
+
 
         if self.curr_authority <= float(self.full_authority.split(';')[1]):
             authority_list = self.full_authority.split(';')
@@ -281,7 +297,7 @@ class TCmodel(QObject):
             if (self.currentSpeed > 0):
                 self.pwr = 0
                 self.sbrake_ask(True)
-                self.commandedSpeed = 0
+                self.set_commanded_speed(0)
                 self.set_ebrake_from_driver(True)
                 self.atStation = 0 #maybeeee
                 #whatever else to stop immediatly
@@ -296,11 +312,11 @@ class TCmodel(QObject):
                 self.timer.start(10000) #not 60 seconds yet, put 60000 for 60 sec
         elif (self.leaving_station == True):
             self.sbrake_ask(False)
-            self.commandedSpeed = self.current_speed_limit
+            self.set_commanded_speed(self.current_speed_limit)
 
     def on_timer_timeout(self):
         self.atStation = -1 #no longer at station, can resume
-        self.commandedSpeed = self.current_speed_limit
+        self.set_commanded_speed(self.current_speed_limit)
         self.leaving_station = True
         self.sbrake_ask(False)
         self.approaching = 0
