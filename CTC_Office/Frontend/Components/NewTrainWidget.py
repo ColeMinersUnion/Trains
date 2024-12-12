@@ -11,12 +11,12 @@ Blue = ['Station B', 'Station C']
 Red = ['Shadyside', 'Herron Ave', 'Swissville', 
        'Penn Station', 'Steel Plaza', 'First Ave',
        'Station Square', 'South Hills Junction']
-Green = ['Pioneer', 'Edgebrook', 'Station D', 
-         'Whited', 'South Bank', 'Central',
-         'Inglewood', 'Overbrook', 'Glenbury',
-         'Dormont', 'MT Lebanon', 'Poplar',
-         'Castle Shannon', 'Dormont', 'Glenbury',
-         'Overbrook', 'Inglewood', 'Central']
+Green = ['Glenbury', 'Dormont', 'Mt. Lebanon', 
+         'Poplar', 'Castle Shanon', 'Poplar',
+         'Dormont', 'Glenbury', 'Overbrook',
+         'Inglewood', 'Central', 'Whited',
+         'Station D', 'Whited', 'Sout Bank',
+         'Central', 'Inglewood', 'Overbrook']
 
 class Station:
     def __init__(self, stations: list):

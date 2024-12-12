@@ -1,5 +1,4 @@
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel, QTextEdit, QFileDialog
-from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import pyqtSignal
 
 class filedialogdemo(QWidget):
