@@ -183,9 +183,24 @@ class CTC_Office:
                     cls.line[line].graph[i].closed = False
                     print(f"Track {i} was fixed")
 
-                             
+    #finds the time to get to a station
+    def timeToStop(cls, line: str, station: int) -> int:
+        seconds = 0
+        if(line == "Green"):
+            cls.skips = Skiplist(cls.line["Green"], greenSkips())
+            
+        else:
+            return 0
         
+        rt = cls.skips.skipRoute(0, station)
+        for block in rt:
+            seconds +=  3.6 * cls.line["Green"].graph[block].block_length / cls.line["Green"].graph[block].speed_limit
+            
+        #1/3.6 is the conversion from km/h to m/s
 
+        return seconds
+        
+    
     
 
 
