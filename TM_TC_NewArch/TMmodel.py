@@ -69,6 +69,8 @@ class TrainModel(QObject):
     @Slot(float)
     def set_power(self, power: float):
 
+        print(power)
+
         self.calcTotalMass()
         
         if self.serviceBrakeStatus and (not self.brakeFailureStatus): # if the service brake is activated
@@ -81,7 +83,7 @@ class TrainModel(QObject):
                 self.vn = 0.0
 
         elif self.emergencyBrakeStatus: # if the emergency brake is active
-
+            self.vn_1 = self.vn
             if(self.vn > 0):
                 self.an = (-2.73 / 8)
                 self.vn += self.an
@@ -90,7 +92,7 @@ class TrainModel(QObject):
                 self.vn = 0.0
 
         elif self.engineFailureStatus:  # if the engine failure is active
-
+            self.vn_1 = self.vn
             if(self.vn > 0):
                 self.an = ((-9.8) * 0.2 / 8)
                 self.vn += self.an
@@ -172,6 +174,7 @@ class TrainModel(QObject):
     """ For toggling the service brake (True = On)"""
     @Slot()
     def toggleServiceBrake(self):
+        print("called serv toggle")
         if(not self.brakeFailureStatus):
             self.serviceBrakeStatus = not self.serviceBrakeStatus
             self.service_brake_updated.emit(self.serviceBrakeStatus)
@@ -215,6 +218,7 @@ class TrainModel(QObject):
     #incomplete, but exists for future use
     @Slot(list)
     def beaconInformation(self, beacon: list):
+        print(beacon)
         if(not self.signalFailureStatus):
             if(self.blockID[self.i - 1] == beacon[0]):
                 # logic will go here once the format is known

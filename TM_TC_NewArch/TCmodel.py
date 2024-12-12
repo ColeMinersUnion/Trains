@@ -10,7 +10,7 @@ class TCmodel(QObject):
     ebrake_change = Signal(bool)  # Signal to send emergency brake change to TM
     internal_ebrake_signal = Signal(bool)  
     #meep meep check on ebrake signals, make sure it does NOT need approval
-    internal_sbrake = Signal()
+    internal_sbrake = Signal(bool)
     internal_hl = Signal(bool)
     internal_left_doors = Signal(bool)
     internal_right_doors = Signal(bool)
@@ -376,4 +376,4 @@ class TCmodel(QObject):
     @Slot (bool)
     def sbrake_slot(self, sb):
         self.sbrake = sb
-        self.internal_sbrake.emit()
+        self.internal_sbrake.emit(self.sbrake)
