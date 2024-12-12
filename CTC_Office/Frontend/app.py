@@ -347,7 +347,7 @@ class CTCApplication(QMainWindow):
             numStations += len(train.schedule.routes)
         maint = sum([x.maintenance for x in self.Office.line["Green"].graph])
         closed = sum([x.closed for x in self.Office.line["Green"].graph])
-        self.throughput.setText(f"Trains: {numTrains}\nStations Serviced: {numStations}\nBlocks in Maintenance: {maint}\nBlocks Closed: {closed}")
+        self.throughput.setText(f"Trains: {numTrains}\nStations Serviced: {numStations-1}\nBlocks in Maintenance: {maint}\nBlocks Closed: {closed}")
 
 
 
