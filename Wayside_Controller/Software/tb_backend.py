@@ -1,10 +1,73 @@
-#test case 1
+# This is a testbench for the Green Line PLC code
+
+# test case 1
 #tests: authority, switches, signals and crossings with empty track and edge cases that test switch states
 #from SoftwareShell import WaysideShell
 from GreenMainPLC import GreenPLC
 
 def main():
-    occ=[False for i in range(151)]
+    occ=[False for i in range(1,150)]
+    occ2=[False,False,True,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,True,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,True,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,False]
+    
+    occ3=[False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,True,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,True,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,True,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,
+          False,False,False,False,False,False]
     sw77=False
     sw85=False
     sw28=False
@@ -26,8 +89,8 @@ def main():
     print(f"Crossing 19: {crossing19}, \nCrossing 108: {crossing108}")'''
 
     #testing update_values function that should update all authority, switches, signals, crossings:
-    auth,switch77,switch85,switch28,switch13,signal77,signal85,signal28,signal13,crossing19,crossing108=plc.update_values(occ)
-    for i in range(151):
+    auth,switch77,switch85,switch28,switch13,signal77,signal85,signal28,signal13,crossing19,crossing108=plc.update_values(occ3)
+    for i in range(1,150):
         print(f"Green Line Authority Block {i}: {auth[i]} ")
     print(f"Switch 77: {switch77}, \nSwitch 85: {switch85}, \nSwitch 28: {switch28}, \nSwitch 13: {switch13}")
     print(f"Signal 77: {signal77}, \nSignal 85: {signal85}, \nSignal 28: {signal28}, \nSignal 13: {signal13}")
