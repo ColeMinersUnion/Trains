@@ -75,6 +75,20 @@ class WaysideShell(QMainWindow):
         self.signal_52=True
         self.crossing_47=False
 
+        #occupancy:
+        for i in range(47):
+            self.wayside_block_table.setItem(i-0, 0, QTableWidgetItem(""))   
+        for i in range(69,151):
+            self.wayside_block_table.setItem(i-0,0, QTableWidgetItem(""))
+        #authority:
+        for i in range(41):
+            self.wayside_block_table.setItem(i-0,1, QTableWidgetItem(""))
+        for i in range(69,151):
+            self.wayside_block_table.setItem(i-0,1, QTableWidgetItem(""))
+        
+
+
+        self.wayside_block_table.setSelectionMode(QTableWidget.SelectionMode.NoSelection) 
         #lets user toggle buttons manually
         self.manual_inputs()
 
@@ -280,7 +294,7 @@ class WaysideShell(QMainWindow):
         for i in range(len(self.authority)):
             self.wayside_block_table.setItem(i,1, QTableWidgetItem(str(self.authority[i])))'''
         #update green line block table state and authority from Track Model
-        for i in range(47):
+        '''for i in range(47):
             self.wayside_block_table.setItem(i-0,0, QTableWidgetItem(str(self.occupancy[i])))
 
         for i in range(41):
@@ -290,7 +304,38 @@ class WaysideShell(QMainWindow):
             self.wayside_block_table.setItem(i-0,0, QTableWidgetItem(str(self.occupancy[i])))
         
         for i in range(69, 150):
-            self.wayside_block_table.setItem(i-0,1, QTableWidgetItem(str(self.authority[i])))
+            self.wayside_block_table.setItem(i-0,1, QTableWidgetItem(str(self.authority[i])))'''
+        
+        #update occupancy in table to have colors
+        for i in range(47):
+            block=self.wayside_block_table.item(i-0, 0)
+            if self.occupancy[i]:
+                block.setBackground(QtGui.QColor(0, 0, 255))
+            else:
+                block.setBackground(QtGui.QColor(16, 16, 16))
+        for i in range(69,151):
+            block = self.wayside_block_table.item(i-0, 0)
+            if self.occupancy[i]:
+                block.setBackground(QtGui.QColor(0, 0, 255))
+            else:
+                block.setBackground(QtGui.QColor(16, 16, 16))
+
+        
+
+
+        #update authority in table with colors
+        for i in range(41):
+            block = self.wayside_block_table.item(i-0, 1)
+            if self.authority[i]:
+                block.setBackground(QtGui.QColor(0, 255, 0))
+            else:
+                block.setBackground(QtGui.QColor(255, 0, 0))
+        for i in range(69,151):
+            block = self.wayside_block_table.item(i-0, 1)
+            if self.authority[i]:
+                block.setBackground(QtGui.QColor(0, 255, 0))
+            else:
+                block.setBackground(QtGui.QColor(255, 0, 0))
         
         #update red line wayside 1 block table state and authority
         for i in range(21,46):
