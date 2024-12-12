@@ -335,7 +335,7 @@ class TCView(QWidget):
 
     def sbrake_toggle(self):
         #attempt to toggle, wont work if theres a brake failure
-        self.sbrake_signal.emit
+        self.sbrake_signal.emit()
 
     def update_sbrake_label(self, sb):
         self.sbrake = sb

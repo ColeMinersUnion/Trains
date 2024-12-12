@@ -1,21 +1,50 @@
 # train_model/view.py
-from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout, QPushButton
+from PyQt6.QtWidgets import (QWidget, QLabel, QVBoxLayout, QPushButton, QSlider, QButtonGroup,
+                             QLineEdit, QGroupBox, QFormLayout, QGridLayout, QComboBox, QSpinBox,
+                             QDoubleSpinBox, QCheckBox, QRadioButton, QHBoxLayout)
 from PyQt6.QtCore import pyqtSignal as Signal
 from PyQt6.QtCore import pyqtSlot as Slot
-from PyQt6.QtWidgets import QSlider, QButtonGroup, QLineEdit, QGroupBox, QFormLayout, QGridLayout, QComboBox, QSpinBox, QDoubleSpinBox, QCheckBox, QRadioButton
+from PyQt6.QtGui import QFont, QColor, QPalette
 
 class TrainModelView(QWidget):
-    
     eBrake_toggle = Signal()
     eFailure_toggle = Signal()
     bFailure_toggle = Signal()
     sFailure_toggle = Signal()
-    
-    def __init__(self):
 
+    def __init__(self):
         super().__init__()
 
-        # Create labels
+        # Set global styling
+        self.setStyleSheet("""
+            QLabel {
+                font-size: 14px;
+            }
+            QPushButton {
+                background-color: #007BFF;
+                color: white;
+                border: none;
+                padding: 10px;
+                border-radius: 5px;
+            }
+            QPushButton:hover {
+                background-color: #0056b3;
+            }
+            QGroupBox {
+                font-weight: bold;
+                font-size: 16px;
+                border: 2px solid #007BFF;
+                border-radius: 5px;
+                margin-top: 10px;
+            }
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                subcontrol-position: top center;
+                padding: 0 10px;
+            }
+        """)
+
+        # Create labels with improved fonts
         self.v_label = QLabel("Train Velocity: 0.0 mph")
         self.a_label = QLabel("Train Acceleration: 0.0 m/s^2")
         self.length_label = QLabel("Train length: 105.6 ft")
@@ -31,6 +60,7 @@ class TrainModelView(QWidget):
         self.service_brake_label = QLabel("Service Brake: OFF")
         self.station_label = QLabel("Current Station: ")
 
+        # Create buttons with consistent style
         self.emergencyBrakeButton = QPushButton("Emergency Brake: OFF")
         self.emergencyBrakeButton.clicked.connect(self.update_emergency_brake_status)
 
@@ -43,24 +73,18 @@ class TrainModelView(QWidget):
         self.brakeFailureButton = QPushButton("Brake Failure: OFF")
         self.brakeFailureButton.clicked.connect(self.update_brake_failure_status)
 
+        # Main layout
         main_layout = QVBoxLayout(self)
 
         # Section 1: Metrics View
         metrics_group = QGroupBox("Train Metrics")
         metrics_layout = QVBoxLayout()
-        metrics_layout.addWidget(self.v_label)
-        metrics_layout.addWidget(self.a_label)
-        metrics_layout.addWidget(self.length_label)
-        metrics_layout.addWidget(self.width_label)
-        metrics_layout.addWidget(self.height_label)
-        metrics_layout.addWidget(self.passengers_label)
-        metrics_layout.addWidget(self.trainMass_label)
-        metrics_layout.addWidget(self.temperature_label)
-        metrics_layout.addWidget(self.intLight_label)
-        metrics_layout.addWidget(self.extLight_label)
-        metrics_layout.addWidget(self.left_door_label)
-        metrics_layout.addWidget(self.right_door_label)
-        metrics_layout.addWidget(self.service_brake_label)
+        metrics_labels = [self.v_label, self.a_label, self.length_label, self.width_label,
+                          self.height_label, self.passengers_label, self.trainMass_label,
+                          self.temperature_label, self.intLight_label, self.extLight_label,
+                          self.left_door_label, self.right_door_label, self.service_brake_label]
+        for label in metrics_labels:
+            metrics_layout.addWidget(label)
         metrics_group.setLayout(metrics_layout)
 
         # Section 2: Passenger View
@@ -86,6 +110,13 @@ class TrainModelView(QWidget):
         # Set the layout and window title
         self.setLayout(main_layout)
         self.setWindowTitle("Train Model View")
+
+    def set_button_style(self, button, is_on):
+        if is_on:
+            button.setStyleSheet("background-color: red; color: white; border: none; padding: 10px; border-radius: 5px;")
+        else:
+            button.setStyleSheet("background-color: #007BFF; color: white; border: none; padding: 10px; border-radius: 5px;")
+
 
     def update_velocity(self, velocity: float):
         """ Update the velocity display. """
@@ -146,6 +177,7 @@ class TrainModelView(QWidget):
     @Slot(bool)
     def update_eBrake_label(self, eBrake_status: bool):
         self.emergencyBrakeButton.setText("Emergency Brake: ON" if eBrake_status else "Emergency Brake: OFF")
+        self.set_button_style(self.emergencyBrakeButton, eBrake_status)
 
     @Slot()
     def update_engine_failure_status(self):
@@ -166,13 +198,16 @@ class TrainModelView(QWidget):
     def update_eFailure_label(self, input: bool):
         """ Update button text """
         self.engineFailureButton.setText("Engine Failure: ON" if input else "Engine Failure: OFF")
+        self.set_button_style(self.engineFailureButton, input)
 
     @Slot(bool)
     def update_sFailure_label(self, input: bool):
         """ Update button text """
         self.signalFailureButton.setText("Signal Failure: ON" if input else "Signal Failure: OFF")
+        self.set_button_style(self.signalFailureButton, input)
 
     @Slot(bool)
     def update_bFailure_label(self, input: bool):
         """ Update button text """
         self.brakeFailureButton.setText("Brake Failure: ON" if input else "Brake Failure: OFF")
+        self.set_button_style(self.brakeFailureButton, input)

@@ -63,7 +63,7 @@ class Train(QWidget):
         self.train_model.right_door_updated.connect(self.train_controller_model.right_doors_slot)
         self.train_model.intLights_updated.connect(self.train_controller_model.lights_slot)
         self.train_model.extLights_updated.connect(self.train_controller_model.headlights_slot)
-        #no brake connection yet, coming soon
+        self.train_model.service_brake_updated.connect(self.train_controller_model.sbrake_slot)
 
         # Connect the train controller to the train model for brake inputs and outputs
         self.train_controller_model.ebrake_change.connect(self.train_model.toggleEmergencyBrake)
