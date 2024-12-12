@@ -208,7 +208,6 @@ class TrainModel(QObject):
             print("Moving onto " + str(self.blockID[self.i]))
             self.i += 1
 
-    @Slot(int)
     def requestBeaconInformation(self):
         self.current_block_ID.emit(self.blockID[self.i - 1])
 
