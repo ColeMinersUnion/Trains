@@ -69,3 +69,6 @@ class Train(QWidget):
         self.train_controller_model.ebrake_change.connect(self.train_model.toggleEmergencyBrake)
         self.train_model.emergency_brake_updated.connect(self.train_controller_model.set_ebrake)
 
+        #go nogo signal connect
+        self.train_model.boolean_authority_signal.connect(self.train_controller_model.wayside_stop)
+
