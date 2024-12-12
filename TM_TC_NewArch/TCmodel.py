@@ -1,5 +1,5 @@
 # train_controller/model.py
-from PyQt5.QtCore import QObject, pyqtSignal as Signal, pyqtSlot as Slot, QTimer
+from PyQt6.QtCore import QObject, pyqtSignal as Signal, pyqtSlot as Slot, QTimer
 import os, time as timer
 
 T = 0.125  # Period of control loop in seconds 
