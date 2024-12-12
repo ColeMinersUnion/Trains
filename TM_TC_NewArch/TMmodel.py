@@ -209,10 +209,10 @@ class TrainModel(QObject):
             #print("Moving onto " + str(self.blockID[self.i]))
             self.i += 1
 
-    @Slot()
-    def updateStationName(self):
-        self.stationName = self.beaconData[1]
-        self.station_name_updated.emit(self.stationName)
+    # @Slot()
+    # def updateStationName(self):
+    #     self.stationName = self.beaconData[1]
+    #     self.station_name_updated.emit(self.stationName)
 
     @Slot(list)
     def beaconInformation(self, beacon: list):

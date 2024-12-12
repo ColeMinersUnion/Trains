@@ -52,7 +52,7 @@ def trainFactory(routeInfo: list, authority: str):
         # sends request for beacon data as block number
         #trains[-1].train_model.current_block_ID.connect(tm_signals.getBeacon)
         # sends beacon data as list with block number and beacon data
-        tm_signals.sendBeacon.connect(trains[-1].train_model.beaconInformation)
+        #tm_signals.sendBeacon.connect(trains[-1].train_model.beaconInformation)
     except TypeError:
         print('Oops')
 

@@ -25,7 +25,7 @@ class TCmodel(QObject):
     speed_limit = Signal(float)
     train_at_yard = Signal()
     gonogo_display = Signal(bool)
-    station_name_display = Signal()
+    #station_name_display = Signal()
 
 
     def __init__(self):
@@ -248,7 +248,7 @@ class TCmodel(QObject):
     def dist_from_station(self):
         """ Calculate the distance from the station based on current speed and deceleration. """
         self.curr_dist = self.curr_dist - float(self.distance_traveled())
-        if (self.curr_dist <= 0 and self.currentSpeed <= 0.2 and self.leaving_station == False):
+        if (self.curr_dist <= 10 and self.currentSpeed <= 0.2 and self.leaving_station == False):
             #self.curr_dist = 0
             self.atStation = self.atStation + 1
         elif(self.leaving_station == True):
@@ -297,7 +297,7 @@ class TCmodel(QObject):
         #at a station
         #print(f"station value: {self.atStation}")
         if (self.atStation == 1):
-            self.station_name_display.emit()
+            #self.station_name_display.emit()
             if (self.currentSpeed > 0):
                 self.pwr = 0
                 self.sbrake_ask(True)

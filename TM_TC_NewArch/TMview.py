@@ -67,7 +67,7 @@ class TrainModelView(QWidget):
         self.left_door_label = QLabel("Left Doors: Closed")
         self.right_door_label = QLabel("Right Doors: Closed")
         self.service_brake_label = QLabel("Service Brake: OFF")
-        self.station_label = QLabel("Current Station: ")
+        self.station_label = QLabel("Current Station: Glenbury")
 
         # Create buttons with consistent style
         self.emergencyBrakeButton = QPushButton("Emergency Brake: OFF")
