@@ -143,7 +143,7 @@ class Signal:
     def __init__(self,linenum,block):
         self.linenum = linenum #index in lines of Line object it belongs to
         self.block = block
-        self.on = False
+        self.on = True
         self.signalid = signalid[linenum] #gives id in line
         signalid[linenum] = signalid[linenum]+1 #gets next id
         self.msg = "Signal (" + linenames[linenum] + " Line, Block " + str(block) + ")\nGo: "
@@ -295,6 +295,8 @@ class SignalHandler(QObject): #handles signals from other modules
         for b in lines[0].blocks: #gather authorities
             authorities.append(b.authority) 
         self.sendAuthorities.emit(authorities)
+        print("Sending authority")
+        print(authorities)
 
     @pyqtSlot(list) #expecting block and number of passengers
     def getPassengers(self,message):
@@ -313,20 +315,27 @@ class SignalHandler(QObject): #handles signals from other modules
     @pyqtSlot(int)
     def toggleOcc(self,message): #toggle occupancy of block
         lines[0].blocks[message].switchOccupancy()
-        print("Block occupancy toggled " + str(message) + " " + str(lines[0].blocks[message].occupied))
 
     @pyqtSlot(list)
     def getHardwareAuthority(self,message): #get authorities from hardware track controller
+        global lines
+        print("hardware authority received")
+        print(message)
         for i in range(len(lines[0].blocks)): #make list with authorities from HW's ranges, [41,76] for green
-            if(i<41 or i>76):
+            if(i>40 and i<69):
                 lines[0].blocks[i].setAuth(message[i])
+                print(str(i) + " " + str(message[i]) + " " + str(lines[0].blocks[i].authority))
         self.callAuthSend()
 
     @pyqtSlot(list)
     def getSoftwareAuthority(self,message): #get authorities from software track controller
+        global lines
+        print("software authority received")
+        print(message)
         for i in range(len(lines[0].blocks)): #make list with authorities from SW's ranges, [1,40] and [77,151] for green
-            if(i>40 and i<77):
+            if(i<41 or i>68):
                 lines[0].blocks[i].setAuth(message[i])
+                print(str(i) + " " + str(message[i]) + " " + str(lines[0].blocks[i].authority))
         self.callAuthSend()
 
     # Switch signals
@@ -630,6 +639,10 @@ class BlockIcon(QWidget):
     def setFailure(self,event): #set failure
         global failmode 
         objfail = lines[self.obj.linenum].blocks[self.obj.number].failure
+
+        authority = lines[self.obj.linenum].blocks[self.obj.number].authority
+        print(authority)
+
         if(objfail != failmode): #only update backend if new value
             lines[self.obj.linenum].blocks[self.obj.number].failure = failmode #change back end object
             lines[self.obj.linenum].blocks[self.obj.number].occupied = (failmode in [1,3]) #occupied if rail or power failure so no train goes there     
