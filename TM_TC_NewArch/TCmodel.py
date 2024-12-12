@@ -237,7 +237,7 @@ class TCmodel(QObject):
 
     def distance_traveled(self):
         delta_d = self.currentSpeed*T + (0.5*self.acceleration*T*T)
-        print(f"current acceleration: {self.acceleration} m/s^2")
+        #print(f"current acceleration: {self.acceleration} m/s^2")
         return delta_d
     @Slot ()
     def sbrake_slot(self):
