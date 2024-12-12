@@ -71,4 +71,8 @@ class Train(QWidget):
 
         #go nogo signal connect
         self.train_model.boolean_authority_signal.connect(self.train_controller_model.wayside_stop)
+        
+        #display station name
+        self.train_controller_model.station_name_display.connect(self.train_model.updateStationName)
+
 
