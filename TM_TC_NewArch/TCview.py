@@ -267,7 +267,7 @@ class TCView(QWidget):
         #
     @Slot (bool)
     def gonogo_update(self, value):
-        self.gonogo_label.setText(f"Wayside Value: {'STOP' if value else 'GO'}")
+        self.gonogo_label.setText(f"Wayside Value: {'GO' if value else 'STOP'}")
 
     @Slot ()
     def update_lights_label(self):
