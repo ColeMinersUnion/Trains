@@ -11,7 +11,7 @@ Right click on the downloaded folder and hit "Open in terminal."
 ### Run the program
 Enter the following command into your terminal. 
 ```bash
-Train_Controller_Simulation
+./Train_Controller_Simulation.sh
 ```
 ### Hardware
 Plug in the wayside hardware via ethernet. Press connect on the Hardware Wasyside Controller. 
