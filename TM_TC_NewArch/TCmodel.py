@@ -224,7 +224,8 @@ class TCmodel(QObject):
     
     @Slot (list)
     def wayside_stop(self, input):
-        go_nogo = input[self.blocks]
+        go_nogo = input[self.blockID]
+        print(f"wayside stop: {go_nogo}")
         self.gonogo_display.emit(go_nogo)
         #check if wayside stop is enabled
         if (go_nogo == False):
