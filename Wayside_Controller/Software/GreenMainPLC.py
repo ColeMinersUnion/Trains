@@ -326,7 +326,7 @@ class GreenPLC:
         #Q ends at 100 and goes back into N (85)
         #start looking ahead into N at the end of the loop (blocks 85 down to 77)
         #SWITCH 85 AGAIN after going round the loop must be switched so train can move forward
-        if (self.switch_85==True or any(occupancy[85:77])==True):
+        if (any(occupancy[85:77])==True):
             self.authority[85]=False
         else:
             self.authority[85]=True
