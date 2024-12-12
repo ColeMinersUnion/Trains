@@ -94,6 +94,7 @@ wsh_window.wsh_tm_sig62.connect(tm_signals.getSignal62) #signal 62
 wsh_window.wsh_tm_maint.connect(tm_signals.toggleOcc) 
 
 wsh_window.wsh_tm_authority.connect(tm_signals.getHardwareAuthority) #hardware authority (41 to 76) as list of booleans
+wss_window.wss_tm_authority.connect(tm_signals.getSoftwareAuthority) #software authority (0 to 40, 77 to 151) as list of booleans
 
 #connects CTC to train command
 ctc.emitTrain.connect(trainFactory)
