@@ -50,7 +50,7 @@ class TrainModelView(QWidget):
         self.length_label = QLabel("Train length: 105.6 ft")
         self.width_label = QLabel("Train width: 8.7 ft")
         self.height_label = QLabel("Train height: 11.2 ft")
-        self.passengers_label = QLabel("Passengers/Crew: 3 people")
+        self.passengers_label = QLabel("Passengers/Crew: 2 people")
         self.trainMass_label = QLabel("Current Mass: 0 lbs")
         self.temperature_label = QLabel("Cabin Temperature: 65.0 °F")
         self.intLight_label = QLabel("Interior Lights: OFF")

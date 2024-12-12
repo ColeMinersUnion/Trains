@@ -38,10 +38,10 @@ class TrainModel(QObject):
         self.an_1 = 0.0
         self.maxPower = 120000.0
         self.trainMass = (81800 * 4.44822 / 9.8)
-        self.maxSpeed = 700000.0/3600.0
+        self.maxSpeed = 70000.0/3600.0
         self.extLightStatus = False
         self.intLightStatus = False
-        self.passengerCount = 3 # to represent the intial crew
+        self.passengerCount = 2 # to represent the intial crew
         self.avgHumanMass = (150 * 4.44822 / 9.8) #in kg
         self.totalMass = 0.0
         self.temperature = 65.0
@@ -68,8 +68,6 @@ class TrainModel(QObject):
     """ velocity calculation """
     @Slot(float)
     def set_power(self, power: float):
-
-        print(power)
 
         self.calcTotalMass()
         
@@ -101,7 +99,7 @@ class TrainModel(QObject):
                 self.vn = 0.0
         else:   # if nothing is active keep chugging
             """ Simulate the train's response to power. """
-            if power <= 0:
+            if power < 0:
                 self.an = 0
                 self.vn = 0
             else:
@@ -174,7 +172,6 @@ class TrainModel(QObject):
     """ For toggling the service brake (True = On)"""
     @Slot()
     def toggleServiceBrake(self):
-        print("called serv toggle")
         if(not self.brakeFailureStatus):
             self.serviceBrakeStatus = not self.serviceBrakeStatus
             self.service_brake_updated.emit(self.serviceBrakeStatus)
@@ -202,26 +199,24 @@ class TrainModel(QObject):
     def checkBlockChange(self):
         #print("odometer: ", self.totalDistanceTravelled, "currentVel: ", self.vn, "prevVel ", self.vn_1)
         if(self.milestoneDistance <= self.totalDistanceTravelled):
-            print('Block changed')
+            #print('Block changed')
             if(self.i>0):
                 self.block_change.emit(self.blockID[self.i - 1])
-                print("Moving off of " + str(self.blockID[self.i - 1]))
+                #print("Moving off of " + str(self.blockID[self.i - 1]))
             self.milestoneDistance += self.blockLength[self.i]
             self.block_change.emit(self.blockID[self.i])
-            print("Moving onto " + str(self.blockID[self.i]))
+            #print("Moving onto " + str(self.blockID[self.i]))
             self.i += 1
 
     @Slot(int)
     def requestBeaconInformation(self):
         self.current_block_ID.emit(self.blockID[self.i - 1])
 
-    #incomplete, but exists for future use
     @Slot(list)
     def beaconInformation(self, beacon: list):
-        print(beacon)
         if(not self.signalFailureStatus):
             if(self.blockID[self.i - 1] == beacon[0]):
-                # logic will go here once the format is known
+                self.stationName = beacon[1]
                 self.station_name_updated.emit(self.stationName)
                 self.TC_beacon_info_signal.emit(beacon)
         
