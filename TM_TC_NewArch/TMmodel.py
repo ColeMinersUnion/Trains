@@ -259,5 +259,6 @@ class TrainModel(QObject):
     @Slot(list)
     def addPassengersToTrain(self, input: list):
         # add new passengers to the train car
-        self.passengerCount += input[1]
-        self.passengerCount_updated.emit(self.passengerCount)
+        if(self.blockID[self.i - 1] == input[0]): #if right car
+            self.passengerCount += input[1]
+            self.passengerCount_updated.emit(self.passengerCount)
