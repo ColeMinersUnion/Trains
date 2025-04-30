@@ -1,0 +1,100 @@
+#Used as the iterator along a route
+from TrainSchedule import TrainSchedule
+from Node import Node
+from Graph import Graph
+import time # I think I need this for the delays going between blocks
+
+class Train:
+
+    def __init__(self, schedule: TrainSchedule, line: Graph = None, id: int = 0, location: Node = None) -> None:
+        self.id = id #* ID#
+        self.location = location #* Node
+        self.line = line #* Graph
+        self.speed = 0.0 
+        self.authority = 0.0
+        self.Next_Stop = schedule.stations[1]
+        self.schedule = schedule
+        self.curr_route = 0
+        self.curr_route_index = 0
+    
+    def move(self) -> bool:
+        #The notion is that I can do like a while(move())
+        #Sort of thing and in the loop id:      time.sleep(block_length/speed)
+        if(len(self.schedule.routes) == 0 ):
+            print("No Routes")
+            return False
+        #if(self.location == self.schedule.routes[self.curr_route].end):
+        #    if(self.curr_route + 1 <= len(self.schedule.routes)):
+        #        self.curr_route += 1
+        #        self.Next_Stop = self.schedule.stations[self.curr_route + 1]
+        #    else:
+        #        print("Train has made it back to the station")
+        #        return False #!Poof train should disappear
+        else:
+            try:
+            
+                #print(self.schedule.routes[self.curr_route].paths[self.curr_route_index])
+            #print("H")
+                self.location = self.line.graph[self.schedule.routes[self.curr_route].paths[self.curr_route_index]]
+
+                if(self.curr_route_index + 1 <= len(self.schedule.routes[self.curr_route].paths)):
+                    self.curr_route_index += 1
+            except:
+            #    print("IDK")
+                return False
+            #!I really hope that works, I did not think this through enough
+        return True
+
+    def waitTime(self, speedUp: bool = False) -> float:
+        #wait = self.location.block_length / self.location.speed_limit
+        if(speedUp):
+            return 0.36
+        else:
+            return 3.6
+        
+    def speedy(self):
+        try:
+            return self.location.speed_limit
+        except:
+            return 0
+    
+    def auth(self, block = -1):
+        if block == -1:
+            block = self.curr_route_index
+        try:
+            self.authority = 0
+            for i in self.schedule.routes[self.curr_route].paths[block : ]:
+                self.authority += self.line.graph[i].block_length
+            if(self.schedule.routes[self.curr_route].paths[-1] != 0):
+                temp = (self.line.graph[self.schedule.routes[self.curr_route].paths[-1]].block_length/2)
+            else:
+                temp = (self.line.graph[self.schedule.routes[self.curr_route].paths[-1]].block_length)
+            return self.authority + temp
+        except:
+            print("oops")
+            return 0
+    
+    def stringAuth(self):
+        strAuth = ""
+        temp = self.curr_route
+        for r in range(len(self.schedule.routes)):
+            self.curr_route = r
+            for i in range(len(self.schedule.routes[r].paths)+1):
+                strAuth += f'{self.auth(i)};'
+        self.curr_route = temp
+        #print(strAuth)
+        return strAuth
+                
+    
+    
+if(__name__ == '__main__'):
+    #Making the route
+    from GetGreen import Green
+    green = Green()
+    from Default import greenDefault
+    Thomas = TrainSchedule(green, [])
+    from Route import Route
+    from Skiplist import Skiplist
+    from Default import greenSkips
+    skips = Skiplist(green, greenSkips())
+    

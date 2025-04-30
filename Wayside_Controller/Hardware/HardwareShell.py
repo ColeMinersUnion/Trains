@@ -1,0 +1,344 @@
+# receiver.py
+from PyQt6 import QtCore, QtGui, QtWidgets, uic
+from PyQt6.QtWidgets import *
+from PyQt6.QtCore import pyqtSlot , pyqtSignal
+import copy
+import socket
+import json
+from time import time
+
+
+class WaysideWindow(QMainWindow):
+    wsh_tm_authority = pyqtSignal(list)
+    ws_ctc_switch_result = pyqtSignal(bool)
+    wsh_tm_switch_58 = pyqtSignal(bool)
+    wsh_tm_switch_62 = pyqtSignal(bool)
+    wsh_tm_sig58 = pyqtSignal(bool)
+    wsh_tm_sig62 = pyqtSignal(bool)
+    ws_tm_maintenance = pyqtSignal(list)
+    wsh_ctc_occupancy = pyqtSignal(list)
+    wsh_ctc_safetyCheck = pyqtSignal(bool)
+    wsh_tm_maint = pyqtSignal(int)
+
+    #view
+    def __init__(self):
+        super().__init__()
+        uic.loadUi("Wayside_Controller/Hardware/app.ui", self)
+        
+        self.occupancy = [False for i in range(151)]
+        self.authority = [False for i in range(151)]
+        self.switch_58 = False
+        self.switch_62 = False
+        self.maintenance = [False for i in range(151)]
+        self.signal_58 = False
+        self.signal_62 = False
+        self.connected = False
+
+
+
+        self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    
+        self.server_ip = '192.168.2.2'
+        self.server_port = 9000
+  
+
+        for i in range(41, 77):
+            
+            self.wayside_block_table.setItem(i-41, 0, QTableWidgetItem(""))   
+
+        for i in range(41, 69):
+            self.wayside_block_table.setItem(i-41,1, QTableWidgetItem(""))
+
+        self.wayside_block_table.setSelectionMode(QTableWidget.SelectionMode.NoSelection)
+
+        self.update_ui()
+
+        #reads inputs from the user
+        self.user_inputs()
+
+        
+    def connect(self):
+        try:
+            start = time()
+            self.client_socket.connect((self.server_ip, self.server_port))
+            end = time()    
+            print(f"Connected to server {end - start} seconds") 
+            data = {
+                "input" : "say_hi",
+                "occ" : self.occupancy
+            }
+            self.send(data)
+            decoded_json = self.receive()
+            self.connected = True
+            self.authority = decoded_json["auth"]
+            self.update_ui()
+            self.wsh_tm_authority.emit(self.authority)
+        except socket.error as e:
+            self.server_ip = '127.0.0.1'
+            self.connect()
+            print(f"socket error: {e}")
+            self.client_socket.close()
+            print("socket closed")
+
+
+    #view
+    def user_inputs(self):
+        self.manual_sw58_button.clicked.connect(self.toggle_sw58)
+        self.manual_sw62_button.clicked.connect(self.toggle_sw62)
+        self.manual_sig58_button.clicked.connect(self.toggle_sig58)
+        self.manual_sig62_button.clicked.connect(self.toggle_sig62)
+        self.connect_green.clicked.connect(self.connect)
+
+
+
+    def send(self, data):
+        json_data = json.dumps(data)
+        length_prefix = f"{len(json_data):<10}"  # Fixed 10-byte length prefix
+        self.client_socket.sendall(length_prefix.encode('utf-8') + json_data.encode('utf-8'))
+
+
+    def receive(self):
+        length_prefix = self.client_socket.recv(10).decode('utf-8').strip()
+        message_length = int(length_prefix)
+        print(message_length)
+        message_data = self.client_socket.recv(message_length).decode('utf-8')
+        decoded_json = ""
+
+        try:
+            decoded_json = json.loads(message_data)
+
+        except json.JSONDecodeError:
+            remaining_length = message_length - len(message_data.encode('utf-8'))
+            if remaining_length > 0:
+                print(f"Receiving the remaining {remaining_length} bytes...")
+                remaining_data = self.client_socket.recv(remaining_length).decode('utf-8')
+                message_data += remaining_data  # Append the remaining data
+                try:
+                    decoded_json = json.loads(message_data)  # Try decoding again
+                    print("Decoded JSON after receiving more data:", decoded_json)
+                except json.JSONDecodeError as e:
+                    print("Failed to decode JSON even after receiving more data:", e)
+                    return None
+
+        return decoded_json
+
+    
+
+    #view
+    def update_ui(self):
+        for i in range(41, 77):
+            item = self.wayside_block_table.item(i-41, 0)
+            if self.occupancy[i]:
+                print("wsh occupied block:", i)
+                item.setBackground(QtGui.QColor(0, 0, 255))
+
+            else:
+                item.setBackground(QtGui.QColor(16, 16, 16))
+
+        for i in range(41, 69):
+            item = self.wayside_block_table.item(i-41, 1)
+            if self.authority[i]:
+                item.setBackground(QtGui.QColor(0, 255, 0))
+            else:
+                item.setBackground(QtGui.QColor(255, 0, 0))
+
+        if(self.switch_58):
+            self.wayside_elements_table.setItem(0,0, QTableWidgetItem("57 -> 58"))
+        else:
+            self.wayside_elements_table.setItem(0,0, QTableWidgetItem("57 -> Yard"))
+
+        if(self.switch_62): 
+            self.wayside_elements_table.setItem(1,0, QTableWidgetItem("62 -> 63"))
+        else:
+            self.wayside_elements_table.setItem(1,0, QTableWidgetItem("Yard -> 63"))
+
+        if(self.signal_58):
+            self.wayside_elements_table.setItem(2,0, QTableWidgetItem("Green"))
+        else:
+            self.wayside_elements_table.setItem(2,0, QTableWidgetItem("Red"))
+        
+        if(self.signal_62):
+            self.wayside_elements_table.setItem(3,0, QTableWidgetItem("Green"))
+        else:
+            self.wayside_elements_table.setItem(3,0, QTableWidgetItem("Red"))
+
+        # Disables manual mode if the track is occupied
+        if(any(self.occupancy[41:77])):
+            self.manual_sw58_button.setEnabled(False)
+            self.manual_sw62_button.setEnabled(False)
+            self.manual_sig58_button.setEnabled(False)
+            self.manual_sig62_button.setEnabled(False)
+        else:
+            self.manual_sw58_button.setEnabled(True)
+            self.manual_sw62_button.setEnabled(True)
+            self.manual_sig58_button.setEnabled(True)
+            self.manual_sig62_button.setEnabled(True)
+
+
+
+    @pyqtSlot(int)
+    def update_maint_switch(self, switch):
+        
+        if switch == 58:
+            input = "ctc_sw58"
+        elif switch == 62:
+            input = "ctc_sw62"
+
+        
+        data = {
+            "input" : input
+        }
+        self.send(data)
+        decoded_json = self.receive()
+        self.switch_58 = decoded_json["sw58"]
+        self.switch_62 = decoded_json["sw62"]
+        self.signal_58 = decoded_json["sig58"]
+        self.signal_62 = decoded_json["sig62"]
+        result = decoded_json["result"]
+        self.wsh_tm_switch_58.emit(self.switch_58)
+        self.wsh_tm_switch_62.emit(self.switch_62)
+        self.wsh_tm_authority.emit(self.authority)
+        self.wsh_ctc_safetyCheck.emit(result)
+        self.update_ui()
+
+    @pyqtSlot(list)
+    def update_occupancy(self, new_occ):
+        # Slot to update the label text
+        self.occupancy[41:77] = new_occ[41:77]
+        self.wsh_ctc_occupancy.emit(self.occupancy)
+        if self.connected:
+            self.send_occupancy(new_occ)
+        self.wsh_tm_authority.emit(self.authority)
+        self.update_ui()
+
+
+    def send_occupancy(self, occupancy):
+        
+        data = {
+            "input" : "tm_occupancy",
+            "occupancy": occupancy
+        }
+        self.send(data)
+        decoded_json = self.receive()
+        self.authority = decoded_json["auth"]
+        self.signal_58 = decoded_json["sig58"]
+        self.signal_62 = decoded_json["sig62"]
+        self.wsh_tm_authority.emit(self.authority)
+        self.update_ui()
+
+    def toggle_sw58(self):
+        data = {
+            "input": "ws_sw58"
+        }
+        if self.connected:
+            self.send(data)
+            decoded_json = self.receive()
+            self.switch_58 = decoded_json["sw58"]
+            self.authority = decoded_json["auth"]
+        else:
+            self.switch_58 = not self.switch_58
+        
+        self.ws_ctc_switch_result.emit({"result": True, "switch_58": self.switch_58, "switch_62": self.switch_62, "signal_58": self.signal_58, "signal_62": self.signal_62})
+        self.wsh_tm_switch_58.emit(not self.switch_58)
+        self.wsh_tm_authority.emit(self.authority)
+        print("Switch 58: ", self.switch_58)
+        self.update_ui()
+
+    def toggle_sw62(self):
+        data = {
+            "input": "ws_sw62"
+        }
+        if self.connected:
+            self.send(data)
+            decoded_json = self.receive()
+            self.switch_62 = decoded_json["sw62"]
+            self.authority = decoded_json["auth"]
+        else:
+            self.switch_62 = not self.switch_62
+        self.ws_ctc_switch_result.emit({"result": True, "switch_58": self.switch_58, "switch_62": self.switch_62, "signal_58": self.signal_58, "signal_62": self.signal_62})
+        self.wsh_tm_switch_62.emit(not self.switch_62)
+        self.wsh_tm_authority.emit(self.authority)
+        self.update_ui()
+
+
+    def toggle_sig58(self):
+        data = {
+            "input": "ws_sig58"
+        }
+        if self.connected:
+            self.send(data)
+            decoded_json = self.receive()
+            self.signal_58 = decoded_json["sig58"]
+        self.ws_ctc_switch_result.emit({"result": True, "switch_58": self.switch_58, "switch_62": self.switch_62, "signal_58": self.signal_58, "signal_62": self.signal_62})
+        self.wsh_tm_sig58.emit(self.signal_58)
+        self.wsh_tm_authority.emit(self.authority)
+        self.update_ui()
+
+
+    def toggle_sig62(self):
+        data = {
+            "input": "ws_sig62"
+        }
+        if self.connected:
+            self.send(data)
+            decoded_json = self.receive()
+            self.signal_62 = decoded_json["sig62"]
+        self.ws_ctc_switch_result.emit({"result": True, "switch_58": self.switch_58, "switch_62": self.switch_62, "signal_58": self.signal_58, "signal_62": self.signal_62})
+        self.wsh_tm_sig62.emit(self.signal_62)
+        self.wsh_tm_authority.emit(self.authority)
+        self.update_ui()
+
+
+
+    @pyqtSlot(list)
+    def update_maintenance(self, maint_prop):
+        print(maint_prop)
+        data = {
+            "input" : "ctc_maintenance",
+            "maint": maint_prop
+        }
+        self.send(data)
+        decoded_json = self.receive()
+        self.maintenance = decoded_json["maint"]
+        self.ws_tm_maintenance.emit(self.maintenance)
+        self.wsh_ctc_safetyCheck.emit(maint_prop == self.maintenance)
+        print("Maintenance64: ", self.maintenance[64])
+        self.wsh_ctc_occupancy.emit(self.occupancy)
+        for i in range(41, 77):
+            if self.maintenance[i]:
+                self.wsh_tm_maint.emit(i)
+        self.update_ui()
+
+
+    @pyqtSlot(int)
+    def update_switch(self, exit_block):
+        sw = False
+        if exit_block == 0:
+            sw = False
+        elif exit_block == 76:
+            sw = True
+        
+        data = {
+            "input" : "ctc_suggested_switch",
+            "switch": sw
+        }
+        if self.connected:
+            self.send(data)
+            decoded_json = self.receive()
+            result = decoded_json["result"]
+            self.switch_58 = decoded_json["sw58"]
+            self.switch_62 = decoded_json["sw62"]
+            self.signal_58 = decoded_json["sig58"]
+            self.signal_62 = decoded_json["sig62"]
+        #self.ws_ctc_switch_result.emit({"result": result, "switch_58": self.switch_58, "switch_62": self.switch_62, "signal_58": self.signal_58, "signal_62": self.signal_62})
+        self.wsh_tm_switch_58.emit(self.switch_58)
+        self.wsh_tm_sig58.emit(self.signal_58)
+        self.wsh_tm_switch_62.emit(self.switch_62)
+        self.wsh_tm_sig62.emit(self.signal_62)
+        self.wsh_tm_authority.emit(self.authority)
+        self.update_ui()
+
+
+if __name__ == "__main__":
+    ws = WaysideWindow()
+    ws.client_socket.sendall("Hello, World!")
